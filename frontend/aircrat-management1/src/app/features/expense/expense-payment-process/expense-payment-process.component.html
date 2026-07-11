@@ -1,0 +1,69 @@
+<div class="expense-payment-wrapper">
+  <section class="payment-header">
+    <div>
+      <span class="payment-eyebrow"><i class="fas fa-file-invoice-dollar"></i> Expense Payment</span>
+      <h1>Pay Approved Expense</h1>
+      <p>Complete a pending operating expense payment and generate the payment voucher.</p>
+    </div>
+    <button type="button" routerLink="/expense/payment-queue" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Expense Payment Queue
+    </button>
+  </section>
+
+  <div class="payment-alert error" *ngIf="errorMsg">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMsg }}
+  </div>
+  <div class="payment-alert success" *ngIf="successMsg">
+    <i class="fas fa-check-circle"></i> {{ successMsg }}
+  </div>
+
+  <div class="payment-card" *ngIf="loading">Loading expense payment information...</div>
+
+  <form class="payment-card payment-form" *ngIf="!loading && expense" [formGroup]="form" (ngSubmit)="payNow()">
+    <div class="readonly-grid">
+      <label>
+        Expense Reference
+        <input type="text" [value]="expenseReference()" readonly>
+      </label>
+      <label>
+        Category
+        <input type="text" [value]="expense.category || 'N/A'" readonly>
+      </label>
+      <label>
+        Payee / Vendor
+        <input type="text" [value]="expense.vendorName || 'N/A'" readonly>
+      </label>
+      <label>
+        Amount
+        <input type="text" [value]="'$' + formatAmount(expense.amount)" readonly>
+      </label>
+    </div>
+
+    <div class="editable-grid">
+      <label>
+        Payment Method
+        <select formControlName="paymentMethod">
+          <option *ngFor="let method of methods" [value]="method">{{ method }}</option>
+        </select>
+      </label>
+      <label>
+        Transaction Reference
+        <input type="text" formControlName="transactionReference" placeholder="Bank, card, wallet, or cash receipt id">
+      </label>
+      <label class="notes-field">
+        Notes
+        <textarea formControlName="notes" rows="4" placeholder="Optional payment note"></textarea>
+      </label>
+    </div>
+
+    <div class="payment-footer">
+      <div>
+        <span>Total Payable</span>
+        <strong>${{ expense.amount || 0 | number:'1.2-2' }}</strong>
+      </div>
+      <button type="submit" class="pay-btn" [disabled]="form.invalid || !canPay()">
+        <i class="fas fa-lock"></i> {{ submitting ? 'Processing...' : 'Pay Expense' }}
+      </button>
+    </div>
+  </form>
+</div>

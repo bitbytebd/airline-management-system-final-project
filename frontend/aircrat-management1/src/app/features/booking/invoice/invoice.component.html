@@ -1,0 +1,203 @@
+<div class="invoice-wrapper">
+  <div class="invoice-container" *ngIf="booking; else invoiceLoading">
+    <header class="invoice-header">
+      <div class="brand">
+        <div class="logo-circle">
+          <i class="fas fa-plane"></i>
+        </div>
+        <div class="brand-name">
+          <h1>SKYWARD</h1>
+          <span>International Airlines</span>
+        </div>
+      </div>
+      <div class="invoice-title">
+        <h2>Invoice / Travel Voucher</h2>
+        <div class="pnr-box">
+          <span>Booking Reference / PNR</span>
+          <strong>{{ booking.bookingReference || 'N/A' }}</strong>
+        </div>
+      </div>
+    </header>
+
+    <div class="status-banner">
+      <div class="status-left">
+        <i class="fas fa-check-circle"></i>
+        <span>{{ booking.status || 'N/A' }}</span>
+      </div>
+      <div class="status-right">
+        <small>Issued on: {{ booking.bookingDate || 'N/A' }}</small>
+      </div>
+    </div>
+
+    <main class="invoice-body">
+      <section class="info-grid">
+        <div class="card-box passenger-card">
+          <div class="card-icon"><i class="fas fa-user"></i></div>
+          <div class="card-content">
+            <h3>Passenger</h3>
+            <h2>{{ booking.passengerName || 'N/A' }}</h2>
+            <p><label>Passport:</label> {{ booking.passportNumber || 'N/A' }}</p>
+            <p><label>Email:</label> {{ booking.email || 'N/A' }}</p>
+            <p><label>Phone:</label> {{ booking.phone || 'N/A' }}</p>
+          </div>
+        </div>
+
+        <div class="card-box flight-card">
+          <div class="flight-visual">
+            <div class="city-code">
+              <small>FROM</small>
+              <h2>{{ booking.origin || 'N/A' }}</h2>
+              <time>{{ booking.departureTime || 'N/A' }}</time>
+            </div>
+            <div class="flight-line">
+              <i class="fas fa-plane"></i>
+              <small>{{ booking.flightNumber || 'N/A' }}</small>
+            </div>
+            <div class="city-code text-right">
+              <small>TO</small>
+              <h2>{{ booking.destination || 'N/A' }}</h2>
+              <time>{{ booking.arrivalTime || 'N/A' }}</time>
+            </div>
+          </div>
+
+          <div class="flight-meta-grid">
+            <div class="meta-item">
+              <label>Departure Date</label>
+              <span>{{ booking.departureDate || 'N/A' }}</span>
+            </div>
+            <div class="meta-item">
+              <label>Arrival Time</label>
+              <span>{{ booking.arrivalTime || 'N/A' }}</span>
+            </div>
+            <div class="meta-item">
+              <label>Class</label>
+              <span>{{ booking.classType || 'N/A' }}</span>
+            </div>
+            <div class="meta-item">
+              <label>Seat</label>
+              <span>{{ booking.seatNumber || 'N/A' }}</span>
+            </div>
+            <div class="meta-item">
+              <label>Trip Type</label>
+              <span>{{ booking.tripType || 'ONE_WAY' }}</span>
+            </div>
+            <div class="meta-item">
+              <label>Return Date</label>
+              <span>{{ booking.tripType === 'ROUND_TRIP' ? (booking.returnDate || 'N/A') : 'N/A' }}</span>
+            </div>
+            <div class="meta-item">
+              <label>Distance</label>
+              <span>{{ booking.totalDistance || 0 }} KM</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-grid">
+        <div class="detail-box">
+          <h4><i class="fas fa-users"></i> Passenger Count</h4>
+          <div class="mini-row"><span>Adults</span><strong>{{ booking.adultCount || 1 }}</strong></div>
+          <div class="mini-row"><span>Children</span><strong>{{ booking.childCount || 0 }}</strong></div>
+          <div class="mini-row"><span>Infants</span><strong>{{ booking.infantCount || 0 }}</strong></div>
+        </div>
+
+        <div class="detail-box">
+          <h4><i class="fas fa-suitcase-rolling"></i> Add-ons</h4>
+          <div class="mini-row"><span>Checked Bags</span><strong>{{ booking.checkedBags || 0 }}</strong></div>
+          <div class="mini-row"><span>Checked Weight</span><strong>{{ booking.checkedWeightKg || 0 }} kg</strong></div>
+          <div class="mini-row"><span>Cabin Weight</span><strong>{{ booking.cabinWeightKg || 0 }} kg</strong></div>
+          <div class="mini-row wrap"><span>Special Services</span><strong>{{ booking.specialServices || 'N/A' }}</strong></div>
+        </div>
+
+        <div class="detail-box">
+          <h4><i class="fas fa-credit-card"></i> Payment</h4>
+          <div class="mini-row"><span>Method</span><strong>{{ booking.paymentMethod || 'N/A' }}</strong></div>
+          <div class="mini-row"><span>Payment Status</span><strong>{{ booking.paymentStatus || 'N/A' }}</strong></div>
+          <div class="mini-row"><span>Booking Status</span><strong>{{ booking.status || 'N/A' }}</strong></div>
+        </div>
+      </section>
+
+      <section class="pricing-section">
+        <h4><i class="fas fa-receipt"></i> Fare Breakdown</h4>
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="right">Amount (USD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Base / Class Fare ({{ booking.classType || 'N/A' }})</td>
+              <td class="right">{{ (booking.baseFare || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Adult Fare Total</td>
+              <td class="right">{{ (booking.adultFareTotal || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Child Fare Total</td>
+              <td class="right">{{ (booking.childFareTotal || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Infant Fare Total</td>
+              <td class="right">{{ (booking.infantFareTotal || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Passenger Fare Total</td>
+              <td class="right">{{ (booking.passengerFareTotal || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Baggage Fee</td>
+              <td class="right">{{ (booking.baggageFee || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Special Service Fee</td>
+              <td class="right">{{ (booking.specialServiceFee || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Tax & Fees</td>
+              <td class="right">{{ (booking.tax || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr class="discount-row">
+              <td>Coupon Discount {{ booking.couponCode ? '(' + booking.couponCode + ')' : '' }}</td>
+              <td class="right">- {{ (booking.couponDiscount || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr class="discount-row">
+              <td>Loyalty Discount {{ paymentLoyaltyPointsUsed() ? '(' + paymentLoyaltyPointsUsed() + ' pts)' : '' }}</td>
+              <td class="right">- {{ paymentLoyaltyDiscount() | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td><strong>FINAL CHARGED AMOUNT</strong></td>
+              <td class="right total-price"><strong>${{ finalChargedAmount() | number:'1.2-2' }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+    </main>
+
+    <footer class="invoice-footer">
+      <div class="terms">
+        <small>Thank you for choosing Skyward Airlines. Please arrive at the airport at least 3 hours before departure with valid travel documents.</small>
+      </div>
+
+      <div class="action-buttons no-print">
+        <button routerLink="/booking" class="btn-back">
+          <i class="fas fa-arrow-left"></i> Booking List
+        </button>
+        <button (click)="print()" class="btn-print">
+          <i class="fas fa-print"></i> Print Invoice
+        </button>
+        <button (click)="goToTicket()" class="btn-ticket" type="button">
+          <i class="fas fa-ticket-alt"></i> View Ticket
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <ng-template #invoiceLoading>
+    <div class="invoice-container loading-state">Loading invoice...</div>
+  </ng-template>
+</div>

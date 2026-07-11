@@ -1,0 +1,25 @@
+<footer class="main-footer">
+  <section class="footer-brand">
+    <div class="brand-mark"><i class="fas fa-paper-plane"></i></div>
+    <div>
+      <h3>Skyward Airlines Control Center</h3>
+      <p>Enterprise airline operations workspace for Mousumi Akter.</p>
+    </div>
+  </section>
+
+  <section class="footer-quick-links" aria-label="Workspace quick links">
+    <a *ngFor="let link of quickLinks" [routerLink]="link.route">
+      <i [class]="link.icon"></i>
+      <span>{{ link.label }}</span>
+    </a>
+  </section>
+
+  <section class="footer-bottom">
+    <span>2026 Skyward Airlines. All rights reserved.</span>
+    <div class="policy-links">
+      <a routerLink="/home">Public Home</a>
+      <a routerLink="/user-portal">User Portal</a>
+      <a routerLink="/auth/login">Admin Login</a>
+    </div>
+  </section>
+</footer>

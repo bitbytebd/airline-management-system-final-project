@@ -1,0 +1,78 @@
+<section class="flight-page">
+  <div class="flight-hero">
+    <div>
+      <button type="button" class="back-link" (click)="backToSource()">
+        <i class="fas fa-arrow-left"></i>
+        {{ sourceModule === 'aircraft' ? 'Back to Aircraft' : sourceModule === 'airline' ? 'Back to Airline' : 'Workspace' }}
+      </button>
+      <div class="eyebrow"><i class="fas fa-plane-departure"></i> Flight Operations</div>
+      <h1>Flight Management Dashboard</h1>
+      <p>Manage routes, timings, fares, status, and schedule readiness for international reservation operations.</p>
+      <div class="hero-actions">
+        <a routerLink="/flight/new" class="primary-btn"><i class="fas fa-plus"></i> Add Flight</a>
+        <a routerLink="/flight/schedule" class="ghost-btn"><i class="fas fa-calendar-days"></i> Flight Schedule</a>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <span>Scheduled Network</span>
+      <strong>{{ flights.length }}</strong>
+      <small>active flight records</small>
+      <div><i class="fas fa-route"></i> Live route and fare control</div>
+      <div><i class="fas fa-clock"></i> Departure and arrival visibility</div>
+    </div>
+  </div>
+
+  <div class="card-container">
+    <div class="card">
+      <div class="table-responsive">
+        <table class="enterprise-table">
+          <thead>
+            <tr>
+              <th>FLIGHT NO</th>
+              <th>ORIGIN</th>
+              <th>DESTINATION</th>
+              <th>DEP DATE</th>
+              <th>DEP TIME</th>
+              <th>ARR DATE</th>
+              <th>ARR TIME</th>
+              <th>BASE FARE</th>
+              <th>STATUS</th>
+              <th style="text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of flights">
+              <td><div class="flight-code">{{ f.flightNumber }}</div></td>
+              <td><span class="city-name">{{ getCityDisplay(f.origin) }}</span></td>
+              <td><span class="city-name">{{ getCityDisplay(f.destination) }}</span></td>
+              <td><span class="date-text">{{ f.departureDate | date:'dd MMM, yyyy' }}</span></td>
+              <td><span class="time-badge">{{ formatTime(f.departureTime) }}</span></td>
+              <td><span class="date-text">{{ f.arrivalDate | date:'dd MMM, yyyy' }}</span></td>
+              <td><span class="time-badge">{{ formatTime(f.arrivalTime) }}</span></td>
+              <td><span class="price-tag">${{ f.basePrice }}</span></td>
+              <td>
+                <span class="status-pill" [ngClass]="{
+                  'status-scheduled': f.status==='Scheduled',
+                  'status-cancelled': f.status==='Cancelled',
+                  'status-delayed': f.status==='Delayed',
+                  'status-landed': f.status==='Landed'
+                }">{{ f.status }}</span>
+              </td>
+              <td style="text-align: right;">
+                <button (click)="onEdit(f.id)" class="action-btn edit-btn" title="Edit Flight"><i class="fas fa-edit"></i></button>
+                <button (click)="onDelete(f.id)" class="action-btn delete-btn" title="Delete Flight"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr *ngIf="flights.length === 0">
+              <td colspan="10" class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h4>No Flights Found</h4>
+                <p>Start by adding a new flight schedule.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

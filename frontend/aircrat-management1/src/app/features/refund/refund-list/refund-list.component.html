@@ -1,0 +1,186 @@
+<div class="rl-page">
+
+  <!-- HEADER -->
+  <div class="refund-hero">
+    <div class="rl-title-group">
+      <span class="refund-eyebrow">Passenger Recovery Desk</span>
+      <h1><i class="fas fa-undo-alt"></i> Refund Management</h1>
+      <p>Process cancellations, penalty decisions, approvals and payment recovery with booking-connected airline workflow.</p>
+      <div class="refund-hero-actions">
+        <button class="rl-btn-new" (click)="goToInitiate()">
+          <i class="fas fa-plus"></i> Initiate Refund
+        </button>
+        <a routerLink="/refund/pending" class="refund-secondary-btn">
+          <i class="fas fa-tasks"></i> Approval Queue
+        </a>
+      </div>
+    </div>
+    <div class="refund-hero-panel">
+      <span>Processed refunds</span>
+      <strong>{{ stats.processedCount }}</strong>
+      <small>Total refunded {{ formatAmount(stats.totalRefunded) }}</small>
+    </div>
+  </div>
+
+  <div class="rl-notice" *ngIf="notice">
+    <i class="fas fa-check-circle"></i> {{ notice }}
+    <button type="button" (click)="notice = ''"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- STATS KPI -->
+  <div class="rl-kpi-row">
+    <div class="kpi-card pending" (click)="setFilter('PENDING')" [class.active]="activeTab==='PENDING'">
+      <div class="kpi-icon"><i class="fas fa-hourglass-half"></i></div>
+      <div class="kpi-info">
+        <h2>{{ stats.pendingCount }}</h2>
+        <span>Pending</span>
+      </div>
+    </div>
+
+    <div class="kpi-card approved" (click)="setFilter('APPROVED')" [class.active]="activeTab==='APPROVED'">
+      <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+      <div class="kpi-info">
+        <h2>{{ stats.approvedCount }}</h2>
+        <span>Approved</span>
+      </div>
+    </div>
+
+    <div class="kpi-card processed" (click)="setFilter('PROCESSED')" [class.active]="activeTab==='PROCESSED'">
+      <div class="kpi-icon"><i class="fas fa-credit-card"></i></div>
+      <div class="kpi-info">
+        <h2>{{ stats.processedCount }}</h2>
+        <span>Processed</span>
+      </div>
+    </div>
+
+    <div class="kpi-card rejected" (click)="setFilter('REJECTED')" [class.active]="activeTab==='REJECTED'">
+      <div class="kpi-icon"><i class="fas fa-ban"></i></div>
+      <div class="kpi-info">
+        <h2>{{ stats.rejectedCount }}</h2>
+        <span>Rejected</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="rl-toolbar">
+    <div class="tabs-pill">
+      <button [class.active]="activeTab === 'ALL'" (click)="setFilter('ALL')">All Requests</button>
+    </div>
+
+    <div class="search-box refund-search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search reference, booking, passenger, email or flight" [(ngModel)]="searchQuery" (input)="onSearchInput()" (focus)="onSearchInput()" (keyup.enter)="onSearch()">
+      <button *ngIf="searchQuery" (click)="clearSearch()"><i class="fas fa-times"></i></button>
+      <div class="refund-suggestions" *ngIf="showSuggestions">
+        <button type="button" *ngFor="let item of suggestions" (click)="selectSuggestion(item)">
+          <strong>{{ item.refundReference }}</strong>
+          <span>{{ item.passengerName }} | {{ item.bookingReference }} | {{ item.flightNumber }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE CONTAINER -->
+  <div class="rl-table-card">
+    
+    <div *ngIf="isLoading" class="rl-loader">
+      <i class="fas fa-spinner fa-spin"></i> Loading Data...
+    </div>
+
+    <div class="rl-table-wrapper" *ngIf="!isLoading">
+      
+      <div class="rl-empty" *ngIf="refunds.length === 0">
+        <i class="fas fa-folder-open"></i>
+        <h4>No Refunds Found</h4>
+      </div>
+
+      <table class="rl-data-table" *ngIf="refunds.length > 0">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Passenger</th>
+            <th>Flight Info</th>
+            <th>Amounts</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th style="text-align:center;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of refunds">
+            
+            <td>
+              <strong class="text-primary">{{ r.refundReference }}</strong>
+              <div class="sub-text">BNF: {{ r.bookingReference }}</div>
+            </td>
+
+            <td>
+              <div class="user-cell">
+                <div class="avatar"><i class="fas fa-user"></i></div>
+                <div class="info">
+                  <strong>{{ r.passengerName }}</strong>
+                  <span>{{ r.passengerEmail }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <div class="flight-cell">
+                <strong><i class="fas fa-plane"></i> {{ r.flightNumber }}</strong>
+                <span>{{ r.flightRoute }}</span>
+              </div>
+            </td>
+
+            <td>
+              <div class="price-cell">
+                <span class="old">Orig: {{ formatAmount(r.originalAmount) }}</span>
+                <span class="new">Refund: <b>{{ formatAmount(r.refundAmount) }}</b></span>
+              </div>
+            </td>
+
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(r.status)">
+                <!-- ✅ FIX: Safe handling of icon class -->
+                <i class="fas" [ngClass]="statusMeta[r.status]?.icon || 'fa-question'"></i>
+                {{ r.status }}
+              </span>
+            </td>
+
+            <td>{{ formatDate(r.requestedAt) }}</td>
+
+            <td class="action-cell">
+              <!-- ✅ FIX: Check if id exists before passing -->
+              <button *ngIf="r.status === 'PENDING'" 
+                      class="btn-icon approve" 
+                      [disabled]="isActionLoading(r.id)"
+                      (click)="approve(r.id!)" title="Approve">
+                <i class="fas" [class.fa-check]="!isActionLoading(r.id)" [class.fa-spinner]="isActionLoading(r.id)" [class.fa-spin]="isActionLoading(r.id)"></i>
+              </button>
+
+              <button *ngIf="r.status === 'APPROVED'" 
+                      class="btn-icon process" 
+                      [disabled]="isActionLoading(r.id)"
+                      (click)="process(r.id!)" title="Process Payment">
+                <i class="fas" [class.fa-paper-plane]="!isActionLoading(r.id)" [class.fa-spinner]="isActionLoading(r.id)" [class.fa-spin]="isActionLoading(r.id)"></i>
+              </button>
+
+              <button *ngIf="r.status === 'PENDING' || r.status === 'APPROVED'" 
+                      class="btn-icon reject" 
+                      [disabled]="isActionLoading(r.id)"
+                      (click)="reject(r.id!)" title="Reject">
+                <i class="fas fa-times"></i>
+              </button>
+
+              <span *ngIf="r.status === 'PROCESSED' || r.status === 'REJECTED'" class="locked">
+                <i class="fas fa-lock"></i>
+              </span>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,94 @@
+# General
+*.log
+logs/
+log/
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+*.pid
+*.zip
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+.cache/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.*
+!.env.example
+
+# Spring Boot / Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/timing.properties
+hs_err_pid*
+replay_pid*
+spring.log
+application-local.properties
+application-secrets.properties
+backend/airline/src/main/resources/application.properties
+backend/airline/src/main/resources/*seed*.sql
+backend/airline/src/main/resources/*completion*.sql
+
+# Gradle if present
+.gradle/
+build/
+
+# Database
+*.sql.gz
+*.dump
+*.bak
+*.sqlite
+*.db
+database/private/
+database/backups/
+database/full-data/
+database/generated/
+database/airway-database.sql
+!database/schema.sql
+!database/README.md
+
+# Runtime content
+uploads/
+backend/airline/uploads/
+backend/airline/logs/
+backend/airline/*.log
+backend/airline/log/
+generated-reports/
+tickets/
+invoices/
+vouchers/
+
+# Local document extraction helpers
+docs/PdfExtract.java
+
+# Machine-specific launchers
+run-*.bat
+run-*.cmd
+run-*.ps1
+start-*.bat
+start-*.cmd
+start-*.ps1

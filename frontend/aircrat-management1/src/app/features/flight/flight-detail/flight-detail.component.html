@@ -1,0 +1,150 @@
+<div class="form-container">
+  <div class="card">
+    
+    <div class="special-header">
+      <div class="icon-box"><i class="fas fa-plane-departure"></i></div>
+      <div class="text-box">
+        <h2>{{ isEdit ? 'Modify Flight Details' : 'Add New Flight' }}</h2>
+        <p>Fill in the details below to configure a new route and pricing</p>
+      </div>
+    </div>
+
+    <form *ngIf="form" [formGroup]="form" (ngSubmit)="onSubmit()" class="form-body">
+      
+      <h4 class="section-title">Flight Information</h4>
+      <div class="form-grid">
+        
+        <div class="field">
+          <label>Flight Number</label>
+          <input type="text" formControlName="flightNumber" placeholder="e.g. BG-123">
+        </div>
+        
+        <!-- ORIGIN FIELD -->
+        <div class="field">
+          <label>Origin</label>
+          <div class="input-wrapper">
+            <!-- formControlName="originInput" used instead of ngModel -->
+            <input type="text" 
+                   formControlName="originInput" 
+                   placeholder="Type code, city or country" 
+                   autocomplete="off"
+                   (blur)="resolveTypedAirport('origin')">
+            
+            <ul class="suggestion-list" *ngIf="filteredOrigins.length > 0">
+              <li *ngFor="let apt of filteredOrigins" (pointerdown)="$event.preventDefault(); $event.stopPropagation(); selectOriginAirport(apt)">
+                <strong>{{ apt.code }}</strong> - {{ apt.city }} ({{ apt.country }})
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- DESTINATION FIELD -->
+        <div class="field">
+          <label>Destination</label>
+          <div class="input-wrapper">
+            <input type="text" 
+                   formControlName="destinationInput" 
+                   placeholder="Type code, city or country" 
+                   autocomplete="off"
+                   (blur)="resolveTypedAirport('destination')">
+            
+            <ul class="suggestion-list" *ngIf="filteredDestinations.length > 0">
+              <li *ngFor="let apt of filteredDestinations" (pointerdown)="$event.preventDefault(); $event.stopPropagation(); selectDestinationAirport(apt)">
+                <strong>{{ apt.code }}</strong> - {{ apt.city }} ({{ apt.country }})
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- DATES & TIMES -->
+        <div class="field">
+          <label>Departure Date <span class="required">*</span></label>
+          <input type="date" formControlName="departureDate" (change)="calculateFlightDetails()">
+        </div>
+
+        <div class="field">
+          <label>Departure Time</label>
+          <input type="time" formControlName="departureTime" (change)="calculateFlightDetails()">
+        </div>
+
+        <div class="field">
+          <label>Arrival Date (Auto)</label>
+          <input type="date" formControlName="arrivalDate" readonly>
+        </div>
+
+        <div class="field">
+          <label>Arrival Time (Auto)</label>
+          <input type="time" formControlName="arrivalTime" readonly>
+        </div>
+      </div>
+
+      <!-- PRICING SECTION -->
+      <div class="pricing-section">
+        <h4 class="section-title-blue">Pricing & Details</h4>
+        <div class="form-grid">
+          <div class="field">
+            <label>Base Price ($) <span class="required">*</span></label>
+            <input type="number" formControlName="basePrice" placeholder="Enter base fare">
+            <small class="hint">Enter Economy class base fare</small>
+          </div>
+          <div class="field">
+            <label>Distance (KM) - Auto Calc</label>
+            <input type="number" formControlName="distance" readonly>
+            <small class="hint">Auto calculated based on route</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLASS PREVIEW -->
+      <div class="classes-wrapper">
+        <div class="classes-header">
+          <i class="fas fa-tags"></i> Available Classes Price Preview
+        </div>
+        <div class="class-grid">
+          <div class="class-card">
+            <div class="class-header blue">Economy</div>
+            <div class="class-body">
+              <label>Price ($)</label>
+              <input [value]="economyPrice | number:'1.0-0'" readonly>
+            </div>
+          </div>
+          <div class="class-card">
+            <div class="class-header purple">Premium</div>
+            <div class="class-body">
+              <label>Price ($)</label>
+              <input [value]="premiumPrice | number:'1.0-0'" readonly>
+            </div>
+          </div>
+          <div class="class-card">
+            <div class="class-header gold">Business</div>
+            <div class="class-body">
+              <label>Price ($)</label>
+              <input [value]="businessPrice | number:'1.0-0'" readonly>
+            </div>
+          </div>
+          <div class="class-card">
+            <div class="class-header dark">First Class</div>
+            <div class="class-body">
+              <label>Price ($)</label>
+              <input [value]="firstClassPrice | number:'1.0-0'" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
+        
+        <button type="submit" class="btn-save" [disabled]="isSaveDisabled()">
+          <i class="fas fa-check-circle"></i> Save Flight
+        </button>
+      </div>
+
+      <div class="validation-message" *ngIf="validationMessage">
+        <i class="fas fa-info-circle"></i>
+        {{ validationMessage }}
+      </div>
+
+    </form>
+  </div>
+</div>

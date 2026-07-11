@@ -1,0 +1,107 @@
+<div class="ops-page">
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Passenger Care Desk</span>
+      <h1>Special Assistance</h1>
+      <p>Coordinate mobility, medical, family and priority boarding services from one booking-connected workspace.</p>
+      <div class="hero-actions">
+        <button type="button" (click)="createRequest()" [disabled]="!selectedBooking || loading">
+          <i class="fas fa-paper-plane"></i> Submit Request
+        </button>
+        <span>{{ requests.length }} service requests tracked</span>
+      </div>
+    </div>
+    <div class="hero-card">
+      <i class="fas fa-hands-helping"></i>
+      <strong>Airport handoff</strong>
+      <small>Check-in, gate and cabin crew receive a single care summary.</small>
+    </div>
+  </section>
+
+  <section class="search-panel">
+    <div class="field-wrap">
+      <label>Find passenger booking</label>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="searchText" (focus)="showSuggestions = true" (input)="showSuggestions = true" placeholder="Search reference, name, email, phone or flight">
+      </div>
+      <div class="suggestions" *ngIf="showSuggestions && suggestions.length">
+        <button type="button" *ngFor="let booking of suggestions" (click)="selectBooking(booking)">
+          <span>{{ booking.passengerName }}</span>
+          <small>{{ booking.bookingReference }} | {{ booking.flightNumber }} | {{ booking.origin }} to {{ booking.destination }}</small>
+        </button>
+      </div>
+    </div>
+    <div class="booking-summary" *ngIf="selectedBooking">
+      <span>Selected Booking</span>
+      <strong>{{ selectedBooking.bookingReference }}</strong>
+      <small>{{ selectedBooking.passengerName }} | {{ selectedBooking.departureDate }} | {{ selectedBooking.classType }}</small>
+    </div>
+  </section>
+
+  <main class="workspace">
+    <section class="service-grid">
+      <button type="button" *ngFor="let option of options" class="service-card" [class.active]="selectedServices.includes(option.key)" (click)="toggleService(option.key)">
+        <i [class]="option.icon"></i>
+        <strong>{{ option.title }}</strong>
+        <small>{{ option.detail }}</small>
+      </button>
+    </section>
+
+    <aside class="request-panel">
+      <h2>Request Details</h2>
+      <label>Priority</label>
+      <select [(ngModel)]="priority">
+        <option>Standard</option>
+        <option>High</option>
+        <option>Critical</option>
+      </select>
+      <label>Contact Preference</label>
+      <select [(ngModel)]="contactPreference">
+        <option>Phone</option>
+        <option>Email</option>
+        <option>Check-in Counter</option>
+      </select>
+      <label>Operational Notes</label>
+      <textarea rows="5" [(ngModel)]="notes"></textarea>
+      <button type="button" class="primary" (click)="createRequest()" [disabled]="!selectedBooking || loading">
+        <i class="fas fa-check-circle"></i> Save Assistance
+      </button>
+    </aside>
+  </main>
+
+  <section class="queue">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Live Queue</span>
+        <h2>Service Requests</h2>
+      </div>
+    </div>
+    <div class="table-shell">
+      <table>
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Passenger</th>
+            <th>Flight</th>
+            <th>Services</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of requests">
+            <td>{{ item.requestReference || 'Pending' }}</td>
+            <td>{{ item.passengerName }}<small>{{ item.bookingReference }}</small></td>
+            <td>{{ item.flightNumber }}<small>{{ item.route }}</small></td>
+            <td>{{ item.services }}</td>
+            <td>{{ item.priority }}</td>
+            <td><span class="status" [class.done]="item.status === 'COMPLETED'">{{ item.status }}</span></td>
+            <td><button type="button" class="mini" (click)="completeRequest(item)" [disabled]="item.status === 'COMPLETED'">Complete</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

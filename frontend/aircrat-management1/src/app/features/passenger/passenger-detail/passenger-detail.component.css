@@ -1,0 +1,425 @@
+/* =========================================
+   1. LAYOUT & CARD (DEEP GREEN BORDER)
+   ========================================= */
+.form-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 14px;
+  background: linear-gradient(180deg, #dff7ff 0%, #f8fdff 55%, #fff 100%);
+}
+
+.form-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  overflow: hidden;
+  
+  /* Deep Green Border Added */
+  border: 1px solid #cfeef8;
+}
+
+/* =========================================
+   2. MAIN HEADER (DEEP GREEN THEME)
+   ========================================= */
+.form-header {
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(2,132,199,.94), rgba(56,189,248,.78)),
+    url('https://images.unsplash.com/photo-1517400508447-f8dd518b86db?auto=format&fit=crop&w=1600&q=80') center/cover;
+  background-blend-mode: multiply;
+  border-bottom: none; /* Removed default border */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Semi-transparent white */
+  background: rgba(255, 255, 255, 0.1);
+  color: white; /* White Icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.back-btn:hover { 
+  background: rgba(255, 255, 255, 0.2); 
+  border-color: rgba(255, 255, 255, 0.5); 
+}
+
+.title-group h2 { 
+  margin: 0; 
+  font-size: 22px; 
+  color: #ffffff; /* White Text */
+}
+.title-group p { 
+  margin: 4px 0 0; 
+  color: rgba(255, 255, 255, 0.8); /* Lighter white */
+  font-size: 13px; 
+}
+
+.header-right .logo-placeholder i { 
+  font-size: 48px; 
+  color: rgba(255, 255, 255, 0.6); 
+}
+
+/* =========================================
+   3. PHOTO UPLOAD SECTION
+   ========================================= */
+.photo-upload-section {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0 20px;
+  background: white;
+}
+.photo-container {
+  position: relative;
+}
+.photo-container img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #166534; /* Deep Green for Camera Button */
+  color: white;
+  border: 3px solid white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* =========================================
+   4. FORM BODY & SECTIONS
+   ========================================= */
+.form-body {
+  padding: 0 40px 40px;
+}
+
+.form-section {
+  margin-top: 35px;
+  padding-bottom: 35px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.form-section.no-border { border-bottom: none; }
+
+.profile-intelligence {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.profile-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.profile-summary-grid article {
+  padding: 16px;
+  border: 1px solid #bae6fd;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f0f9ff, #ffffff);
+}
+
+.profile-summary-grid span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.profile-summary-grid strong {
+  display: block;
+  margin-top: 6px;
+  color: #075985;
+  font-size: 24px;
+}
+
+.profile-panel {
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(14, 116, 144, .08);
+}
+
+.panel-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  background: #f0f9ff;
+}
+
+.panel-title h4 {
+  margin: 0;
+  color: #075985;
+  font-size: 15px;
+}
+
+.panel-title small {
+  color: #64748b;
+  font-weight: 700;
+}
+
+.mini-table-wrap {
+  overflow-x: auto;
+}
+
+.mini-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.mini-table th {
+  padding: 11px;
+  color: #ffffff;
+  background: #075985;
+  font-size: 11px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.mini-table td {
+  padding: 11px;
+  border-bottom: 1px solid #eef6ff;
+  color: #334155;
+  font-size: 12px;
+}
+
+.mini-status {
+  display: inline-flex;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.link-actions {
+  white-space: nowrap;
+}
+
+.link-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 4px;
+  border-radius: 8px;
+  color: #075985;
+  background: #e0f2fe;
+  text-decoration: none;
+}
+
+.two-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.history-list.compact {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.history-row strong,
+.history-row b {
+  color: #0f172a;
+  font-size: 12px;
+}
+
+.history-row span {
+  color: #64748b;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.mini-empty {
+  padding: 18px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Mini Section Headers (Deep Green Styling) */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  /* Deep Green Background for Icon Box */
+  background: #052e16; 
+  color: white; /* White Icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* Override previous variations to keep consistent Deep Green */
+.icon-box.blue, .icon-box.green, .icon-box.yellow {
+  background: #052e16;
+  color: white;
+}
+
+.section-header h3 { 
+  margin: 0; 
+  font-size: 16px; 
+  color: #052e16; /* Deep Green Text for Title */
+  font-weight: 700;
+}
+.section-header span { 
+  font-size: 13px; 
+  color: #64748b; 
+}
+
+/* =========================================
+   5. GRID & FIELDS (UPDATED LABEL COLOR)
+   ========================================= */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field.full-width { grid-column: span 2; }
+
+label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #052e16; /* Deep Green Color for Field Names */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.req { color: #ef4444; font-size: 14px; }
+
+/* Inputs with Deep Green Focus */
+input, select, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 14px;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #166534; /* Deep Green Border on Focus */
+  background: white;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(22, 101, 52, 0.1); /* Green Glow */
+}
+
+/* =========================================
+   6. FOOTER BUTTONS
+   ========================================= */
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+.left-info { font-size: 12px; color: #94a3b8; }
+.right-actions { display: flex; gap: 12px; }
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-ghost {
+  background: transparent;
+  color: #64748b;
+}
+.btn-ghost:hover { background: #f1f5f9; color: #0f172a; }
+
+.btn-submit {
+  background: linear-gradient(135deg, #052e16 0%, #166534 100%); /* Deep Green Gradient Button */
+  color: white;
+  padding: 12px 32px;
+}
+.btn-submit:hover { 
+  background: linear-gradient(135deg, #166534 0%, #15803d 100%); 
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.3);
+}
+.btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+
+/* =========================================
+   7. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .grid-layout { grid-template-columns: 1fr; }
+  .field.full-width { grid-column: span 1; }
+  .form-body { padding: 0 20px 20px; }
+  .profile-summary-grid,
+  .two-panel-grid {
+    grid-template-columns: 1fr;
+  }
+  .panel-title,
+  .history-row {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+}

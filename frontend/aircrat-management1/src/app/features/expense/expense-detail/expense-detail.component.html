@@ -1,0 +1,117 @@
+<div class="form-container">
+  <div class="card">
+    <div class="card-header">
+      <a routerLink="/expense/category" class="back-category"><i class="fas fa-arrow-left"></i> Back to Expense Categories</a>
+      <h3>{{ isEdit ? 'Update Expense' : 'Record New Expense' }}</h3>
+      <p class="subtitle">Fill in the details below</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      
+      <!-- Grid Layout for Inputs -->
+      <div class="form-grid">
+        
+        <!-- Category -->
+        <div class="form-group">
+          <label>Category <span class="required">*</span></label>
+          <select formControlName="category">
+            <option value="">Select Category</option>
+            <option value="AIRLINE_FARE">Airline Fare</option>
+            <option value="AIRPORT_TAX">Airport Tax</option>
+            <option value="SALARY">Salary</option>
+            <option value="MAINTENANCE">Maintenance</option>
+            <option value="UTILITY">Utility</option>
+            <option value="MARKETING">Marketing</option>
+            <option value="OFFICE_SUPPLIES">Office Supplies</option>
+            <option value="OTHER">Other</option>
+          </select>
+          <!-- Error Message -->
+          <small *ngIf="form.get('category')?.invalid && form.get('category')?.touched" class="error-text">Category is required</small>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group">
+          <label>Amount ($) <span class="required">*</span></label>
+          <input type="number" formControlName="amount" placeholder="0.00" step="0.01">
+          <small *ngIf="form.get('amount')?.invalid && form.get('amount')?.touched" class="error-text">Valid amount required</small>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label>Date <span class="required">*</span></label>
+          <input type="date" formControlName="expenseDate">
+        </div>
+
+        <!-- Department -->
+        <div class="form-group">
+          <label>Department</label>
+          <select formControlName="department">
+            <option value="">Select Department</option>
+            <option value="Operations">Operations</option>
+            <option value="Finance">Finance</option>
+            <option value="HR">HR</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+
+        <!-- Vendor Name -->
+        <div class="form-group">
+          <label>Vendor / Payee Name</label>
+          <input type="text" formControlName="vendorName" placeholder="Who was paid?">
+        </div>
+
+        <!-- Payment Method -->
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select formControlName="paymentMethod">
+            <option value="CASH">Cash</option>
+            <option value="BANK_TRANSFER">Bank Transfer</option>
+            <option value="CARD">Card</option>
+            <option value="CHEQUE">Cheque</option>
+          </select>
+        </div>
+
+        <!-- Reference No -->
+        <div class="form-group">
+          <label>Reference / Cheque No</label>
+          <input type="text" formControlName="referenceNo" placeholder="Transaction ID">
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+          <label>Status</label>
+          <select formControlName="status">
+            <option value="PENDING_PAYMENT">Pending Payment</option>
+            <option value="APPROVED">Approved</option>
+            <option value="PAID">Paid</option>
+            <option value="PENDING">Pending</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+
+        <!-- Description (Full Width) -->
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea formControlName="description" rows="3" placeholder="Expense details..."></textarea>
+        </div>
+
+        <!-- Booking Reference -->
+        <div class="form-group">
+          <label>Booking Reference (Optional)</label>
+          <input type="text" formControlName="bookingReference" placeholder="e.g. SKY-ABC12">
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-footer">
+        <button type="button" class="btn-cancel" routerLink="/expense">Cancel</button>
+        <button type="submit" class="btn-save" [disabled]="form.invalid">
+          <i class="fas fa-save"></i> Save Expense
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

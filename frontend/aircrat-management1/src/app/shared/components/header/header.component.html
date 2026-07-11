@@ -1,0 +1,67 @@
+<header class="topbar">
+    <div class="search-bar">
+        <i class="fas fa-search" style="color:#cbd5e1; margin-right:10px;"></i>
+        <input type="text"
+               placeholder="Search modules, pages, booking, payment, tracking..."
+               [(ngModel)]="searchTerm"
+               (focus)="onSearchFocus()"
+               (input)="onSearchChange()">
+        <div class="header-dropdown search-suggestions" *ngIf="showSearchSuggestions">
+            <button type="button" *ngFor="let item of filteredSuggestions" (click)="navigateSuggestion(item)">
+                <i class="fas fa-location-arrow"></i>
+                <span>{{ item.label }}</span>
+            </button>
+            <p *ngIf="!filteredSuggestions.length">No accessible page found</p>
+        </div>
+    </div>
+
+    <div class="topbar-right">
+        <div class="header-action-wrap">
+            <button type="button" class="icon-action notification" (click)="toggleNotifications()" aria-label="Open notifications">
+                <i class="fas fa-bell"></i>
+            </button>
+            <div class="header-dropdown notifications-panel" *ngIf="showNotifications">
+                <h3>Operational Alerts</h3>
+                <article *ngFor="let item of notifications">
+                    <strong>{{ item.title }}</strong>
+                    <span>{{ item.detail }}</span>
+                </article>
+                <p *ngIf="!notifications.length">No critical alerts</p>
+            </div>
+        </div>
+
+        <div class="header-action-wrap" *ngIf="canViewAdminProfiles">
+            <button type="button" class="admin-profiles-btn" (click)="toggleAdminProfiles()">
+                <i class="fas fa-users"></i>
+                <span>Staff Directory</span>
+            </button>
+            <div class="header-dropdown admin-profiles-panel" *ngIf="showAdminProfiles">
+                <h3>Staff Directory</h3>
+                <p *ngIf="loadingAdmins">Loading profiles...</p>
+                <div class="admin-profile-item" *ngFor="let user of adminProfiles">
+                    <span class="mini-avatar">
+                        <img *ngIf="resolveUserImage(user); else adminInitials" [src]="resolveUserImage(user)" [alt]="user.fullName + ' profile photo'">
+                        <ng-template #adminInitials>{{ getInitials(user) }}</ng-template>
+                    </span>
+                    <span class="admin-profile-copy">
+                        <strong>{{ user.fullName || user.username }}</strong>
+                        <small>{{ user.role }} &bull; {{ user.department || user.station || 'N/A' }}</small>
+                        <em>{{ user.email || 'No email' }}</em>
+                    </span>
+                </div>
+                <p *ngIf="!loadingAdmins && !adminProfiles.length">No profiles found</p>
+            </div>
+        </div>
+
+        <a class="profile" routerLink="/users/profile" title="Open My Profile" aria-label="Open My Profile">
+            <div class="profile-img">
+                <img *ngIf="profileImageUrl; else profileIcon" [src]="profileImageUrl" [alt]="displayName + ' profile photo'" (error)="onProfileImageError()">
+                <ng-template #profileIcon><i class="fas fa-user"></i></ng-template>
+            </div>
+            <div class="profile-info">
+                <h4>{{ displayName }}</h4>
+                <small>{{ roleLabel }} &bull; My Profile</small>
+            </div>
+        </a>
+    </div>
+</header>

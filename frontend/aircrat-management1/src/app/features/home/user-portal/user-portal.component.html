@@ -1,0 +1,215 @@
+<div class="portal-shell">
+  <header class="portal-nav">
+    <a routerLink="/" class="brand"><img src="assets/skyward-logo.svg" alt="Skyward Airlines logo"></a>
+    <div>
+      <a routerLink="/">Home</a>
+      <a routerLink="/auth/login">Admin Login</a>
+    </div>
+  </header>
+
+  <main class="portal-main" *ngIf="step !== 'dashboard'">
+    <section class="portal-hero">
+      <p>Secure passenger access</p>
+      <h1>User Portal</h1>
+      <span>View booking status, payments, loyalty points, and travel history by matching the phone number or email used in booking.</span>
+    </section>
+
+    <section class="auth-card">
+      <div class="steps">
+        <span [class.active]="step === 'phone'">1. Phone or Email</span>
+        <span>2. Passenger Match</span>
+        <span>3. Dashboard</span>
+      </div>
+
+      <div class="otp-note">
+        <strong>{{ portalModeTitle }}</strong>
+        <span>{{ portalModeMessage }}</span>
+      </div>
+
+      <form *ngIf="step === 'phone'" [formGroup]="phoneForm" (ngSubmit)="sendOtp()">
+        <label>
+          Phone number or email
+          <input type="text" formControlName="phoneNumber" placeholder="Type Phone Number or Email">
+        </label>
+        <small *ngIf="phoneForm.get('phoneNumber')?.touched && phoneForm.get('phoneNumber')?.invalid">
+          Please enter the phone number or email used in booking.
+        </small>
+        <button type="submit" [disabled]="loading">{{ loading ? 'Opening...' : 'Open Dashboard' }}</button>
+      </form>
+
+      <form *ngIf="step === 'otp'" [formGroup]="otpForm" (ngSubmit)="verifyOtp()">
+        <div class="otp-note">
+          OTP generated for <strong>{{ maskedPhone }}</strong>
+          <span>Use the floating OTP popup to continue securely.</span>
+        </div>
+        <label>
+          6 digit OTP
+          <input type="text" inputmode="numeric" formControlName="otp" placeholder="Enter OTP">
+        </label>
+        <small *ngIf="otpForm.get('otp')?.touched && otpForm.get('otp')?.invalid">
+          OTP must be exactly 6 digits.
+        </small>
+        <button type="submit" [disabled]="loading">{{ loading ? 'Verifying...' : 'Verify & Open Dashboard' }}</button>
+        <button type="button" class="ghost" (click)="showOtpModal()">Show OTP Popup</button>
+        <button type="button" class="ghost" (click)="reset()">Use another phone</button>
+      </form>
+
+      <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    </section>
+  </main>
+
+  <div class="sweet-overlay" *ngIf="otpModalOpen">
+    <div class="sweet-card" role="dialog" aria-modal="true" aria-label="Generated OTP">
+      <button type="button" class="sweet-close" (click)="closeOtpModal()">×</button>
+      <div class="sweet-icon">✓</div>
+      <h2>Portal OTP Generated</h2>
+      <p>Use this one-time code to open your Skyward passenger dashboard.</p>
+      <strong class="sweet-otp">{{ generatedOtp }}</strong>
+      <span>For: {{ maskedPhone }}</span>
+      <button type="button" (click)="closeOtpModal()">I Have the OTP</button>
+    </div>
+  </div>
+
+  <main class="dashboard-main" *ngIf="step === 'dashboard' && dashboard as dash">
+    <section class="dashboard-hero">
+      <div>
+        <p>Welcome back</p>
+        <h1>{{ dash.profile.passengerName || 'Passenger' }}</h1>
+        <span>{{ dash.profile.email }} | {{ dash.profile.phone }}</span>
+      </div>
+      <button type="button" (click)="reset()">Sign out</button>
+    </section>
+
+    <section class="summary-grid">
+      <article>
+        <span>Total Bookings</span>
+        <strong>{{ dash.summary.totalBookings }}</strong>
+      </article>
+      <article>
+        <span>Confirmed</span>
+        <strong>{{ dash.summary.confirmedBookings }}</strong>
+      </article>
+      <article>
+        <span>Total Paid</span>
+        <strong>{{ formatAmount(dash.summary.totalPaid) }}</strong>
+      </article>
+      <article>
+        <span>Loyalty Points</span>
+        <strong>{{ dash.summary.loyaltyPoints }}</strong>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel profile-panel">
+        <h2>Passenger Profile</h2>
+        <dl>
+          <div><dt>Passenger ID</dt><dd>{{ dash.profile.passengerId || 'N/A' }}</dd></div>
+          <div><dt>Passport</dt><dd>{{ dash.profile.passportNumber || 'N/A' }}</dd></div>
+          <div><dt>Email</dt><dd>{{ dash.profile.email || 'N/A' }}</dd></div>
+          <div><dt>Phone</dt><dd>{{ dash.profile.phone || 'N/A' }}</dd></div>
+        </dl>
+      </article>
+
+      <article class="panel latest-panel">
+        <h2>Latest Booking Status</h2>
+        <ng-container *ngIf="dash.latestBooking as latestBooking; else noBooking">
+          <div class="route-line">
+            <strong>{{ latestBooking.origin }}</strong>
+            <span></span>
+            <strong>{{ latestBooking.destination }}</strong>
+          </div>
+          <p>{{ latestBooking.flightNumber }} | {{ latestBooking.departureDate }} | Seat {{ latestBooking.seatNumber || 'Pending' }}</p>
+          <span class="status-pill" [ngClass]="statusClass(latestBooking.status)">{{ latestBooking.status }}</span>
+        </ng-container>
+        <ng-template #noBooking>
+          <p>No booking history is available for this phone number.</p>
+        </ng-template>
+      </article>
+
+      <article class="panel loyalty-panel">
+        <h2>Loyalty</h2>
+        <ng-container *ngIf="dash.loyaltyAccount as loyaltyAccount; else noLoyalty">
+          <strong>{{ loyaltyAccount.memberNumber }}</strong>
+          <p>{{ loyaltyAccount.tier }} tier with {{ loyaltyAccount.availablePoints }} available points.</p>
+          <div class="loyalty-strip">
+            <span>Earned {{ loyaltyAccount.totalPointsEarned }}</span>
+            <span>Redeemed {{ loyaltyAccount.totalPointsRedeemed }}</span>
+          </div>
+        </ng-container>
+        <ng-template #noLoyalty>
+          <p>No loyalty account is connected yet.</p>
+        </ng-template>
+      </article>
+    </section>
+
+    <section class="panel table-panel">
+      <h2>Booking History</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>PNR</th>
+              <th>Route</th>
+              <th>Flight</th>
+              <th>Date</th>
+              <th>Class</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let booking of dash.bookings">
+              <td>{{ booking.bookingReference }}</td>
+              <td>{{ booking.origin }} to {{ booking.destination }}</td>
+              <td>{{ booking.flightNumber }}</td>
+              <td>{{ booking.departureDate }}</td>
+              <td>{{ booking.classType }}</td>
+              <td>{{ formatAmount(booking.totalPrice) }}</td>
+              <td><span class="status-pill" [ngClass]="statusClass(booking.status)">{{ booking.status }}</span></td>
+              <td>
+                <button
+                  type="button"
+                  class="pay-now-btn"
+                  *ngIf="canPayBooking(booking); else noPaymentAction"
+                  (click)="openPublicPayment(booking)">
+                  Pay Now
+                </button>
+                <ng-template #noPaymentAction>
+                  <span class="muted-action">-</span>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <h2>Payment Records</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Payment Ref</th>
+              <th>Booking</th>
+              <th>Method</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let payment of dash.payments">
+              <td>{{ payment.paymentReference }}</td>
+              <td>{{ payment.bookingReference }}</td>
+              <td>{{ payment.paymentMethod }}</td>
+              <td>{{ formatAmount(payment.totalAmount) }}</td>
+              <td><span class="status-pill" [ngClass]="statusClass(payment.status)">{{ payment.status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,149 @@
+<section class="flight-performance-dashboard">
+  <div class="dashboard-shell">
+    <header class="section-header">
+      <div>
+        <span>Skyward Operations</span>
+        <h2>Flight Performance Dashboard</h2>
+      </div>
+      <button type="button" (click)="loadDashboard()" [disabled]="loading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+        Refresh
+      </button>
+    </header>
+
+    <div class="loading-state" *ngIf="loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <strong>Loading flight performance...</strong>
+      <span>Flights, bookings, and live tracking are loading in parallel.</span>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <section class="kpi-grid">
+        <article class="kpi-card" *ngFor="let item of kpis" [ngClass]="item.tone">
+          <div class="kpi-icon"><i [class]="item.icon"></i></div>
+          <div class="kpi-copy">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+            <small>{{ item.hint }}</small>
+          </div>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="panel route-panel">
+          <div class="panel-head">
+            <div>
+              <span>Route Performance</span>
+              <h3>Top Routes Ticket Sales</h3>
+            </div>
+            <small>Based on booking records</small>
+          </div>
+          <div class="chart-wrap">
+            <canvas #routePerformanceChart></canvas>
+          </div>
+        </article>
+
+        <article class="panel status-panel">
+          <div class="panel-head">
+            <div>
+              <span>Punctuality</span>
+              <h3>Flight Status Distribution</h3>
+            </div>
+            <small>Flight and tracking status</small>
+          </div>
+          <div class="chart-wrap compact-chart">
+            <canvas #statusDistributionChart></canvas>
+          </div>
+        </article>
+      </section>
+
+      <section class="operations-grid">
+        <article class="panel table-panel">
+          <div class="panel-head">
+            <div>
+              <span>Operational Table</span>
+              <h3>Flight Performance Summary</h3>
+            </div>
+            <small>Latest 10 flight records</small>
+          </div>
+
+          <div class="table-scroll" *ngIf="tableRows.length; else noFlights">
+            <table>
+              <thead>
+                <tr>
+                  <th>Flight Number</th>
+                  <th>Route</th>
+                  <th>Departure Date</th>
+                  <th>Status</th>
+                  <th>Bookings</th>
+                  <th>Progress</th>
+                  <th>ETA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of tableRows">
+                  <td><strong>{{ row.flightNumber }}</strong></td>
+                  <td><span class="ellipsis">{{ row.route }}</span></td>
+                  <td>{{ row.departureDate }}</td>
+                  <td><span class="status-pill" [ngClass]="statusClass(row.status)">{{ row.status }}</span></td>
+                  <td>{{ row.bookings }}</td>
+                  <td>
+                    <div class="progress-cell">
+                      <div class="progress-track"><span [style.width.%]="row.progress"></span></div>
+                      <b>{{ formatPercent(row.progress) }}</b>
+                    </div>
+                  </td>
+                  <td>{{ row.eta }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel tracking-panel">
+          <div class="panel-head">
+            <div>
+              <span>Tracking Mini Summary</span>
+              <h3>Active Route Watch</h3>
+            </div>
+            <a routerLink="/tracking">View Live Tracking</a>
+          </div>
+
+          <div class="tracking-list" *ngIf="trackingRows.length; else noTracking">
+            <div class="tracking-item" *ngFor="let row of trackingRows">
+              <div>
+                <strong>{{ row.flightNumber }}</strong>
+                <span>{{ row.route }}</span>
+              </div>
+              <div class="tracking-meta">
+                <span class="status-pill" [ngClass]="statusClass(row.status)">{{ row.status }}</span>
+                <small>{{ row.trackingMode }} · {{ formatPercent(row.progress) }}</small>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="quick-actions">
+        <a routerLink="/flight" class="action-link"><i class="fas fa-plane"></i> Flight List</a>
+        <a routerLink="/tracking" class="action-link"><i class="fas fa-map-marked-alt"></i> Live Tracking</a>
+        <a routerLink="/booking" class="action-link"><i class="fas fa-ticket-alt"></i> Booking Desk</a>
+        <a routerLink="/report/flight-seat" class="action-link"><i class="fas fa-chart-line"></i> Flight Reports</a>
+      </section>
+    </ng-container>
+  </div>
+</section>
+
+<ng-template #noFlights>
+  <div class="empty-state">
+    <i class="fas fa-plane-slash"></i>
+    <strong>No flight performance records found.</strong>
+  </div>
+</ng-template>
+
+<ng-template #noTracking>
+  <div class="empty-state small">
+    <i class="fas fa-satellite-dish"></i>
+    <strong>No live tracking records available.</strong>
+  </div>
+</ng-template>

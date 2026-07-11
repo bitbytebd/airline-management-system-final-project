@@ -1,0 +1,193 @@
+<!-- ==================== ১. HEADER SECTION ==================== -->
+<div class="page-header">
+    <div>
+        <h2>My Bookings</h2>
+        <p>Manage your upcoming and past trips</p>
+    </div>
+
+    <div class="header-actions">
+        
+        <!-- NEW: Search Flight Input -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" 
+                   [(ngModel)]="searchQuery"
+                   (input)="onSearchInput()"
+                   (blur)="showDropdown = false"
+                   placeholder="Select Flight..."
+                   class="search-input">
+            
+            <!-- Autocomplete Dropdown -->
+            <div class="dropdown-menu-custom" *ngIf="showDropdown && filteredFlights.length > 0">
+                <div class="dropdown-item" *ngFor="let f of filteredFlights" (mousedown)="selectFlight(f)">
+                    <div class="flight-icon"><i class="fas fa-plane"></i></div>
+                    <div class="flight-details">
+                        <strong>{{ f.flightNumber }}</strong>
+                        <span>{{ f.origin }} → {{ f.destination }}</span>
+                    </div>
+                    <small class="date-tag">{{ f.departureDate | date:'MMM dd' }}</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Booking Button -->
+        <button routerLink="/booking/new" class="btn-add-new">
+            <i class="fas fa-plus-circle"></i> Add Booking
+        </button>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+    <div class="stat-card aqua">
+        <span>Total Bookings</span>
+        <h3>{{ bookings.length }}</h3>
+    </div>
+    <div class="stat-card review">
+        <span>Pending Review</span>
+        <h3>{{ pendingReviewCount }}</h3>
+    </div>
+    <div class="stat-card approved">
+        <span>Approved for Payment</span>
+        <h3>{{ approvedForPaymentCount }}</h3>
+    </div>
+    <div class="stat-card paid">
+        <span>Paid Tickets</span>
+        <h3>{{ paidCount }}</h3>
+    </div>
+</div>
+
+<!-- Main Table -->
+<div class="card">
+    <div class="table-responsive">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>PNR</th>
+                    <th>Passenger</th>
+                    <th>Passport</th>
+                    <th>Route</th>
+                    <th>Flight</th>
+                    <th>Dep-Date</th>
+                    <th>Class</th>
+                    <th>Total ($)</th>
+                    <th>Review Status</th>
+                    <th>Payment</th>
+                    <th style="text-align:right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let b of bookings">
+                    <td><strong class="pnr-code">{{ b.bookingReference || b.id }}</strong></td>
+                    <td>
+                        <div class="passenger-cell">
+                            <i class="fas fa-user-circle"></i>
+                            <span>
+                                <span class="name">{{ b.passengerName }}</span>
+                                <small class="phone-line"><i class="fas fa-phone"></i> {{ b.phone || 'No phone' }}</small>
+                            </span>
+                        </div>
+                    </td>
+                    <td><small class="text-muted">{{ b.passportNumber }}</small></td>
+                    <td>
+                        <div class="route-badge">
+                            <span>{{ b.origin }}</span>
+                            <i class="fas fa-plane"></i>
+                            <span>{{ b.destination }}</span>
+                        </div>
+                    </td>
+                    <td><strong>{{ b.flightNumber }}</strong></td>
+                    <td>{{ b.departureDate }}</td>
+                    <td><span class="class-tag">{{ b.classType }}</span></td>
+                    <td><strong>{{ b.totalPrice }}</strong></td>
+                    <td>
+                        <span class="status-badge" [ngClass]="statusClass(b.status)">
+                            {{ b.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="payment-badge" [ngClass]="statusClass(b.paymentStatus)">
+                            {{ b.paymentStatus }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button [routerLink]="['/booking/invoice', b.id]" class="btn-icon invoice" title="Invoice">
+                            <i class="fas fa-file-invoice"></i>
+                        </button>
+                        <button (click)="onEdit(b.id)" class="btn-icon edit" title="Edit">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button (click)="onDelete(b.id)" class="btn-icon delete" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==================== ২. POPUP: FLIGHT SPECIFIC BOOKINGS ==================== -->
+<div class="modal-overlay-professional" [class.active]="isFlightModalOpen" (click)="closeModal()">
+    <div class="modal-container-large" (click)="$event.stopPropagation()">
+        
+        <!-- Modal Header -->
+        <div class="modal-pro-header">
+            <div class="header-content">
+                <div class="icon-circle"><i class="fas fa-plane-departure"></i></div>
+                <div>
+                    <h3>Flight Bookings: {{ selectedFlightInfo?.flightNumber }}</h3>
+                    <p>{{ selectedFlightInfo?.origin }} to {{ selectedFlightInfo?.destination }} | {{ selectedFlightInfo?.departureDate | date:'fullDate' }}</p>
+                </div>
+            </div>
+            <button class="close-modal-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-pro-body">
+            <div *ngIf="isLoadingSearch" class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i> Loading bookings...
+            </div>
+
+            <!-- Result Table inside Modal -->
+            <div *ngIf="!isLoadingSearch">
+                <div *ngIf="flightBookings.length > 0" class="table-responsive">
+                    <table class="custom-popup-table">
+                        <thead>
+                            <tr>
+                                <th>PNR</th>
+                                <th>Passenger</th>
+                                <th>Seat</th>
+                                <th>Class</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let b of flightBookings">
+                                <td><span class="pnr-link">{{ b.bookingReference }}</span></td>
+                                <td><strong>{{ b.passengerName }}</strong></td>
+                                <td><span class="seat-tag">{{ b.seatNumber || 'N/A' }}</span></td>
+                                <td>{{ b.classType }}</td>
+                                <td><strong>$ {{ b.totalPrice | number:'1.2-2' }}</strong></td>
+                                <td>
+                                    <span class="status-badge" [ngClass]="{'confirmed': b.status==='CONFIRMED'}">
+                                        {{ b.status }}
+                                    </span>
+                                </td>
+                                <td><span class="payment-badge" [ngClass]="statusClass(b.paymentStatus)">{{ b.paymentStatus }}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div *ngIf="flightBookings.length === 0" class="no-result-state">
+                    <i class="fas fa-inbox"></i>
+                    <h4>No Bookings Found</h4>
+                    <p>No bookings exist for this specific flight.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

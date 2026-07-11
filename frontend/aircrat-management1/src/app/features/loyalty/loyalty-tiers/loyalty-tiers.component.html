@@ -1,0 +1,123 @@
+<div class="lt-page">
+  <section class="lt-hero">
+    <div class="lt-hero-copy">
+      <a routerLink="/loyalty" class="lt-back"><i class="fas fa-arrow-left"></i> Loyalty Accounts</a>
+      <div class="lt-brand">
+        <span class="lt-logo"><i class="fas fa-plane-departure"></i></span>
+        <span>Skyward Rewards</span>
+      </div>
+      <h1>Loyalty Tier Benefits</h1>
+      <p>Professional tier rules, earning multipliers, travel privileges and member distribution for the airline rewards program.</p>
+      <div class="lt-actions">
+        <button type="button" class="lt-primary" (click)="goRedeem()"><i class="fas fa-gift"></i> Redeem Points</button>
+        <a routerLink="/loyalty" class="lt-secondary"><i class="fas fa-users"></i> View Members</a>
+      </div>
+    </div>
+    <div class="lt-hero-panel">
+      <div class="lt-plane-mark"><i class="fas fa-crown"></i></div>
+      <div>
+        <span class="lt-panel-label">Total Members</span>
+        <strong>{{ formatNum(stats.totalMembers) }}</strong>
+      </div>
+      <div class="lt-panel-grid">
+        <span><i class="fas fa-coins"></i> {{ formatNum(stats.totalAvailablePoints) }} available pts</span>
+        <span><i class="fas fa-exchange-alt"></i> {{ formatNum(stats.totalPointsRedeemed) }} redeemed pts</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="lt-loading" *ngIf="loading">
+    <i class="fas fa-spinner fa-spin"></i>
+    Loading tier analytics...
+  </div>
+
+  <section class="lt-kpis" *ngIf="!loading">
+    <div class="lt-kpi lt-blue">
+      <i class="fas fa-users"></i>
+      <strong>{{ formatNum(stats.totalMembers) }}</strong>
+      <span>Total members</span>
+    </div>
+    <div class="lt-kpi lt-green">
+      <i class="fas fa-coins"></i>
+      <strong>{{ formatNum(stats.totalAvailablePoints) }}</strong>
+      <span>Available points</span>
+    </div>
+    <div class="lt-kpi lt-amber">
+      <i class="fas fa-chart-line"></i>
+      <strong>{{ formatNum(stats.totalPointsEverIssued) }}</strong>
+      <span>Lifetime issued</span>
+    </div>
+    <div class="lt-kpi lt-purple">
+      <i class="fas fa-dollar-sign"></i>
+      <strong>${{ formatNum(stats.totalRedeemedValueUSD) }}</strong>
+      <span>Redeemed value</span>
+    </div>
+  </section>
+
+  <section class="lt-tier-grid" *ngIf="!loading">
+    <article class="lt-tier-card"
+             *ngFor="let tier of tierViews"
+             [style.--tier-color]="tierMeta[tier.tier].color">
+      <div class="lt-tier-head" [style.background]="tierMeta[tier.tier].gradient">
+        <div>
+          <span>{{ tierMeta[tier.tier].label }}</span>
+          <h2>{{ getRange(tier.tier) }}</h2>
+        </div>
+        <i class="fas" [ngClass]="tierMeta[tier.tier].icon"></i>
+      </div>
+
+      <div class="lt-tier-body">
+        <div class="lt-member-row">
+          <div>
+            <strong>{{ formatNum(tier.members) }}</strong>
+            <span>members</span>
+          </div>
+          <div class="lt-share">
+            <b>{{ getMemberShare(tier.tier) }}%</b>
+            <span>of base</span>
+          </div>
+        </div>
+
+        <div class="lt-share-bar">
+          <div [style.width.%]="getMemberShare(tier.tier)" [style.background]="tierMeta[tier.tier].gradient"></div>
+        </div>
+
+        <div class="lt-benefit-grid">
+          <div><i class="fas fa-percentage"></i><span>Earn Rate</span><strong>{{ tierMeta[tier.tier].multiplier }}</strong></div>
+          <div><i class="fas fa-dollar-sign"></i><span>Annual Value</span><strong>{{ tier.annualValue }}</strong></div>
+          <div><i class="fas fa-arrow-up"></i><span>Upgrade</span><strong>{{ tier.upgradeCredit }}</strong></div>
+          <div><i class="fas fa-couch"></i><span>Lounge</span><strong>{{ tier.loungeAccess }}</strong></div>
+          <div><i class="fas fa-suitcase-rolling"></i><span>Baggage</span><strong>{{ tier.baggage }}</strong></div>
+          <div><i class="fas fa-headset"></i><span>Support</span><strong>{{ tier.support }}</strong></div>
+        </div>
+
+        <div class="lt-perks">
+          <h3><i class="fas fa-star"></i> Included Benefits</h3>
+          <ul>
+            <li *ngFor="let perk of tierMeta[tier.tier].perks">
+              <i class="fas fa-check"></i>
+              <span>{{ perk }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <button type="button" class="lt-tier-btn" (click)="openTier(tier.tier)">
+          View {{ tierMeta[tier.tier].label }} Members
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </article>
+  </section>
+
+  <section class="lt-policy" *ngIf="!loading">
+    <div class="lt-policy-copy">
+      <h2><i class="fas fa-shield-alt"></i> Tier Policy Standard</h2>
+      <p>Use tier qualifying points to upgrade members, show USD-based redemption value in booking flows, and keep reward benefits clear for agents and passengers.</p>
+    </div>
+    <div class="lt-policy-points">
+      <span><i class="fas fa-clock"></i> Review tiers monthly</span>
+      <span><i class="fas fa-file-invoice-dollar"></i> 100 points = $1.00 redemption value</span>
+      <span><i class="fas fa-plane"></i> Benefits apply to confirmed paid bookings</span>
+    </div>
+  </section>
+</div>

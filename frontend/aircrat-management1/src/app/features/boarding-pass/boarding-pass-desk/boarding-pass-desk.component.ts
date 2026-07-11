@@ -1,0 +1,220 @@
+import { Component, OnInit } from '@angular/core';
+import { Booking } from 'src/app/core/models/booking.model';
+import { BoardingPassRecord } from 'src/app/core/models/airport-operations.model';
+import { AirportOperationsService } from 'src/app/core/services/airport-operations.service';
+import { BookingService } from 'src/app/core/services/booking.service';
+
+@Component({
+  selector: 'app-boarding-pass-desk',
+  template: `
+    <div class="ops-page">
+      <section class="hero">
+        <div>
+          <span class="eyebrow">Departure Control</span>
+          <h1>Boarding Pass</h1>
+          <p>Issue a clean passenger boarding pass directly from confirmed booking data with gate, seat and boarding zone.</p>
+          <button type="button" (click)="issuePass()" [disabled]="!selectedBooking || loading">
+            <i class="fas fa-qrcode"></i> Issue Pass
+          </button>
+        </div>
+        <div class="hero-card">
+          <i class="fas fa-plane-departure"></i>
+          <strong>{{ issuedPasses.length }}</strong>
+          <small>Passes issued</small>
+        </div>
+      </section>
+
+      <section class="search-panel">
+        <div class="field-wrap">
+          <label>Find confirmed booking</label>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" [(ngModel)]="searchText" (focus)="showSuggestions = true" (input)="showSuggestions = true" placeholder="Search reference, passenger, flight or seat">
+          </div>
+          <div class="suggestions" *ngIf="showSuggestions && suggestions.length">
+            <button type="button" *ngFor="let booking of suggestions" (click)="selectBooking(booking)">
+              <span>{{ booking.passengerName }}</span>
+              <small>{{ booking.bookingReference }} | {{ booking.flightNumber }} | Seat {{ booking.seatNumber }}</small>
+            </button>
+          </div>
+        </div>
+        <label class="gate-field">Gate
+          <select [(ngModel)]="gate">
+            <option *ngFor="let gateName of gateOptions" [value]="gateName">{{ gateName }}</option>
+          </select>
+        </label>
+      </section>
+
+      <main class="pass-layout">
+        <section class="boarding-pass" *ngIf="selectedBooking">
+          <div class="pass-top">
+            <div>
+              <span>Skyward Airlines</span>
+              <h2>Boarding Pass</h2>
+            </div>
+            <strong>{{ selectedBooking.flightNumber }}</strong>
+          </div>
+          <div class="route">
+            <div><small>From</small><strong>{{ selectedBooking.origin }}</strong></div>
+            <i class="fas fa-plane"></i>
+            <div><small>To</small><strong>{{ selectedBooking.destination }}</strong></div>
+          </div>
+          <div class="pass-grid">
+            <div><small>Passenger</small><strong>{{ selectedBooking.passengerName }}</strong></div>
+            <div><small>Date</small><strong>{{ selectedBooking.departureDate }}</strong></div>
+            <div><small>Boarding</small><strong>{{ boardingTime }}</strong></div>
+            <div><small>Depart</small><strong>{{ selectedBooking.departureTime }}</strong></div>
+            <div><small>Gate</small><strong>{{ gate }}</strong></div>
+            <div><small>Seat</small><strong>{{ selectedBooking.seatNumber || 'Assign' }}</strong></div>
+            <div><small>Zone</small><strong>{{ zone }}</strong></div>
+            <div><small>Class</small><strong>{{ selectedBooking.classType }}</strong></div>
+          </div>
+          <div class="barcode"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="pass-actions">
+            <button type="button" class="primary" (click)="issuePass()" [disabled]="loading">Issue & Save</button>
+            <button type="button" (click)="printPass()">Print</button>
+          </div>
+        </section>
+
+        <aside class="issued-panel">
+          <h2>Recent Issued Passes</h2>
+          <article *ngFor="let item of issuedPasses">
+            <strong>{{ item.passReference }}</strong>
+            <span>{{ item.passengerName }} | {{ item.flightNumber }}</span>
+            <small>{{ item.gate }} | {{ item.seatNumber }} | {{ item.status }}</small>
+            <button type="button" class="print-issued" (click)="printIssuedPass(item)">
+              <i class="fas fa-print"></i> Print This Pass
+            </button>
+          </article>
+        </aside>
+      </main>
+    </div>
+  `,
+  styleUrls: ['./boarding-pass-desk.component.css']
+})
+export class BoardingPassDeskComponent implements OnInit {
+  bookings: Booking[] = [];
+  issuedPasses: BoardingPassRecord[] = [];
+  selectedBooking: Booking | null = null;
+  issuedPass: BoardingPassRecord | null = null;
+  searchText = '';
+  showSuggestions = false;
+  gate = 'A12';
+  gateOptions = ['A01','A04','A07','A12','B02','B05','B09','C03','C08','D01','D06','E10'];
+  loading = false;
+
+  constructor(
+    private bookingService: BookingService,
+    private operationsService: AirportOperationsService
+  ) {}
+
+  ngOnInit(): void {
+    this.bookingService.getAll().subscribe(data => this.bookings = data || []);
+    this.operationsService.getBoardingPasses().subscribe(data => this.issuedPasses = data || []);
+  }
+
+  get suggestions(): Booking[] {
+    const q = this.searchText.trim().toLowerCase();
+    if (!q) return [];
+    return this.bookings.filter(b =>
+      (b.bookingReference || '').toLowerCase().includes(q) ||
+      (b.passengerName || '').toLowerCase().includes(q) ||
+      (b.flightNumber || '').toLowerCase().includes(q) ||
+      (b.seatNumber || '').toLowerCase().includes(q)
+    ).slice(0, 7);
+  }
+
+  get zone(): string {
+    const cabin = (this.selectedBooking?.classType || '').toUpperCase();
+    if (cabin.includes('FIRST')) return 'Zone 1';
+    if (cabin.includes('BUSINESS')) return 'Zone 2';
+    if (cabin.includes('PREMIUM')) return 'Zone 3';
+    return 'Zone 4';
+  }
+
+  get boardingTime(): string {
+    const time = this.selectedBooking?.departureTime || '10:00';
+    const parts = time.split(':').map(Number);
+    const minutes = ((parts[0] || 0) * 60 + (parts[1] || 0) - 45 + 1440) % 1440;
+    return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+  }
+
+  selectBooking(booking: Booking): void {
+    this.selectedBooking = booking;
+    this.issuedPass = null;
+    this.searchText = `${booking.bookingReference} - ${booking.passengerName}`;
+    this.showSuggestions = false;
+  }
+
+  issuePass(): void {
+    if (!this.selectedBooking) return;
+    this.loading = true;
+    const b = this.selectedBooking;
+    const payload: BoardingPassRecord = {
+      bookingId: b.id,
+      bookingReference: b.bookingReference,
+      passengerName: b.passengerName,
+      flightNumber: b.flightNumber,
+      route: `${b.origin} to ${b.destination}`,
+      departureDate: b.departureDate,
+      departureTime: b.departureTime,
+      boardingTime: this.boardingTime,
+      gate: this.gate,
+      seatNumber: b.seatNumber,
+      zone: this.zone,
+      classType: b.classType,
+      status: 'ISSUED'
+    };
+    this.operationsService.issueBoardingPass(payload).subscribe({
+      next: issued => {
+        this.issuedPass = issued;
+        this.issuedPasses = [issued, ...this.issuedPasses];
+        this.loading = false;
+      },
+      error: () => this.loading = false
+    });
+  }
+
+  printPass(): void {
+    document.body.classList.add('boarding-print-mode');
+    window.onafterprint = () => document.body.classList.remove('boarding-print-mode');
+    window.print();
+  }
+
+  printIssuedPass(pass: BoardingPassRecord): void {
+    const route = (pass.route || 'Origin to Destination').split(' to ');
+    this.selectedBooking = {
+      bookingReference: pass.bookingReference || '',
+      passengerId: 0,
+      passengerName: pass.passengerName || '',
+      passportNumber: '',
+      email: '',
+      phone: '',
+      flightId: 0,
+      flightNumber: pass.flightNumber || '',
+      origin: route[0] || '',
+      destination: route[1] || '',
+      departureDate: pass.departureDate || '',
+      departureTime: pass.departureTime || '',
+      arrivalTime: '',
+      totalDistance: 0,
+      classType: pass.classType || '',
+      seatNumber: pass.seatNumber || '',
+      baseFare: 0,
+      tax: 0,
+      discount: 0,
+      couponCode: '',
+      couponDiscount: 0,
+      loyaltyMemberNumber: '',
+      loyaltyPointsUsed: 0,
+      loyaltyDiscount: 0,
+      totalPrice: 0,
+      paymentMethod: '',
+      paymentStatus: '',
+      bookingDate: '',
+      status: pass.status || 'ISSUED'
+    };
+    this.gate = pass.gate || this.gate;
+    setTimeout(() => this.printPass());
+  }
+}

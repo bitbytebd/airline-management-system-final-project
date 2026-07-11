@@ -1,0 +1,108 @@
+<div class="approval-page">
+  <section class="approval-hero">
+    <div>
+      <span class="eyebrow">Booking Approval Queue</span>
+      <h2>Pending Review Desk</h2>
+      <p>Review booking requests before they move to payment collection.</p>
+    </div>
+    <div class="hero-actions">
+      <button type="button" class="back-btn" routerLink="/booking">
+        <i class="fas fa-arrow-left"></i>
+        Back to Booking List
+      </button>
+      <button type="button" class="refresh-btn" (click)="loadQueue()" [disabled]="loading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+        Refresh
+      </button>
+    </div>
+  </section>
+
+  <div class="summary-row">
+    <div class="summary-card">
+      <span>Pending Review</span>
+      <strong>{{ bookings.length }}</strong>
+    </div>
+    <div class="summary-card approve-card">
+      <span>Approve Permission</span>
+      <strong>{{ canApprove ? 'Enabled' : 'Hidden' }}</strong>
+    </div>
+    <div class="summary-card reject-card">
+      <span>Reject Permission</span>
+      <strong>{{ canReject ? 'Enabled' : 'Hidden' }}</strong>
+    </div>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="queue-card">
+    <div class="loading-state" *ngIf="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      Loading approval queue...
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && bookings.length === 0">
+      <i class="fas fa-check-circle"></i>
+      <h3>No Pending Reviews</h3>
+      <p>All booking requests are already approved, rejected, or confirmed.</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading && bookings.length > 0">
+      <table class="approval-table">
+        <thead>
+          <tr>
+            <th>PNR</th>
+            <th>Passenger</th>
+            <th>Passport</th>
+            <th>Route</th>
+            <th>Flight</th>
+            <th>Departure Date</th>
+            <th>Class</th>
+            <th>Total Price</th>
+            <th>Payment Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of bookings; trackBy: trackByBookingId">
+            <td><strong class="pnr-code">{{ b.bookingReference || b.id }}</strong></td>
+            <td>
+              <span class="passenger-name">{{ b.passengerName }}</span>
+              <small>{{ b.phone || b.email || 'No contact' }}</small>
+            </td>
+            <td>{{ b.passportNumber || '-' }}</td>
+            <td>
+              <span class="route-badge">{{ b.origin }} <i class="fas fa-plane"></i> {{ b.destination }}</span>
+            </td>
+            <td><strong>{{ b.flightNumber }}</strong></td>
+            <td>{{ b.departureDate }}</td>
+            <td><span class="class-tag">{{ b.classType }}</span></td>
+            <td><strong>${{ b.totalPrice | number:'1.2-2' }}</strong></td>
+            <td>
+              <span class="payment-badge" [ngClass]="statusClass(b.paymentStatus)">
+                {{ b.paymentStatus }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button *ngIf="canApprove"
+                      type="button"
+                      class="action-btn approve"
+                      (click)="approve(b)"
+                      [disabled]="actionLoadingId === b.id"
+                      title="Approve booking">
+                <i class="fas fa-check"></i>
+              </button>
+              <button *ngIf="canReject"
+                      type="button"
+                      class="action-btn reject"
+                      (click)="reject(b)"
+                      [disabled]="actionLoadingId === b.id"
+                      title="Reject booking">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

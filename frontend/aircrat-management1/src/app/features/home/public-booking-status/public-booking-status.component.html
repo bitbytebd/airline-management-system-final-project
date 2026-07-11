@@ -1,0 +1,284 @@
+<section class="status-page">
+  <header class="public-nav">
+    <a routerLink="/" class="brand">
+      <img src="assets/skyward-logo.svg" alt="Skyward Airlines">
+    </a>
+    <nav>
+      <a routerLink="/">Home</a>
+      <a routerLink="/flights/search">Search Flights</a>
+      <a routerLink="/user-portal">User Portal</a>
+    </nav>
+  </header>
+
+  <main class="status-shell">
+    <section class="status-hero">
+      <p>Passenger booking status</p>
+      <h1>Check Approval & Payment</h1>
+      <span>Use your booking reference / PNR to see whether your booking is approved for payment.</span>
+    </section>
+
+    <section class="lookup-card no-print">
+      <label>
+        Booking Reference / PNR
+        <input
+          type="text"
+          [(ngModel)]="bookingReference"
+          placeholder="Enter booking reference"
+          (keyup.enter)="loadBooking()">
+      </label>
+      <button type="button" (click)="loadBooking()" [disabled]="loading">
+        {{ loading ? 'Checking...' : 'Refresh Status' }}
+      </button>
+    </section>
+
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <section class="status-card" *ngIf="booking && isStatusView()">
+      <div class="status-top">
+        <div>
+          <span>Booking Reference</span>
+          <h2>{{ booking.bookingReference }}</h2>
+        </div>
+        <span class="status-pill" [ngClass]="statusClass(booking.status)">{{ booking.status }}</span>
+      </div>
+
+      <dl>
+        <div><dt>Passenger</dt><dd>{{ booking.passengerName || 'Passenger' }}</dd></div>
+        <div><dt>Route</dt><dd>{{ booking.origin }} to {{ booking.destination }}</dd></div>
+        <div><dt>Flight</dt><dd>{{ booking.flightNumber || 'N/A' }}</dd></div>
+        <div><dt>Travel Date</dt><dd>{{ booking.departureDate || 'TBA' }} {{ booking.departureTime || '' }}</dd></div>
+        <div><dt>Payment Status</dt><dd><span class="status-pill" [ngClass]="statusClass(booking.paymentStatus)">{{ booking.paymentStatus }}</span></dd></div>
+        <div><dt>Final Payable Amount</dt><dd>{{ formatAmount(finalPayableAmount()) }}</dd></div>
+      </dl>
+
+      <div class="status-message pending" *ngIf="isPendingReview()">
+        <strong>Your booking is waiting for airline approval.</strong>
+        <span>Please refresh this page after the airline team approves your request.</span>
+      </div>
+
+      <div class="status-message approved" *ngIf="canPay()">
+        <strong>Your booking has been approved.</strong>
+        <span>Please complete payment to confirm your ticket.</span>
+      </div>
+
+      <div class="status-message paid" *ngIf="isPaid()">
+        <strong>Payment completed. Your invoice and ticket are ready.</strong>
+        <span>Open the passenger portal for final travel details and history.</span>
+      </div>
+
+      <div class="action-row">
+        <button type="button" *ngIf="isPendingReview()" (click)="loadBooking()">Refresh Status</button>
+        <button type="button" *ngIf="canPay()" (click)="goToPayment()">Pay Now</button>
+        <button type="button" *ngIf="isPaid()" (click)="showInvoice()">View Invoice</button>
+        <button type="button" *ngIf="isPaid()" (click)="showTicket()">View Ticket</button>
+        <button type="button" class="ghost" (click)="openPortal()">Open User Portal</button>
+      </div>
+    </section>
+
+    <section class="document-card invoice-card" *ngIf="booking && isInvoiceView()">
+      <div class="document-toolbar no-print">
+        <button type="button" class="ghost" (click)="showStatus()">Back to Status</button>
+        <button type="button" class="ghost" routerLink="/">Back Home</button>
+        <button type="button" class="ghost" (click)="openPortal()">Open User Portal</button>
+        <button type="button" (click)="showTicket()">View Ticket</button>
+        <button type="button" (click)="printPage()">Print / Save PDF</button>
+      </div>
+
+      <div class="invoice-voucher">
+        <header class="voucher-header">
+          <div class="voucher-brand">
+            <div class="voucher-logo"><i class="fas fa-plane"></i></div>
+            <div>
+              <h2>SKYWARD</h2>
+              <span>International Airlines</span>
+            </div>
+          </div>
+          <div class="voucher-title">
+            <h3>Invoice / Travel Voucher</h3>
+            <div class="pnr-box">
+              <span>Booking Reference / PNR</span>
+              <strong>{{ booking.bookingReference || 'N/A' }}</strong>
+            </div>
+          </div>
+        </header>
+
+        <div class="voucher-status">
+          <div><i class="fas fa-check-circle"></i><span>{{ booking.status || 'N/A' }}</span></div>
+          <small>Issued on: {{ booking.bookingDate || 'N/A' }}</small>
+        </div>
+
+        <section class="voucher-info-grid">
+          <article class="voucher-card passenger-card">
+            <div class="card-icon"><i class="fas fa-user"></i></div>
+            <div>
+              <h4>Passenger</h4>
+              <h3>{{ booking.passengerName || 'N/A' }}</h3>
+              <p><b>Passport:</b> {{ booking.passportNumber || 'N/A' }}</p>
+              <p><b>Email:</b> {{ booking.email || 'N/A' }}</p>
+              <p><b>Phone:</b> {{ booking.phone || 'N/A' }}</p>
+            </div>
+          </article>
+
+          <article class="voucher-card flight-card">
+            <div class="flight-visual">
+              <div class="city-code">
+                <small>FROM</small>
+                <h3>{{ booking.origin || 'N/A' }}</h3>
+                <time>{{ booking.departureTime || 'N/A' }}</time>
+              </div>
+              <div class="flight-line">
+                <i class="fas fa-plane"></i>
+                <small>{{ booking.flightNumber || 'N/A' }}</small>
+              </div>
+              <div class="city-code text-right">
+                <small>TO</small>
+                <h3>{{ booking.destination || 'N/A' }}</h3>
+                <time>{{ booking.arrivalTime || 'N/A' }}</time>
+              </div>
+            </div>
+            <div class="flight-meta-grid">
+              <div><label>Departure Date</label><span>{{ booking.departureDate || 'N/A' }}</span></div>
+              <div><label>Arrival Time</label><span>{{ booking.arrivalTime || 'N/A' }}</span></div>
+              <div><label>Class</label><span>{{ booking.classType || 'N/A' }}</span></div>
+              <div><label>Seat</label><span>{{ booking.seatNumber || 'N/A' }}</span></div>
+              <div><label>Trip Type</label><span>{{ booking.tripType || 'ONE_WAY' }}</span></div>
+              <div><label>Distance</label><span>{{ booking.totalDistance || 0 }} KM</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="voucher-detail-grid">
+          <article>
+            <h4><i class="fas fa-users"></i> Passenger Count</h4>
+            <div><span>Adults</span><strong>{{ booking.adultCount || 1 }}</strong></div>
+            <div><span>Children</span><strong>{{ booking.childCount || 0 }}</strong></div>
+            <div><span>Infants</span><strong>{{ booking.infantCount || 0 }}</strong></div>
+          </article>
+          <article>
+            <h4><i class="fas fa-suitcase-rolling"></i> Add-ons</h4>
+            <div><span>Checked Bags</span><strong>{{ booking.checkedBags || 0 }}</strong></div>
+            <div><span>Checked Weight</span><strong>{{ booking.checkedWeightKg || 0 }} kg</strong></div>
+            <div><span>Cabin Weight</span><strong>{{ booking.cabinWeightKg || 0 }} kg</strong></div>
+            <div><span>Special Services</span><strong>{{ specialServicesText() }}</strong></div>
+          </article>
+          <article>
+            <h4><i class="fas fa-credit-card"></i> Payment</h4>
+            <div><span>Method</span><strong>{{ booking.paymentMethod || 'N/A' }}</strong></div>
+            <div><span>Payment Status</span><strong>{{ booking.paymentStatus || 'N/A' }}</strong></div>
+            <div><span>Booking Status</span><strong>{{ booking.status || 'N/A' }}</strong></div>
+          </article>
+        </section>
+
+        <section class="pricing-section">
+          <h4><i class="fas fa-receipt"></i> Fare Breakdown</h4>
+          <table class="pricing-table">
+            <thead>
+              <tr><th>Description</th><th>Amount (USD)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Base / Class Fare ({{ booking.classType || 'N/A' }})</td><td>{{ formatAmount(booking.baseFare || 0) }}</td></tr>
+              <tr><td>Adult Fare Total</td><td>{{ formatAmount(booking.adultFareTotal || 0) }}</td></tr>
+              <tr><td>Child Fare Total</td><td>{{ formatAmount(booking.childFareTotal || 0) }}</td></tr>
+              <tr><td>Infant Fare Total</td><td>{{ formatAmount(booking.infantFareTotal || 0) }}</td></tr>
+              <tr><td>Passenger Fare Total</td><td>{{ formatAmount(passengerFareTotal()) }}</td></tr>
+              <tr><td>Baggage Fee</td><td>{{ formatAmount(baggageFee()) }}</td></tr>
+              <tr><td>Special Service Fee</td><td>{{ formatAmount(specialServiceFee()) }}</td></tr>
+              <tr><td>Tax & Fees</td><td>{{ formatAmount(taxAmount()) }}</td></tr>
+              <tr class="discount-row"><td>Coupon Discount {{ booking.couponCode ? '(' + booking.couponCode + ')' : '' }}</td><td>-{{ formatAmount(booking.couponDiscount || 0) }}</td></tr>
+              <tr class="discount-row"><td>Loyalty Discount {{ booking.loyaltyPointsUsed ? '(' + booking.loyaltyPointsUsed + ' pts)' : '' }}</td><td>-{{ formatAmount(booking.loyaltyDiscount || 0) }}</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td>FINAL PAID AMOUNT</td><td>{{ formatAmount(finalPayableAmount()) }}</td></tr>
+            </tfoot>
+          </table>
+        </section>
+
+        <footer class="voucher-footer">
+          <small>Thank you for choosing Skyward Airlines. Please arrive at the airport at least 3 hours before departure with valid travel documents.</small>
+        </footer>
+      </div>
+    </section>
+
+    <section class="document-card ticket-card" *ngIf="booking && isTicketView()">
+      <div class="document-toolbar no-print">
+        <button type="button" class="ghost" (click)="showStatus()">Back to Status</button>
+        <button type="button" class="ghost" routerLink="/">Back Home</button>
+        <button type="button" class="ghost" (click)="openPortal()">Open User Portal</button>
+        <button type="button" (click)="showInvoice()">View Invoice</button>
+        <button type="button" (click)="printPage()">Print / Save PDF</button>
+      </div>
+
+      <div class="boarding-pass">
+        <header class="boarding-header">
+          <div class="voucher-brand">
+            <div class="voucher-logo"><i class="fas fa-plane"></i></div>
+            <div>
+              <h2>SKYWARD</h2>
+              <span>International Airlines</span>
+            </div>
+          </div>
+          <div class="boarding-title">
+            <h3>Boarding Pass</h3>
+            <small>Electronic Ticket</small>
+          </div>
+        </header>
+
+        <div class="ticket-ref-strip">
+          <div><span>PNR</span><strong>{{ booking.bookingReference || 'N/A' }}</strong></div>
+          <div><span>Payment</span><strong>{{ booking.paymentStatus || 'N/A' }}</strong></div>
+          <div><span>Trip</span><strong>{{ booking.tripType || 'ONE_WAY' }}</strong></div>
+        </div>
+
+        <section class="boarding-route">
+          <div>
+            <small>FROM</small>
+            <h2>{{ booking.origin || 'N/A' }}</h2>
+            <span>{{ booking.departureTime || 'N/A' }}</span>
+          </div>
+          <div class="plane-line large">
+            <div></div>
+            <i class="fas fa-plane"></i>
+            <div></div>
+            <small>{{ booking.flightNumber || 'N/A' }}</small>
+          </div>
+          <div class="text-right">
+            <small>TO</small>
+            <h2>{{ booking.destination || 'N/A' }}</h2>
+            <span>{{ booking.arrivalTime || 'N/A' }}</span>
+          </div>
+        </section>
+
+        <section class="boarding-info">
+          <div><label>Passenger</label><strong>{{ booking.passengerName || 'N/A' }}</strong></div>
+          <div><label>Email / Phone</label><strong>{{ booking.email || booking.phone || 'N/A' }}</strong></div>
+          <div><label>Passport</label><strong>{{ booking.passportNumber || 'N/A' }}</strong></div>
+          <div><label>Flight Date</label><strong>{{ booking.departureDate || 'N/A' }}</strong></div>
+        </section>
+
+        <div class="class-badge" [ngClass]="{
+          'economy-bg': booking.classType === 'ECONOMY',
+          'premium-bg': booking.classType === 'PREMIUM',
+          'business-bg': booking.classType === 'BUSINESS',
+          'first-bg': booking.classType === 'FIRST_CLASS'
+        }">
+          <span>Class: <strong>{{ booking.classType || 'N/A' }}</strong></span>
+          <span>Seat: <strong>{{ booking.seatNumber || 'N/A' }}</strong></span>
+        </div>
+
+        <section class="ticket-detail-grid">
+          <div><span>Passenger Count</span><strong>{{ passengerCountText() }}</strong></div>
+          <div><span>Baggage</span><strong>{{ baggageText() }}</strong></div>
+          <div><span>Special Services</span><strong>{{ specialServicesText() }}</strong></div>
+          <div><span>Final Paid</span><strong>{{ formatAmount(finalPayableAmount()) }}</strong></div>
+        </section>
+
+        <div class="tear-line"><span></span><i class="fas fa-cut"></i><span></span></div>
+
+        <footer class="boarding-footer">
+          <div class="barcode-lines"></div>
+          <p>{{ booking.bookingReference || 'N/A' }}</p>
+        </footer>
+      </div>
+    </section>
+  </main>
+</section>

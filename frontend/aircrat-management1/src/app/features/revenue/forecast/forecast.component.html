@@ -1,0 +1,25 @@
+<div class="forecast-page">
+  <section class="forecast-hero">
+    <p>Financial planning</p>
+    <h1>Revenue Forecast</h1>
+    <span>Scenario forecast from actual completed payments and paid expenses.</span>
+  </section>
+  <section class="forecast-controls">
+    <label>Revenue growth % <input type="number" [(ngModel)]="growth" (input)="calculate()"></label>
+    <label>Expense growth % <input type="number" [(ngModel)]="expenseGrowth" (input)="calculate()"></label>
+    <label>Months <input type="number" [(ngModel)]="months" (input)="calculate()" min="1" max="24"></label>
+  </section>
+  <section class="forecast-table">
+    <table>
+      <thead><tr><th>Month</th><th>Revenue</th><th>Expense</th><th>Projected P&L</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td>{{ row.month }}</td>
+          <td>{{ money(row.revenue) }}</td>
+          <td>{{ money(row.expense) }}</td>
+          <td [class.negative]="row.pnl < 0">{{ money(row.pnl) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

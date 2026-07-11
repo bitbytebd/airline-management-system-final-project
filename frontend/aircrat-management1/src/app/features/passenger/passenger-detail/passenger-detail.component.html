@@ -1,0 +1,280 @@
+<div class="form-wrapper">
+  <div class="form-card">
+    
+    <!-- Header Section -->
+    <div class="form-header">
+      <div class="header-left">
+        <div class="back-btn" (click)="onCancel()">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="title-group">
+          <h2>{{ isEdit ? 'Edit Profile' : 'New Registration' }}</h2>
+          <p>Please fill out the form below</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="logo-placeholder">
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-body">
+      
+      <!-- Profile Photo Section (Visual) -->
+      <div class="photo-upload-section">
+        <div class="photo-container">
+          <img src="https://ui-avatars.com/api/?name={{form.value.firstName || 'User'}}+{{form.value.lastName || 'Name'}}&background=random" alt="Profile">
+          <button type="button" class="upload-btn">
+            <i class="fas fa-camera"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 1: Personal Information -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="icon-box"><i class="fas fa-id-badge"></i></div>
+          <div>
+            <h3>Personal Information</h3>
+            <span>Basic details about the passenger</span>
+          </div>
+        </div>
+        
+        <div class="grid-layout">
+          <div class="field">
+            <label>First Name <span class="req">*</span></label>
+            <input type="text" formControlName="firstName" placeholder="Enter first name">
+          </div>
+          <div class="field">
+            <label>Last Name <span class="req">*</span></label>
+            <input type="text" formControlName="lastName" placeholder="Enter last name">
+          </div>
+          <div class="field">
+            <label>Date of Birth</label>
+            <input type="date" formControlName="dateOfBirth">
+          </div>
+          <div class="field">
+            <label>Gender</label>
+            <select formControlName="gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Identification -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="icon-box blue"><i class="fas fa-passport"></i></div>
+          <div>
+            <h3>Identification</h3>
+            <span>Passport and nationality details</span>
+          </div>
+        </div>
+
+        <div class="grid-layout">
+          <div class="field">
+            <label>Passport Number <span class="req">*</span></label>
+            <input type="text" formControlName="passportNumber" placeholder="e.g. A1234567">
+          </div>
+          <div class="field">
+            <label>Nationality</label>
+            <input type="text" formControlName="nationality" placeholder="e.g. Bangladeshi">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Contact Details -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="icon-box green"><i class="fas fa-address-card"></i></div>
+          <div>
+            <h3>Contact Details</h3>
+            <span>How to get in touch</span>
+          </div>
+        </div>
+
+        <div class="grid-layout">
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" formControlName="email" placeholder="example@mail.com">
+          </div>
+          <div class="field">
+            <label>Phone Number</label>
+            <input type="text" formControlName="phoneNumber" placeholder="+880 1xxx-xxxxxx">
+          </div>
+          <div class="field full-width">
+            <label>Residential Address</label>
+            <textarea formControlName="address" rows="2" placeholder="Street, City, Country"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Travel Preferences -->
+      <div class="form-section no-border">
+        <div class="section-header">
+          <div class="icon-box yellow"><i class="fas fa-plane-departure"></i></div>
+          <div>
+            <h3>Travel Preferences</h3>
+            <span>Customize the travel experience</span>
+          </div>
+        </div>
+
+        <div class="grid-layout">
+          <div class="field">
+            <label>Frequent Flyer No</label>
+            <input type="text" formControlName="frequentFlyerNo" placeholder="FFP Number">
+          </div>
+          <div class="field">
+            <label>Meal Preference</label>
+            <select formControlName="mealPreference">
+              <option value="Standard">Standard</option>
+              <option value="Vegetarian">Vegetarian</option>
+              <option value="Halal">Halal</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select formControlName="status">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-intelligence" *ngIf="isEdit">
+        <div class="section-header">
+          <div class="icon-box blue"><i class="fas fa-chart-line"></i></div>
+          <div>
+            <h3>Passenger Travel Profile</h3>
+            <span>Bookings, tickets, invoices, payments, refunds, loyalty, and travel history</span>
+          </div>
+        </div>
+
+        <div class="profile-summary-grid">
+          <article>
+            <span>All Bookings</span>
+            <strong>{{ passengerBookings.length }}</strong>
+          </article>
+          <article>
+            <span>Tickets</span>
+            <strong>{{ passengerBookings.length }}</strong>
+          </article>
+          <article>
+            <span>Payments</span>
+            <strong>${{ totalSpent | number:'1.2-2' }}</strong>
+          </article>
+          <article>
+            <span>Loyalty Points</span>
+            <strong>{{ loyaltyAccount?.availablePoints || 0 }}</strong>
+          </article>
+        </div>
+
+        <div class="profile-panel">
+          <div class="panel-title">
+            <h4>All Bookings, Tickets and Invoices</h4>
+            <small>{{ passengerBookings.length }} linked booking records</small>
+          </div>
+          <div class="mini-table-wrap">
+            <table class="mini-table">
+              <thead>
+                <tr>
+                  <th>PNR</th>
+                  <th>Flight</th>
+                  <th>Route</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                  <th>Open</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let b of passengerBookings">
+                  <td>{{ b.bookingReference }}</td>
+                  <td>{{ b.flightNumber }}</td>
+                  <td>{{ b.origin }} - {{ b.destination }}</td>
+                  <td>{{ b.departureDate }}</td>
+                  <td><span class="mini-status">{{ b.status }}</span></td>
+                  <td>${{ b.totalPrice | number:'1.2-2' }}</td>
+                  <td class="link-actions">
+                    <a [routerLink]="['/booking/ticket', b.bookingReference]" title="Ticket"><i class="fas fa-ticket-alt"></i></a>
+                    <a [routerLink]="['/booking/invoice', b.id]" title="Invoice"><i class="fas fa-file-invoice"></i></a>
+                  </td>
+                </tr>
+                <tr *ngIf="passengerBookings.length === 0">
+                  <td colspan="7" class="mini-empty">No booking history found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="two-panel-grid">
+          <div class="profile-panel">
+            <div class="panel-title">
+              <h4>Payment History</h4>
+              <small>{{ passengerPayments.length }} payment records</small>
+            </div>
+            <div class="history-list">
+              <div class="history-row" *ngFor="let p of passengerPayments">
+                <strong>{{ p.paymentReference }}</strong>
+                <span>{{ p.paymentMethod }} | {{ p.status }}</span>
+                <b>${{ p.totalAmount | number:'1.2-2' }}</b>
+              </div>
+              <div class="mini-empty" *ngIf="passengerPayments.length === 0">No payment history.</div>
+            </div>
+          </div>
+
+          <div class="profile-panel">
+            <div class="panel-title">
+              <h4>Refund History</h4>
+              <small>{{ passengerRefunds.length }} refund records</small>
+            </div>
+            <div class="history-list">
+              <div class="history-row" *ngFor="let r of passengerRefunds">
+                <strong>{{ r.refundReference }}</strong>
+                <span>{{ r.refundReason }} | {{ r.status }}</span>
+                <b>${{ r.refundAmount | number:'1.2-2' }}</b>
+              </div>
+              <div class="mini-empty" *ngIf="passengerRefunds.length === 0">No refund history.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-panel">
+          <div class="panel-title">
+            <h4>Loyalty and Travel History</h4>
+            <small>{{ loyaltyAccount?.memberNumber || 'No loyalty membership yet' }}</small>
+          </div>
+          <div class="history-list compact">
+            <div class="history-row" *ngFor="let tx of loyaltyTransactions">
+              <strong>{{ tx.transactionType }}</strong>
+              <span>{{ tx.description || tx.bookingReference || 'Loyalty activity' }}</span>
+              <b>{{ tx.points }} pts</b>
+            </div>
+            <div class="mini-empty" *ngIf="loyaltyTransactions.length === 0">No loyalty activity yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="form-footer">
+        <div class="left-info">
+          <span class="req">*</span> Required fields
+        </div>
+        <div class="right-actions">
+          <button type="button" class="btn btn-ghost" (click)="onCancel()">Cancel</button>
+          <button type="submit" class="btn btn-submit" [disabled]="form.invalid">
+            <i class="fas fa-check-circle"></i>
+            Save Passenger
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

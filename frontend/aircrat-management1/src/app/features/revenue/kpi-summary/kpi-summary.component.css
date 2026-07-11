@@ -1,0 +1,10 @@
+.kpi-page { min-height: 100vh; padding: 24px; background: #eaf9ff; color: #243444; }
+.kpi-hero { padding: 34px; border-radius: 8px; color: #fff; background: linear-gradient(135deg, #06638f, #0b8fc5); }
+.kpi-hero p { margin: 0 0 8px; color: #dff7ff; font-weight: 900; text-transform: uppercase; }
+.kpi-hero h1 { margin: 0 0 10px; font-size: clamp(32px, 5vw, 54px); }
+.kpi-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: 22px; }
+.kpi-grid article { padding: 22px; border-radius: 8px; background: #fff; box-shadow: 0 18px 40px rgba(35,70,96,.12); border-left: 5px solid #8fd7f4; }
+.kpi-grid span { color: #64788c; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.kpi-grid strong { display: block; margin-top: 8px; color: #17364a; font-size: 28px; }
+.kpi-grid strong.negative { color: #d9304f; }
+@media (max-width: 900px) { .kpi-grid { grid-template-columns: 1fr; } }

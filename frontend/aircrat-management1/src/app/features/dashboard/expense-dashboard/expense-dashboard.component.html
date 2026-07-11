@@ -1,0 +1,150 @@
+<section class="expense-dashboard">
+  <div class="dashboard-shell">
+    <header class="section-header">
+      <div>
+        <span>Skyward Cost Control</span>
+        <h2>Expense Dashboard</h2>
+      </div>
+      <button type="button" (click)="loadDashboard()" [disabled]="loading">
+        <i class="fas fa-sync-alt"></i>
+        Refresh
+      </button>
+    </header>
+
+    <div class="control-row">
+      <button type="button" class="add-btn" routerLink="/expense/new" [disabled]="loading">
+        <i class="fas fa-plus"></i>
+        Add Expense
+      </button>
+
+      <select [value]="categoryFilter" (change)="setCategory($any($event.target).value)" [disabled]="loading">
+        <option value="ALL">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+      </select>
+
+      <select [value]="statusFilter" (change)="setStatus($any($event.target).value)" [disabled]="loading">
+        <option value="ALL">All Status</option>
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+
+      <input type="date" [value]="startDateFilter" (change)="setStartDate($any($event.target).value)" [disabled]="loading">
+      <input type="date" [value]="endDateFilter" (change)="setEndDate($any($event.target).value)" [disabled]="loading">
+
+      <button type="button" class="apply-btn" (click)="applyFilters()" [disabled]="loading">
+        <i class="fas fa-filter"></i>
+        Apply
+      </button>
+      <button type="button" class="clear-btn" (click)="clearFilters()" [disabled]="loading">
+        Clear
+      </button>
+    </div>
+
+    <div class="loading-state compact" *ngIf="loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <strong>Loading expense data...</strong>
+    </div>
+
+      <section class="kpi-grid">
+        <article class="kpi-card skeleton-card" *ngFor="let item of [1,2,3,4,5]" [class.is-loading]="loading" [hidden]="!loading">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-copy">
+            <span></span>
+            <strong></strong>
+            <small></small>
+          </div>
+        </article>
+
+        <article class="kpi-card" *ngFor="let item of kpis" [ngClass]="item.tone" [hidden]="loading">
+          <div class="kpi-icon"><i [class]="item.icon"></i></div>
+          <div>
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+            <small>{{ item.hint }}</small>
+          </div>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <span>Category Analysis</span>
+              <h3>Expense Breakdown</h3>
+            </div>
+          </div>
+          <div class="chart-box"><canvas #expenseBreakdownChart></canvas></div>
+          <div class="chart-loading" *ngIf="loading">Preparing category chart...</div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <span>Monthly Control</span>
+              <h3>Monthly Expenses</h3>
+            </div>
+          </div>
+          <div class="chart-box"><canvas #monthlyExpenseChart></canvas></div>
+          <div class="chart-loading" *ngIf="loading">Preparing monthly chart...</div>
+        </article>
+      </section>
+
+      <section class="summary-grid">
+        <article class="summary-card skeleton-summary" *ngFor="let item of [1,2,3,4]" [hidden]="!loading">
+          <span></span>
+          <strong></strong>
+          <small></small>
+        </article>
+
+        <article class="summary-card" *ngFor="let summary of summaries" [hidden]="loading">
+          <span>{{ summary.label }}</span>
+          <strong>{{ summary.value }}</strong>
+          <small>{{ summary.detail }}</small>
+        </article>
+      </section>
+
+      <section class="panel table-panel">
+        <div class="table-title">
+          <div>
+            <span>Financial Operations</span>
+            <h3>Expense Report</h3>
+          </div>
+          <button type="button" routerLink="/expense/payment-queue" [disabled]="loading">
+            <i class="fas fa-money-check-alt"></i>
+            Payment Queue
+          </button>
+        </div>
+
+        <div class="table-skeleton" *ngIf="loading">
+          <span *ngFor="let item of [1,2,3,4,5]"></span>
+        </div>
+
+        <div class="table-wrap" *ngIf="!loading && tableRows.length; else noExpenses">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Vendor / Payee</th>
+                <th>Payment Method</th>
+                <th>Status</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let expense of tableRows">
+                <td>{{ formatDate(expense.expenseDate) }}</td>
+                <td>{{ expense.category || 'N/A' }}</td>
+                <td>{{ expense.vendorName || 'N/A' }}</td>
+                <td>{{ expense.paymentMethod || 'N/A' }}</td>
+                <td><span class="status-pill" [ngClass]="statusClass(expense.status)">{{ expense.status || 'N/A' }}</span></td>
+                <td><strong>{{ formatCurrency(expense.amount) }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noExpenses>
+          <div class="empty-state" *ngIf="!loading">No expense records found for the selected filters.</div>
+        </ng-template>
+      </section>
+  </div>
+</section>

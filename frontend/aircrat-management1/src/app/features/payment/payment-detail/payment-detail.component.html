@@ -1,0 +1,140 @@
+<section class="voucher-page">
+  <div class="voucher-loading" *ngIf="loading">
+    <i class="fas fa-circle-notch fa-spin"></i>
+    Loading payment voucher...
+  </div>
+
+  <div class="voucher-error" *ngIf="errorMsg && !loading">
+    <i class="fas fa-exclamation-circle"></i>
+    <p>{{ errorMsg }}</p>
+  </div>
+
+  <article class="payment-voucher" #voucherRef *ngIf="payment && !loading" [class.voucher-viewed]="voucherViewed">
+    <header class="voucher-header">
+      <div>
+        <div class="brand-line">
+          <i class="fas fa-plane-departure"></i>
+          <span>Skyward Airlines Pro</span>
+        </div>
+        <h1>Payment Voucher</h1>
+        <p>Official passenger payment confirmation</p>
+      </div>
+      <div class="voucher-status">
+        <span [style.color]="getStatusMeta(payment.status).color">{{ getStatusMeta(payment.status).label }}</span>
+        <strong>{{ payment.paymentReference }}</strong>
+      </div>
+    </header>
+
+    <section class="voucher-strip">
+      <div>
+        <span>Booking Reference</span>
+        <strong>{{ value(payment.bookingReference) }}</strong>
+      </div>
+      <div>
+        <span>Paid Date / Time</span>
+        <strong>{{ formatDT(payment.completedAt || payment.createdAt) }}</strong>
+      </div>
+      <div>
+        <span>Total Paid</span>
+        <strong>{{ formatAmount(payment.totalAmount) }}</strong>
+      </div>
+    </section>
+
+    <section class="voucher-grid">
+      <div class="voucher-card">
+        <h2><i class="fas fa-user"></i> Passenger</h2>
+        <div class="info-row"><span>Name</span><strong>{{ value(payment.passengerName) }}</strong></div>
+        <div class="info-row"><span>Email</span><strong>{{ value(payment.passengerEmail) }}</strong></div>
+        <div class="info-row"><span>Phone</span><strong>{{ passengerPhone() }}</strong></div>
+        <div class="info-row"><span>Passenger Count</span><strong>{{ booking?.adultCount || 1 }} Adult, {{ booking?.childCount || 0 }} Child, {{ booking?.infantCount || 0 }} Infant</strong></div>
+      </div>
+
+      <div class="voucher-card">
+        <h2><i class="fas fa-plane"></i> Flight</h2>
+        <div class="info-row"><span>Flight Number</span><strong>{{ value(payment.flightNumber) }}</strong></div>
+        <div class="info-row"><span>Route</span><strong>{{ flightRoute() }}</strong></div>
+        <div class="info-row"><span>Departure</span><strong>{{ departureText() }}</strong></div>
+        <div class="info-row"><span>Return Date</span><strong>{{ booking?.tripType === 'ROUND_TRIP' ? value(booking?.returnDate) : 'N/A' }}</strong></div>
+        <div class="info-row"><span>Trip Type</span><strong>{{ value(booking?.tripType) }}</strong></div>
+        <div class="info-row"><span>Class</span><strong>{{ value(booking?.classType) }}</strong></div>
+        <div class="info-row"><span>Seat</span><strong>{{ value(booking?.seatNumber) }}</strong></div>
+      </div>
+
+      <div class="voucher-card">
+        <h2><i class="fas fa-credit-card"></i> Payment</h2>
+        <div class="info-row"><span>Method</span><strong>{{ getMethodMeta(payment.paymentMethod).label }}</strong></div>
+        <div class="info-row"><span>Payment Status</span><strong>{{ getStatusMeta(payment.status).label }}</strong></div>
+        <div class="info-row"><span>Booking Status</span><strong>{{ bookingStatus() }}</strong></div>
+        <div class="info-row" *ngIf="payment.gatewayName"><span>Gateway</span><strong>{{ payment.gatewayName }}</strong></div>
+        <div class="info-row" *ngIf="payment.cardLastFour"><span>Card</span><strong>{{ payment.cardBrand }} **** {{ payment.cardLastFour }}</strong></div>
+        <div class="info-row" *ngIf="payment.mobileNumber"><span>Mobile</span><strong>{{ payment.mobileNumber }}</strong></div>
+        <div class="info-row" *ngIf="payment.transactionReference"><span>Transaction</span><strong>{{ payment.transactionReference }}</strong></div>
+        <div class="info-row" *ngIf="payment.gatewayResponseCode"><span>Response</span><strong>{{ payment.gatewayResponseCode }}</strong></div>
+      </div>
+
+      <div class="voucher-card">
+        <h2><i class="fas fa-suitcase-rolling"></i> Add-ons</h2>
+        <div class="info-row"><span>Checked Bags</span><strong>{{ booking?.checkedBags || 0 }}</strong></div>
+        <div class="info-row"><span>Checked Weight</span><strong>{{ booking?.checkedWeightKg || 0 }} kg</strong></div>
+        <div class="info-row"><span>Cabin Weight</span><strong>{{ booking?.cabinWeightKg || 0 }} kg</strong></div>
+        <div class="info-row"><span>Special Services</span><strong>{{ value(booking?.specialServices) }}</strong></div>
+      </div>
+    </section>
+
+    <section class="amount-box">
+      <h2><i class="fas fa-receipt"></i> Amount Breakdown</h2>
+      <div class="amount-row"><span>Base / Class Fare</span><strong>{{ amount(payment.baseFare || booking?.baseFare) }}</strong></div>
+      <div class="amount-row"><span>Adult Fare Total</span><strong>{{ amount(booking?.adultFareTotal) }}</strong></div>
+      <div class="amount-row"><span>Child Fare Total</span><strong>{{ amount(booking?.childFareTotal) }}</strong></div>
+      <div class="amount-row"><span>Infant Fare Total</span><strong>{{ amount(booking?.infantFareTotal) }}</strong></div>
+      <div class="amount-row"><span>Passenger Fare Total</span><strong>{{ amount(booking?.passengerFareTotal) }}</strong></div>
+      <div class="amount-row"><span>Baggage Fee</span><strong>{{ amount(booking?.baggageFee) }}</strong></div>
+      <div class="amount-row"><span>Special Service Fee</span><strong>{{ amount(booking?.specialServiceFee) }}</strong></div>
+      <div class="amount-row"><span>Tax / VAT</span><strong>{{ amount(payment.taxAmount || booking?.tax) }}</strong></div>
+      <div class="amount-row discount"><span>Coupon Discount {{ payment.couponCode ? '(' + payment.couponCode + ')' : '' }}</span><strong>- {{ amount(payment.couponDiscount || booking?.couponDiscount) }}</strong></div>
+      <div class="amount-row discount"><span>Loyalty Discount {{ payment.loyaltyPointsUsed ? '(' + payment.loyaltyPointsUsed + ' pts)' : '' }}</span><strong>- {{ amount(payment.loyaltyDiscount || booking?.loyaltyDiscount) }}</strong></div>
+      <div class="amount-row discount"><span>Total Discount</span><strong>- {{ amount(payment.discountAmount || booking?.discount) }}</strong></div>
+      <div class="amount-total"><span>Total Charged</span><strong>{{ formatAmount(payment.totalAmount) }}</strong></div>
+    </section>
+
+    <footer class="voucher-footer">
+      <div>
+        <strong>Gateway Message</strong>
+        <span>{{ payment.gatewayMessage || 'Transaction approved' }}</span>
+      </div>
+      <div>
+        <strong>Processed By</strong>
+        <span>{{ payment.createdBy || 'Skyward payment console' }}</span>
+      </div>
+      <div class="voucher-code">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </footer>
+  </article>
+
+  <div class="voucher-actions no-print" *ngIf="payment && !loading && !voucherViewed">
+    <button type="button" class="voucher-btn print" (click)="printReceipt()">
+      <i class="fas fa-print"></i>
+      Print Voucher
+    </button>
+    <button type="button" class="voucher-btn view" (click)="viewVoucher()">
+      <i class="fas fa-eye"></i>
+      View Voucher
+    </button>
+    <button type="button" class="voucher-btn back" (click)="backToPaymentList()">
+      <i class="fas fa-arrow-left"></i>
+      Back to Payment List
+    </button>
+  </div>
+
+  <div class="voucher-actions viewed-actions no-print" *ngIf="payment && !loading && voucherViewed">
+    <button type="button" class="voucher-btn download" (click)="downloadVoucher()">
+      <i class="fas fa-download"></i>
+      Download Voucher
+    </button>
+    <button type="button" class="voucher-btn back" (click)="backToPaymentList()">
+      <i class="fas fa-arrow-left"></i>
+      Back to Payment List
+    </button>
+  </div>
+</section>

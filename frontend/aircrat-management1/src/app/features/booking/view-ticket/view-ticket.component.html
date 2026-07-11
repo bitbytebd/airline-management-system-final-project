@@ -1,0 +1,140 @@
+<div class="ticket-wrapper">
+  <div class="ticket-card" #ticketContent *ngIf="booking; else ticketLoading">
+    <div class="ticket-header">
+      <div class="logo-area">
+        <div class="logo-icon"><i class="fas fa-plane"></i></div>
+        <div class="logo-text">
+          <h1>SKYWARD</h1>
+          <span>INTERNATIONAL AIRLINES</span>
+        </div>
+      </div>
+      <div class="boarding-pass-title">
+        <h2>BOARDING PASS</h2>
+        <small>Electronic Ticket</small>
+      </div>
+    </div>
+
+    <div class="ticket-ref-strip">
+      <div>
+        <span>PNR</span>
+        <strong>{{ booking.bookingReference || 'N/A' }}</strong>
+      </div>
+      <div>
+        <span>Payment</span>
+        <strong>{{ booking.paymentStatus || 'N/A' }}</strong>
+      </div>
+      <div>
+        <span>Trip</span>
+        <strong>{{ booking.tripType || 'ONE_WAY' }}</strong>
+      </div>
+    </div>
+
+    <div class="flight-route-section">
+      <div class="route-point">
+        <small>FROM</small>
+        <h1>{{ booking.origin || 'N/A' }}</h1>
+        <span>{{ booking.departureTime || 'N/A' }}</span>
+      </div>
+      <div class="plane-line">
+        <div class="line"></div>
+        <i class="fas fa-plane"></i>
+        <div class="line"></div>
+        <small class="flight-num">{{ booking.flightNumber || 'N/A' }}</small>
+      </div>
+      <div class="route-point text-right">
+        <small>TO</small>
+        <h1>{{ booking.destination || 'N/A' }}</h1>
+        <span>{{ booking.arrivalTime || 'N/A' }}</span>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-row">
+        <div class="info-item">
+          <label>Passenger</label>
+          <strong>{{ booking.passengerName || 'N/A' }}</strong>
+        </div>
+        <div class="info-item">
+          <label>Phone</label>
+          <strong>{{ booking.phone || 'N/A' }}</strong>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-item">
+          <label>Passport</label>
+          <strong>{{ booking.passportNumber || 'N/A' }}</strong>
+        </div>
+        <div class="info-item">
+          <label>Flight Date</label>
+          <strong>{{ booking.departureDate || 'N/A' }}</strong>
+        </div>
+      </div>
+
+      <div class="class-badge" [ngClass]="{
+        'economy-bg': booking.classType === 'ECONOMY',
+        'premium-bg': booking.classType === 'PREMIUM',
+        'business-bg': booking.classType === 'BUSINESS',
+        'first-bg': booking.classType === 'FIRST_CLASS'
+      }">
+        <span>Class: <strong>{{ booking.classType || 'N/A' }}</strong></span>
+        <span>Seat: <strong>{{ booking.seatNumber || 'N/A' }}</strong></span>
+      </div>
+
+      <div class="info-grid-3">
+        <div class="info-item">
+          <label>Arrival Time</label>
+          <strong>{{ booking.arrivalTime || 'N/A' }}</strong>
+        </div>
+        <div class="info-item">
+          <label>Return Date</label>
+          <strong>{{ booking.tripType === 'ROUND_TRIP' ? (booking.returnDate || 'N/A') : 'N/A' }}</strong>
+        </div>
+        <div class="info-item">
+          <label>Distance</label>
+          <strong>{{ booking.totalDistance || 0 }} KM</strong>
+        </div>
+      </div>
+
+      <div class="ticket-detail-grid">
+        <div class="detail-chip">
+          <span>Passenger Count</span>
+          <strong>{{ booking.adultCount || 1 }} Adult, {{ booking.childCount || 0 }} Child, {{ booking.infantCount || 0 }} Infant</strong>
+        </div>
+        <div class="detail-chip">
+          <span>Baggage</span>
+          <strong>{{ booking.checkedBags || 0 }} bag, {{ booking.checkedWeightKg || 0 }} kg checked, {{ booking.cabinWeightKg || 0 }} kg cabin</strong>
+        </div>
+        <div class="detail-chip full">
+          <span>Special Services</span>
+          <strong>{{ booking.specialServices || 'N/A' }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="tear-line">
+      <div class="dash"></div>
+      <div class="scissors"><i class="fas fa-cut"></i></div>
+      <div class="dash"></div>
+    </div>
+
+    <div class="footer-section">
+      <div class="barcode">
+        <div class="barcode-lines"></div>
+        <p>{{ booking.bookingReference || 'N/A' }}</p>
+      </div>
+      <div class="price-ticket">
+        <span>Total Paid: <strong>${{ (booking.totalPrice || 0) | number:'1.2-2' }}</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #ticketLoading>
+    <div class="ticket-card loading-ticket">Loading ticket...</div>
+  </ng-template>
+
+  <div class="action-buttons no-print">
+    <button (click)="downloadTicket()" class="btn-download"><i class="fas fa-download"></i> Download PDF</button>
+    <button routerLink="/booking" class="btn-back"><i class="fas fa-arrow-left"></i> Back to List</button>
+  </div>
+</div>

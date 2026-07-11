@@ -1,0 +1,122 @@
+<div class="cabin-container">
+  
+  <!-- Legend -->
+  <div class="legend-bar">
+    <div class="item"><span class="box available"></span> Available</div>
+    <div class="item"><span class="box occupied"></span> Booked</div>
+    <div class="item"><span class="box pending"></span> Pending</div>
+    <div class="item"><span class="box selected"></span> Selected</div>
+  </div>
+
+  <div class="seat-limit">
+    Select {{ selectedSeats.length }} of {{ maxSeats }} required seat{{ maxSeats === 1 ? '' : 's' }}.
+  </div>
+  <div class="seat-warning" *ngIf="selectionMessage">{{ selectionMessage }}</div>
+
+  <!-- ১. FIRST CLASS SECTION (Rows 1-2) -->
+  <!-- Layout: 1-2-1 (Window, Aisle, Aisle, Window) -->
+  <div class="cabin-section">
+    <div class="class-header">First Class</div>
+    
+    <div class="seat-grid" *ngFor="let row of firstClassRows">
+      <div class="row-wrapper first-layout">
+        
+        <!-- Left: Seat A -->
+        <div class="seat first" [ngClass]="getStatus(row, 'A')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'A')">{{ row }}A</div>
+        
+        <!-- Middle Aisle -->
+        <div class="aisle-space"></div>
+        
+        <!-- Center Group: B, C -->
+        <div class="center-group">
+          <div class="seat first" [ngClass]="getStatus(row, 'B')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'B')">{{ row }}B</div>
+          <div class="seat first" [ngClass]="getStatus(row, 'C')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'C')">{{ row }}C</div>
+        </div>
+        
+        <!-- Aisle -->
+        <div class="aisle-space"></div>
+        
+        <!-- Right: Seat D -->
+        <div class="seat first" [ngClass]="getStatus(row, 'D')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'D')">{{ row }}D</div>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="section-divider"><span>Business Class</span></div>
+
+  <!-- ২. BUSINESS CLASS SECTION (Rows 3-5) -->
+  <!-- Layout: 2-2-2 -->
+  <div class="cabin-section">
+    <div class="seat-grid" *ngFor="let row of businessRows">
+      <div class="row-wrapper">
+        <div class="seat-group">
+          <div class="seat business" [ngClass]="getStatus(row, 'A')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'A')">{{ row }}A</div>
+          <div class="seat business" [ngClass]="getStatus(row, 'B')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'B')">{{ row }}B</div>
+        </div>
+        <div class="aisle-space"></div>
+        <div class="seat-group">
+          <div class="seat business" [ngClass]="getStatus(row, 'C')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'C')">{{ row }}C</div>
+          <div class="seat business" [ngClass]="getStatus(row, 'D')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'D')">{{ row }}D</div>
+        </div>
+        <div class="aisle-space"></div>
+        <div class="seat-group">
+          <div class="seat business" [ngClass]="getStatus(row, 'E')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'E')">{{ row }}E</div>
+          <div class="seat business" [ngClass]="getStatus(row, 'F')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'F')">{{ row }}F</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="section-divider"><span>Premium Economy</span></div>
+
+  <!-- ৩. PREMIUM ECONOMY SECTION (Rows 6-8) -->
+  <!-- Layout: 2-3-2 -->
+  <div class="cabin-section">
+    <div class="seat-grid" *ngFor="let row of premiumRows">
+      <div class="row-wrapper">
+        <div class="seat-group">
+          <div class="seat premium" [ngClass]="getStatus(row, 'A')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'A')">{{ row }}A</div>
+          <div class="seat premium" [ngClass]="getStatus(row, 'B')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'B')">{{ row }}B</div>
+        </div>
+        <div class="aisle-space"></div>
+        <div class="seat-group">
+          <div class="seat premium" [ngClass]="getStatus(row, 'C')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'C')">{{ row }}C</div>
+          <div class="seat premium" [ngClass]="getStatus(row, 'D')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'D')">{{ row }}D</div>
+          <div class="seat premium" [ngClass]="getStatus(row, 'E')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'E')">{{ row }}E</div>
+        </div>
+        <div class="aisle-space"></div>
+        <div class="seat-group">
+          <div class="seat premium" [ngClass]="getStatus(row, 'F')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'F')">{{ row }}F</div>
+          <div class="seat premium" [ngClass]="getStatus(row, 'G')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'G')">{{ row }}G</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="section-divider"><span>Economy Class</span></div>
+
+  <!-- ৪. ECONOMY CLASS SECTION (Rows 9-20) -->
+  <!-- Layout: 3-3-3 -->
+  <div class="cabin-section">
+    <div class="seat-grid" *ngFor="let row of economyRows">
+      <div class="row-wrapper">
+        <div class="seat-group">
+          <div class="seat economy" [ngClass]="getStatus(row, 'A')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'A')">{{ row }}A</div>
+          <div class="seat economy" [ngClass]="getStatus(row, 'B')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'B')">{{ row }}B</div>
+          <div class="seat economy" [ngClass]="getStatus(row, 'C')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'C')">{{ row }}C</div>
+        </div>
+        <div class="aisle-normal">{{ row }}</div>
+        <div class="seat-group">
+          <div class="seat economy" [ngClass]="getStatus(row, 'D')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'D')">{{ row }}D</div>
+          <div class="seat economy" [ngClass]="getStatus(row, 'E')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'E')">{{ row }}E</div>
+          <div class="seat economy" [ngClass]="getStatus(row, 'F')" [title]="getSeatTitle(row)" (click)="selectSeat(row, 'F')">{{ row }}F</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

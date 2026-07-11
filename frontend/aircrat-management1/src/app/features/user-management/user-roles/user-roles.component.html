@@ -1,0 +1,31 @@
+<section class="roles-page">
+  <div class="roles-hero">
+    <div>
+      <a routerLink="/users" class="back-link"><i class="fas fa-arrow-left"></i> User management</a>
+      <div class="eyebrow"><i class="fas fa-shield-halved"></i> Authorization Standard</div>
+      <h1>Role & Permission Matrix</h1>
+      <p>Enterprise airline systems should keep role boundaries visible, auditable, and easy to explain during administration and presentation.</p>
+    </div>
+    <div class="hero-panel">
+      <strong>{{ roles.length }}</strong>
+      <span>standard roles</span>
+      <small>Security-first workspace access model</small>
+    </div>
+  </div>
+
+  <div class="role-grid">
+    <article class="role-card" *ngFor="let item of roles" [style.--role-color]="item.color">
+      <div class="role-head">
+        <div>
+          <span>{{ item.level }}</span>
+          <h2>{{ item.role }}</h2>
+        </div>
+        <i class="fas fa-user-lock"></i>
+      </div>
+      <p>{{ item.description }}</p>
+      <ul>
+        <li *ngFor="let permission of item.permissions"><i class="fas fa-check"></i> {{ permission }}</li>
+      </ul>
+    </article>
+  </div>
+</section>

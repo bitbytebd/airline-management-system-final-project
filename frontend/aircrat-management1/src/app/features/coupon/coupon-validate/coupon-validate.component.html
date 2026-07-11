@@ -1,0 +1,28 @@
+<section class="validate-page">
+  <div class="validate-shell">
+    <div class="validate-copy">
+      <span>Fare eligibility desk</span>
+      <h1>Validate Coupon</h1>
+      <p>Check route, cabin, date, minimum amount, and usage rules before applying a passenger discount.</p>
+      <button routerLink="/coupon"><i class="fas fa-arrow-left"></i> Coupon List</button>
+    </div>
+
+    <div class="validate-card">
+      <label>Coupon Code<input [(ngModel)]="code" placeholder="SKYGLOBAL25"></label>
+      <label>Booking Amount<input type="number" [(ngModel)]="amount"></label>
+      <label>Route<select [(ngModel)]="route"><option *ngFor="let item of routes" [value]="item">{{ item }}</option></select></label>
+      <label>Cabin<select [(ngModel)]="cabin"><option *ngFor="let item of cabins" [value]="item">{{ item }}</option></select></label>
+      <button class="validate-btn" (click)="validate()" [disabled]="checking"><i class="fas fa-check-circle"></i> {{ checking ? 'Checking...' : 'Validate Offer' }}</button>
+    </div>
+
+    <div class="result-card" *ngIf="result" [class.invalid]="!result.valid">
+      <i class="fas" [class.fa-check-circle]="result.valid" [class.fa-times-circle]="!result.valid"></i>
+      <h2>{{ result.valid ? 'Coupon Eligible' : 'Coupon Not Eligible' }}</h2>
+      <p>{{ result.message }}</p>
+      <div class="amount-grid">
+        <div><span>Discount</span><strong>{{ formatMoney(result.discountAmount) }}</strong></div>
+        <div><span>Final Fare</span><strong>{{ formatMoney(result.finalAmount || amount) }}</strong></div>
+      </div>
+    </div>
+  </div>
+</section>

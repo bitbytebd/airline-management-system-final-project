@@ -1,0 +1,76 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+        <i class="fas fa-plane-departure"></i>
+        <h2 *ngIf="!isCollapsed">Sky<span>ward</span></h2>
+        
+        <!-- Collapse Button (New) -->
+        <button class="collapse-btn" (click)="toggleCollapse()" title="Toggle Sidebar">
+            <i class="fas" [class.fa-chevron-left]="!isCollapsed" [class.fa-chevron-right]="isCollapsed"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation Wrapper -->
+    <nav class="sidebar-nav">
+        
+        <!-- GLOBAL SEARCH BAR -->
+        <div class="sidebar-search-container" *ngIf="!isCollapsed">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" 
+                   placeholder="Search (e.g. fly1)" 
+                   [(ngModel)]="searchText" 
+                   (input)="filterMenu()"
+                   (blur)="onBlurEvent()">
+          </div>
+          <!-- Search Results Dropdown -->
+          <div class="search-results" *ngIf="showSearchResults && filteredItems.length > 0">
+            <div class="result-item" *ngFor="let item of filteredItems" (click)="navigateTo(item.route)">
+              <i [class]="item.icon"></i>
+              <div class="result-info">
+                <span class="name">{{ item.name }}</span>
+                <span class="id-badge">{{ item.shortId }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER CARD (New) -->
+        <div class="user-card" *ngIf="!isCollapsed">
+            <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
+            <div class="user-info">
+                <span class="user-name">{{ currentUser?.fullName }}</span>
+                <span class="user-role">{{ currentUser?.role }}</span>
+            </div>
+        </div>
+
+        <div class="nav-section-label" *ngIf="!isCollapsed">MODULES A-Z</div>
+
+        <div class="has-submenu" *ngFor="let module of visibleMenuModules" [class.active]="activeMenu === module.key" (click)="toggleMenu(module.key)">
+            <a class="menu-item">
+                <div class="menu-item-left"><i [class]="module.icon"></i> <span *ngIf="!isCollapsed">{{ module.name }}</span></div>
+                <i class="fas fa-chevron-down arrow" *ngIf="!isCollapsed"></i>
+            </a>
+            <ul class="submenu" *ngIf="!isCollapsed && activeMenu === module.key">
+                <li *ngFor="let item of module.items">
+                  <a [routerLink]="item.route" (click)="$event.stopPropagation()"><i [class]="item.icon"></i> {{ item.name }}</a>
+                </li>
+            </ul>
+        </div>
+
+    </nav>   
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+        <!-- Logout Button (New) -->
+        <button class="logout-btn" (click)="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span *ngIf="!isCollapsed">Logout</span>
+        </button>
+        
+        <div class="footer-brand" *ngIf="!isCollapsed">
+            <h3><span>Skyward</span> Airlines</h3>
+        </div>
+        <div class="tagline" *ngIf="!isCollapsed">fly beyond limits.</div>
+    </div>
+</aside>

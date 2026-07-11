@@ -1,0 +1,10 @@
+# This file is used by the build system to adjust CSS and JS output to support the specified browsers below.
+# Angular 13's build tooling cannot parse newer Browserslist iOS range labels such as "18.5-18.7",
+# so the target list avoids that generated range while keeping modern desktop browser support.
+
+last 1 Chrome version
+last 1 Firefox version
+last 2 Edge versions
+last 1 Safari version
+Firefox ESR
+not ios_saf > 0

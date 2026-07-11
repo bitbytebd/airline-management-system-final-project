@@ -1,0 +1,245 @@
+<section class="booking-ticket-dashboard">
+  <div class="dashboard-shell">
+    <header class="section-header">
+      <div>
+        <span>Skyward Reservations</span>
+        <h2>Booking & Ticket Dashboard</h2>
+      </div>
+      <button type="button" (click)="loadDashboard()">
+        <i class="fas fa-sync-alt"></i>
+        Refresh
+      </button>
+    </header>
+
+    <div class="loading-state" *ngIf="loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <strong>Loading booking and ticket data...</strong>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <section class="kpi-grid">
+        <article class="kpi-card" *ngFor="let item of kpis" [ngClass]="item.tone">
+          <div class="kpi-icon"><i [class]="item.icon"></i></div>
+          <div class="kpi-copy">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+            <small>{{ item.hint }}</small>
+          </div>
+        </article>
+      </section>
+
+      <section class="seat-ticket-grid">
+        <article class="panel seat-panel">
+          <div class="panel-head blue-head">
+            <div>
+              <span>Cabin Snapshot</span>
+              <h3>Seat Occupancy Overview</h3>
+            </div>
+            <div class="legend">
+              <span><i class="confirmed"></i> Confirmed</span>
+              <span><i class="pending"></i> Pending</span>
+              <span><i class="cancelled"></i> Cancelled</span>
+              <span><i class="neutral"></i> Neutral</span>
+            </div>
+          </div>
+
+          <div class="seat-body" *ngIf="seatBlocks.length; else noSeatData">
+            <div class="aircraft-outline">
+              <div class="aircraft-nose">
+                <i class="fas fa-plane"></i>
+                <span>Skyward Cabin</span>
+              </div>
+
+              <div class="class-legend">
+                <span class="class-chip economy">Economy</span>
+                <span class="class-chip premium">Premium</span>
+                <span class="class-chip business">Business</span>
+                <span class="class-chip first-class">First Class</span>
+              </div>
+
+              <div class="cabin-frame">
+                <div class="cabin-wing left-wing"></div>
+                <div class="cabin-wing right-wing"></div>
+                <div class="cabin-group" *ngFor="let group of cabinGroups" [ngClass]="group.key.toLowerCase().replace('_', '-')">
+                  <div class="cabin-label">
+                    <span>{{ group.label }}</span>
+                    <small>{{ group.seats.length }} seats</small>
+                  </div>
+                  <div class="seat-row-block">
+                    <div class="seat-side left-side">
+                      <span
+                        class="seat-cell"
+                        *ngFor="let seat of group.leftSeats"
+                        [ngClass]="seat.status"
+                        [title]="seat.label + ' | ' + seat.classType">
+                        {{ seat.label }}
+                      </span>
+                    </div>
+                    <div class="aisle-line"></div>
+                    <div class="seat-side right-side">
+                      <span
+                        class="seat-cell"
+                        *ngFor="let seat of group.rightSeats"
+                        [ngClass]="seat.status"
+                        [title]="seat.label + ' | ' + seat.classType">
+                        {{ seat.label }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="seat-note">
+              Showing booked seats from current records. Aircraft capacity is not assumed.
+            </div>
+          </div>
+          <ng-template #noSeatData>
+            <div class="empty-state">No booked seat data is available yet.</div>
+          </ng-template>
+        </article>
+
+        <article class="panel ticket-panel">
+          <div class="ticket-title">
+            <span>Ticket Details</span>
+            <h3>Latest Ticket</h3>
+          </div>
+
+          <div class="ticket-card" *ngIf="latestTicket; else noTicket">
+            <div class="ticket-pnr">
+              <span>PNR</span>
+              <strong>{{ latestTicket.bookingReference || 'N/A' }}</strong>
+            </div>
+            <dl>
+              <div>
+                <dt>Passenger</dt>
+                <dd>{{ latestTicket.passengerName || 'N/A' }}</dd>
+              </div>
+              <div>
+                <dt>Flight</dt>
+                <dd>{{ latestTicket.flightNumber || 'N/A' }}</dd>
+              </div>
+              <div>
+                <dt>Route</dt>
+                <dd>{{ ticketRoute(latestTicket) }}</dd>
+              </div>
+              <div>
+                <dt>Seat</dt>
+                <dd>{{ latestTicket.seatNumber || 'N/A' }}</dd>
+              </div>
+              <div>
+                <dt>Class</dt>
+                <dd>{{ latestTicket.classType || 'N/A' }}</dd>
+              </div>
+              <div>
+                <dt>Fare</dt>
+                <dd>{{ formatCurrency(latestTicket.totalPrice) }}</dd>
+              </div>
+              <div>
+                <dt>Payment</dt>
+                <dd><span class="status-pill" [ngClass]="statusClass(latestTicket.paymentStatus)">{{ latestTicket.paymentStatus || 'N/A' }}</span></dd>
+              </div>
+            </dl>
+            <button type="button" class="ticket-action" [routerLink]="ticketLink(latestTicket)">
+              <i class="fas fa-print"></i>
+              View / Print Ticket
+            </button>
+          </div>
+
+          <ng-template #noTicket>
+            <div class="empty-state">No confirmed ticket is available yet.</div>
+          </ng-template>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <span>Booking Trend</span>
+              <h3>Daily Booking Trend</h3>
+            </div>
+          </div>
+          <div class="chart-box"><canvas #bookingTrendChart></canvas></div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <span>Cabin Mix</span>
+              <h3>Class Wise Ticket Distribution</h3>
+            </div>
+          </div>
+          <div class="chart-box"><canvas #classDistributionChart></canvas></div>
+        </article>
+
+        <article class="panel chart-panel wide">
+          <div class="panel-head">
+            <div>
+              <span>Route Demand</span>
+              <h3>Route Wise Booking Count</h3>
+            </div>
+          </div>
+          <div class="chart-box"><canvas #routeBookingChart></canvas></div>
+        </article>
+      </section>
+
+      <section class="lower-grid">
+        <article class="panel table-panel">
+          <div class="panel-head">
+            <div>
+              <span>Reservation Desk</span>
+              <h3>Recent Bookings</h3>
+            </div>
+          </div>
+
+          <div class="table-wrap" *ngIf="recentBookings.length; else noBookings">
+            <table>
+              <thead>
+                <tr>
+                  <th>PNR</th>
+                  <th>Passenger</th>
+                  <th>Flight</th>
+                  <th>Route</th>
+                  <th>Class</th>
+                  <th>Seat</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let booking of recentBookings">
+                  <td><strong>{{ booking.bookingReference || 'N/A' }}</strong></td>
+                  <td>{{ booking.passengerName || 'N/A' }}</td>
+                  <td>{{ booking.flightNumber || 'N/A' }}</td>
+                  <td>{{ ticketRoute(booking) }}</td>
+                  <td>{{ booking.classType || 'N/A' }}</td>
+                  <td>{{ booking.seatNumber || 'N/A' }}</td>
+                  <td><span class="status-pill" [ngClass]="statusClass(booking.status)">{{ booking.status || 'N/A' }}</span></td>
+                  <td>{{ formatCurrency(booking.totalPrice) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noBookings>
+            <div class="empty-state">No booking records are available.</div>
+          </ng-template>
+        </article>
+
+        <article class="panel quick-panel">
+          <div class="panel-head">
+            <div>
+              <span>Workflow</span>
+              <h3>Quick Actions</h3>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button type="button" routerLink="/booking/new"><i class="fas fa-plus"></i><span>New Booking</span></button>
+            <button type="button" routerLink="/booking/approval"><i class="fas fa-user-check"></i><span>Booking Approval</span></button>
+            <button type="button" routerLink="/payment/booking-pending"><i class="fas fa-credit-card"></i><span>Payment Queue</span></button>
+            <button type="button" routerLink="/boarding-pass"><i class="fas fa-ticket-alt"></i><span>View Tickets / Passes</span></button>
+          </div>
+        </article>
+      </section>
+    </ng-container>
+  </div>
+</section>

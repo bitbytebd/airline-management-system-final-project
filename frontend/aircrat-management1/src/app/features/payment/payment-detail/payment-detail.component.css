@@ -1,0 +1,381 @@
+.voucher-page {
+  align-items: flex-start;
+  background: #e7f8ff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 22px;
+}
+
+.payment-voucher {
+  background: #fff;
+  border: 1px solid #bde9fb;
+  box-shadow: 0 18px 45px rgba(8, 47, 73, 0.14);
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  padding: 26px;
+  max-width: 100%;
+  width: min(794px, 100%);
+}
+
+.payment-voucher.voucher-viewed {
+  outline: 3px solid rgba(14, 165, 233, 0.35);
+  outline-offset: 6px;
+}
+
+.voucher-header {
+  align-items: stretch;
+  background: linear-gradient(135deg, #075985, #0ea5e9);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 22px 24px;
+}
+
+.brand-line {
+  align-items: center;
+  display: flex;
+  font-size: 15px;
+  font-weight: 800;
+  gap: 8px;
+}
+
+.voucher-header h1 {
+  font-size: 34px;
+  margin: 10px 0 4px;
+}
+
+.voucher-header p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.voucher-status {
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 210px;
+  padding: 16px;
+  text-align: right;
+}
+
+.voucher-status span {
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.voucher-status strong {
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+.voucher-strip {
+  background: #effaff;
+  border: 1px solid #bae6fd;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 14px;
+}
+
+.voucher-strip div,
+.voucher-card,
+.amount-box,
+.voucher-footer {
+  border-radius: 0;
+}
+
+.voucher-strip span,
+.info-row span,
+.amount-row span,
+.amount-total span,
+.voucher-footer strong {
+  color: #64748b;
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.voucher-strip strong {
+  color: #082f49;
+  display: block;
+  font-size: 16px;
+  margin-top: 4px;
+}
+
+.voucher-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.voucher-card,
+.amount-box {
+  border: 1px solid #dbeafe;
+  padding: 16px;
+}
+
+.voucher-card h2,
+.amount-box h2 {
+  align-items: center;
+  color: #075985;
+  display: flex;
+  font-size: 15px;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.info-row,
+.amount-row,
+.amount-total {
+  align-items: flex-start;
+  border-top: 1px solid #eef2f7;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 9px 0;
+}
+
+.info-row:first-of-type,
+.amount-row:first-of-type {
+  border-top: 0;
+}
+
+.info-row strong,
+.amount-row strong {
+  color: #0f172a;
+  font-size: 13px;
+  max-width: 58%;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.amount-row.discount strong {
+  color: #15803d;
+}
+
+.amount-total {
+  background: #075985;
+  color: #fff;
+  margin-top: 8px;
+  padding: 14px;
+}
+
+.amount-total span,
+.amount-total strong {
+  color: #fff;
+}
+
+.amount-total strong {
+  font-size: 24px;
+}
+
+.voucher-footer {
+  align-items: center;
+  border-top: 1px dashed #94a3b8;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr 180px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.voucher-footer span {
+  color: #0f172a;
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.voucher-code {
+  align-items: end;
+  display: flex;
+  gap: 5px;
+  height: 42px;
+  justify-content: flex-end;
+}
+
+.voucher-code span {
+  background: #0f172a;
+  display: block;
+  margin: 0;
+  width: 12px;
+}
+
+.voucher-code span:nth-child(1) { height: 28px; }
+.voucher-code span:nth-child(2) { height: 40px; }
+.voucher-code span:nth-child(3) { height: 22px; }
+.voucher-code span:nth-child(4) { height: 34px; }
+.voucher-code span:nth-child(5) { height: 26px; }
+
+.voucher-loading,
+.voucher-error {
+  background: #fff;
+  border: 1px solid #bae6fd;
+  color: #075985;
+  padding: 28px;
+  text-align: center;
+  width: 520px;
+}
+
+.voucher-actions {
+  background: #fff;
+  border: 1px solid #bae6fd;
+  box-shadow: 0 12px 30px rgba(8, 47, 73, 0.12);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 16px;
+  max-width: 100%;
+  width: min(794px, 100%);
+}
+
+.viewed-actions {
+  border-color: #7dd3fc;
+}
+
+.voucher-btn {
+  align-items: center;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 800;
+  gap: 8px;
+  justify-content: center;
+  min-width: 170px;
+  padding: 12px 18px;
+}
+
+.voucher-btn.print {
+  background: #075985;
+  color: #fff;
+}
+
+.voucher-btn.view {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.voucher-btn.download {
+  background: #16a34a;
+  color: #fff;
+}
+
+.voucher-btn.back {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.voucher-btn:hover {
+  filter: brightness(0.96);
+}
+
+.voucher-error {
+  color: #b91c1c;
+}
+
+@media (max-width: 860px) {
+  .voucher-page {
+    padding: 10px;
+  }
+
+  .payment-voucher {
+    padding: 14px;
+    width: 100%;
+  }
+
+  .voucher-actions {
+    width: 100%;
+  }
+
+  .voucher-btn {
+    width: 100%;
+  }
+
+  .voucher-header,
+  .voucher-grid,
+  .voucher-strip,
+  .voucher-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .voucher-header {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .voucher-status {
+    text-align: left;
+  }
+}
+
+@media print {
+  @page {
+    margin: 8mm;
+    size: A4 portrait;
+  }
+
+  * {
+    box-shadow: none !important;
+  }
+
+  .voucher-page {
+    background: #fff !important;
+    display: block;
+    min-height: auto;
+    padding: 0;
+  }
+
+  .no-print,
+  .voucher-actions {
+    display: none !important;
+  }
+
+  .payment-voucher {
+    border: 0;
+    box-shadow: none;
+    gap: 8px;
+    min-height: 281mm;
+    padding: 0;
+    width: 100%;
+  }
+
+  .voucher-header {
+    padding: 16px 18px;
+  }
+
+  .voucher-header h1 {
+    font-size: 28px;
+    margin: 6px 0 2px;
+  }
+
+  .voucher-strip,
+  .voucher-card,
+  .amount-box {
+    padding: 10px;
+  }
+
+  .info-row,
+  .amount-row {
+    padding: 6px 0;
+  }
+
+  .amount-total {
+    padding: 10px;
+  }
+
+  .amount-total strong {
+    font-size: 20px;
+  }
+}

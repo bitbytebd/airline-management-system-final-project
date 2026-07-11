@@ -1,0 +1,312 @@
+/* ==========================================
+   screen styles for invoice page (A4 optimized)
+   ========================================== */
+.invoice-wrapper {
+  background-color: #e5e5e5; /* screen gray background */
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px 0;
+}
+
+.invoice-container {
+  /* A4 Size Dimensions: 210mm x 297mm */
+  width: 210mm;
+  min-height: 297mm; /* A4 page height */
+  background: white;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  margin: 0 auto;
+  position: relative;
+  
+  /* print size and optimization */
+  font-size: 12px; 
+  color: #333;
+  box-sizing: border-box;
+}
+
+/* invoice body */
+.invoice-body {
+  padding: 15mm 15mm 42mm; /* leave room for the absolute action footer */
+}
+
+/* ==========================================
+   header styles
+   ========================================== */
+.invoice-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 15px 15mm; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid #f59e0b;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.logo-circle {
+  width: 40px; height: 40px; background: #f59e0b;
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 18px; color: #0f172a;
+}
+
+.brand-name h1 { margin: 0; font-size: 22px; letter-spacing: 1px; font-weight: 900; }
+.brand-name span { font-size: 10px; opacity: 0.8; }
+
+.invoice-title { text-align: right; }
+.invoice-title h2 { margin: 0; font-size: 16px; font-weight: 300; }
+.pnr-box { margin-top: 5px; background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 4px; display: inline-block; }
+.pnr-box span { font-size: 9px; display: block; }
+.pnr-box strong { font-size: 16px; letter-spacing: 1px; color: #f59e0b; }
+
+/* Status Banner */
+.status-banner {
+  background: #0f172a; color: white; padding: 8px 15mm;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px;
+}
+.status-left i { color: #22c55e; margin-right: 5px; }
+
+/* ==========================================
+ body content styles
+   ========================================== */
+.info-grid { 
+  display: grid; 
+  grid-template-columns: 1fr; 
+  gap: 15px; 
+  margin-bottom: 15px; 
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.detail-box {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-left: 4px solid #0ea5e9;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.detail-box h4 {
+  color: #075985;
+  font-size: 11px;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.mini-row {
+  align-items: flex-start;
+  border-top: 1px solid #eef2f7;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.mini-row:first-of-type {
+  border-top: 0;
+}
+
+.mini-row span {
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.mini-row strong {
+  color: #0f172a;
+  font-size: 11px;
+  text-align: right;
+}
+
+.mini-row.wrap {
+  flex-direction: column;
+}
+
+.mini-row.wrap strong {
+  text-align: left;
+}
+
+.card-box {
+  border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px;
+  position: relative; background: #f8fafc;
+}
+.card-icon {
+  position: absolute; top: -10px; left: 15px; background: #2563eb;
+  color: white; width: 24px; height: 24px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center; font-size: 12px;
+}
+
+.card-content h3 { margin: 0 0 3px; font-size: 10px; color: #64748b; text-transform: uppercase; }
+.card-content h2 { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: #0f172a; }
+.card-content p { margin: 2px 0; color: #475569; font-size: 11px; }
+.card-content label { font-weight: 600; color: #94a3b8; font-size: 10px; }
+
+/* Flight Visual */
+.flight-visual {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;
+}
+.city-code h2 { margin: 0; font-size: 24px; font-weight: 800; color: #0f172a; }
+.city-code small { display: block; font-size: 9px; color: #64748b; }
+.city-code time { font-weight: 600; color: #2563eb; font-size: 12px; }
+
+.flight-line { flex: 1; height: 1px; background: #cbd5e1; margin: 0 15px; position: relative; text-align: center; }
+.flight-line i { background: white; padding: 0 5px; color: #2563eb; font-size: 14px; position: relative; top: -7px; }
+.flight-line small { display: block; position: absolute; top: 10px; width: 100%; font-size: 9px; font-weight: 700; }
+
+.flight-meta-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+.meta-item label { display: block; font-size: 8px; color: #94a3b8; }
+.meta-item span { font-weight: 600; color: #334155; font-size: 11px; }
+
+/* Pricing */
+.pricing-section h4 { color: #334155; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #f59e0b; padding-left: 8px; }
+.pricing-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+.pricing-table th { text-align: left; padding: 6px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-size: 9px; }
+.pricing-table td { padding: 6px; border-bottom: 1px solid #f1f5f9; font-size: 11px; }
+.pricing-table .right { text-align: right; }
+.pricing-table tfoot td {
+  background: #ecfdf5;
+  border-bottom: none;
+  border-top: 2px solid #0ea5e9;
+  color: #0f172a;
+  font-size: 14px;
+  padding: 10px 8px;
+}
+.total-price {
+  color: #047857;
+  font-size: 18px;
+}
+.discount-row { color: #ef4444; font-size: 10px; }
+
+/* Footer Info */
+.footer-info { display: flex; gap: 10px; margin-top: 10px; }
+.payment-badge { flex: 1; background: #f1f5f9; padding: 8px; border-radius: 4px; text-align: center; }
+.badge-label { display: block; font-size: 8px; color: #64748b; margin-bottom: 2px; }
+.badge-value { font-weight: 700; font-size: 10px; color: #334155; }
+.badge-value.paid { color: #16a34a; }
+
+/* ==========================================
+   footer below is fixed at the bottom of the page, but will be static in print (handled in print media query)
+   ========================================== */
+.invoice-footer {
+  position: absolute; /* always at the bottom */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #f8fafc;
+  padding: 10px 15mm;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+}
+
+.terms small { color: #94a3b8; font-size: 9px; line-height: 1.4; display: block; }
+
+/* Action Buttons (Screen Only) */
+.action-buttons { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px; 
+    margin-top: 10px;
+}
+
+.btn-back, .btn-print, .btn-ticket {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 15px; border-radius: 4px; font-size: 11px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.btn-back { background: #fff; color: #333; border-color: #ccc; }
+.btn-print { background: #0f172a; color: white; }
+.btn-ticket { background: #15803d; color: white; }
+
+.loading-state {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 220px;
+}
+
+@media (max-width: 900px) {
+  .invoice-container {
+    width: min(100%, 210mm);
+  }
+
+  .invoice-header,
+  .status-banner {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .invoice-body {
+    padding: 18px 18px 150px;
+  }
+
+  .detail-grid,
+  .flight-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flight-visual {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .flight-line {
+    height: 30px;
+    margin: 0;
+  }
+
+  .text-right {
+    text-align: left;
+  }
+}
+
+/* ==========================================
+  print style (CRITICAL FOR A4)
+   ========================================== */
+@media print {
+  /* page setup */
+  @page {
+    size: A4; /* paper A4 */
+    margin: 0; /* browser default margin */
+  }
+
+  /* screen-only elements */
+  .action-buttons, .btn-back, .btn-print, .btn-ticket {
+    display: none !important;
+  }
+  
+  .invoice-wrapper {
+      padding: 0;
+      background: white;
+      min-height: auto;
+  }
+
+  .invoice-container {
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
+    margin: 0;
+    border-radius: 0;
+    font-size: 12px; /* fix print font size */
+  }
+
+  .invoice-body {
+    padding: 15mm;
+  }
+  
+  
+  .invoice-footer {
+      position: static;
+  }
+}

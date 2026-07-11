@@ -1,0 +1,37 @@
+<section class="pnl-page">
+  <div class="pnl-hero">
+    <div>
+      <span>Real-time payment finance</span>
+      <h1>Profit & Loss</h1>
+      <p>Sales are calculated from completed passenger payments and expenses are calculated from paid operating costs.</p>
+    </div>
+    <button (click)="load()"><i class="fas fa-sync-alt"></i> Refresh</button>
+  </div>
+
+  <div class="pnl-grid">
+    <div class="pnl-card revenue"><i class="fas fa-chart-line"></i><span>Total Selling</span><strong>{{ formatMoney(revenue) }}</strong></div>
+    <div class="pnl-card expense"><i class="fas fa-file-invoice-dollar"></i><span>Total Expenses</span><strong>{{ formatMoney(expense) }}</strong></div>
+    <div class="pnl-card" [class.loss]="pnl < 0"><i class="fas fa-balance-scale"></i><span>{{ pnl >= 0 ? 'Net Profit' : 'Net Loss' }}</span><strong>{{ formatMoney(pnl < 0 ? -pnl : pnl) }}</strong></div>
+    <div class="pnl-card margin"><i class="fas fa-percent"></i><span>Operating Margin</span><strong>{{ margin }}%</strong></div>
+  </div>
+
+  <div class="analysis-grid">
+    <section class="analysis-panel">
+      <div class="panel-head"><h2>Revenue by Payment Method</h2><span>{{ payments.length }} payments</span></div>
+      <div class="row" *ngFor="let row of methodRows">
+        <div><strong>{{ row.name }}</strong><span>{{ row.share }}% of selling</span></div>
+        <b>{{ formatMoney(row.amount) }}</b>
+        <div class="bar"><span [style.width.%]="row.share"></span></div>
+      </div>
+    </section>
+
+    <section class="analysis-panel">
+      <div class="panel-head"><h2>Expenses by Category</h2><span>{{ expenses.length }} expenses</span></div>
+      <div class="row" *ngFor="let row of categoryRows">
+        <div><strong>{{ row.name }}</strong><span>{{ row.share }}% of expenses</span></div>
+        <b>{{ formatMoney(row.amount) }}</b>
+        <div class="bar expense-bar"><span [style.width.%]="row.share"></span></div>
+      </div>
+    </section>
+  </div>
+</section>

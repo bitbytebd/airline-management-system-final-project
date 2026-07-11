@@ -1,0 +1,191 @@
+<section class="pp-page">
+  <div class="pp-hero">
+    <div>
+      <span class="pp-eyebrow">Skyward SecurePay</span>
+      <h1>Process Passenger Payment</h1>
+      <p>Complete booking payments with controlled gateway fields, real-time booking lookup, and a clear settlement summary.</p>
+    </div>
+    <button class="pp-outline" routerLink="/payment">
+      <i class="fas fa-arrow-left"></i>
+      Ledger
+    </button>
+  </div>
+
+  <div class="pp-alert error" *ngIf="errorMsg">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ errorMsg }}
+  </div>
+
+  <div class="pp-alert success" *ngIf="successMsg">
+    <i class="fas fa-check-circle"></i>
+    <span>{{ successMsg }}</span>
+    <button type="button" *ngIf="createdPayment" (click)="viewCreatedPayment()">View Receipt</button>
+  </div>
+
+  <form class="pp-grid" [formGroup]="form" (ngSubmit)="processPayment()">
+    <div class="pp-main">
+      <section class="pp-panel booking-panel">
+        <div class="pp-panel-head">
+          <div>
+            <span>Step 01</span>
+            <h2>Select Booking</h2>
+          </div>
+          <i class="fas fa-search-dollar"></i>
+        </div>
+
+        <div class="booking-search">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            name="bookingSearch"
+            [(ngModel)]="bookingSearch"
+            [ngModelOptions]="{ standalone: true }"
+            (input)="filterBookings()"
+            (focus)="filterBookings()"
+            (keydown.enter)="$event.preventDefault(); filteredBookings[0] && selectBooking(filteredBookings[0])"
+            placeholder="Search booking reference, passenger, email, or flight number">
+        </div>
+
+        <div class="booking-suggestions" *ngIf="filteredBookings.length">
+          <button type="button" *ngFor="let booking of filteredBookings" (mousedown)="$event.preventDefault(); selectBooking(booking)">
+            <span class="booking-code">{{ booking.bookingReference }}</span>
+            <span class="booking-person">{{ booking.passengerName || 'Passenger' }}</span>
+            <span class="booking-route">{{ booking.flightNumber || 'Flight' }} | {{ booking.origin }} to {{ booking.destination }}</span>
+            <span class="booking-date">{{ booking.departureDate | date:'dd MMM, yyyy' }}</span>
+          <strong>{{ formatAmount(booking.totalPrice) }}</strong>
+          </button>
+        </div>
+
+        <div class="selected-booking-table" *ngIf="selectedBooking">
+          <table>
+            <thead>
+              <tr>
+                <th>PNR</th>
+                <th>Passenger</th>
+                <th>Route</th>
+                <th>Flight</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>{{ selectedBooking.bookingReference }}</strong></td>
+                <td>{{ selectedBooking.passengerName }}</td>
+                <td>{{ selectedBooking.origin }} to {{ selectedBooking.destination }}</td>
+                <td>{{ selectedBooking.flightNumber }}</td>
+                <td><strong>{{ formatAmount(selectedBooking.totalPrice) }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pp-empty" *ngIf="!loadingBookings && !bookings.length">
+          <i class="fas fa-folder-open"></i>
+          No bookings are available for payment.
+        </div>
+
+        <div class="selected-booking" *ngIf="selectedBooking">
+          <div class="passenger-mark">
+            {{ selectedBooking.passengerName?.charAt(0) || 'P' }}
+          </div>
+          <div>
+            <h3>{{ selectedBooking.passengerName }}</h3>
+            <p>{{ selectedBooking.bookingReference }} | {{ selectedBooking.flightNumber }} | {{ selectedBooking.origin }} to {{ selectedBooking.destination }} | {{ selectedBooking.departureDate | date:'dd MMM, yyyy' }}</p>
+          </div>
+               <strong>{{ formatAmount(selectedBooking.totalPrice) }}</strong>     
+         </div>
+      </section>
+
+      <section class="pp-panel">
+        <div class="pp-panel-head">
+          <div>
+            <span>Step 02</span>
+            <h2>Payment Method</h2>
+          </div>
+          <i class="fas fa-shield-alt"></i>
+        </div>
+
+        <div class="method-grid">
+          <button
+            type="button"
+            *ngFor="let method of methods"
+            [class.active]="selectedMethod() === method"
+            (click)="chooseMethod(method)">
+            <i [class]="methodMeta[method].icon"></i>
+            <span>{{ methodMeta[method].label }}</span>
+          </button>
+        </div>
+
+        <div class="field-grid">
+          <label>
+            Gateway
+            <input type="text" formControlName="gatewayName" placeholder="Gateway name">
+          </label>
+
+          <ng-container *ngIf="selectedMethod() === 'CREDIT_CARD' || selectedMethod() === 'DEBIT_CARD' || selectedMethod() === 'ONLINE_PAYMENT'">
+            <label>
+              Card Last 4
+              <input type="text" formControlName="cardLastFour" maxlength="4" placeholder="4242">
+            </label>
+            <label>
+              Card Brand
+              <input type="text" formControlName="cardBrand" placeholder="VISA">
+            </label>
+          </ng-container>
+
+          <ng-container *ngIf="selectedMethod() === 'BKASH' || selectedMethod() === 'NAGAD'">
+            <label>
+              Mobile Wallet
+              <input type="text" formControlName="mobileNumber" placeholder="+8801XXXXXXXXX">
+            </label>
+          </ng-container>
+
+          <ng-container *ngIf="selectedMethod() === 'BANK_TRANSFER'">
+            <label>
+              Bank Name
+              <input type="text" formControlName="bankName" placeholder="Skyward Partner Bank">
+            </label>
+          </ng-container>
+
+          <label>
+            Loyalty Points
+            <input type="number" formControlName="loyaltyPointsToUse" min="0">
+          </label>
+        </div>
+
+        <label class="notes-box">
+          Payment Notes
+          <textarea formControlName="notes" rows="3"></textarea>
+        </label>
+      </section>
+    </div>
+
+    <aside class="pp-summary">
+      <div class="summary-card">
+        <span class="pp-eyebrow">Settlement Preview</span>
+        <h2>{{ selectedBooking ? (selectedBooking.bookingReference || 'Selected Booking') : 'No booking selected' }}</h2>
+
+        <div class="summary-line">
+          <span>Passenger</span>
+          <strong>{{ selectedBooking?.passengerName || '--' }}</strong>
+        </div>
+        <div class="summary-line">
+          <span>Flight</span>
+          <strong>{{ selectedBooking?.flightNumber || '--' }}</strong>
+        </div>
+        <div class="summary-line">
+          <span>Method</span>
+          <strong>{{ selectedMethod() ? methodMeta[selectedMethod()].label : '--' }}</strong>
+        </div>
+        <div class="summary-total">
+          <span>Total Due</span>
+                         <strong>{{ formatAmount(selectedBooking?.totalPrice) }}</strong>        </div>
+
+        <button class="pp-submit" type="submit" [disabled]="submitting || form.invalid || !selectedBooking">
+          <i class="fas fa-lock"></i>
+          {{ submitting ? 'Processing...' : 'Process Secure Payment' }}
+        </button>
+      </div>
+    </aside>
+  </form>
+</section>

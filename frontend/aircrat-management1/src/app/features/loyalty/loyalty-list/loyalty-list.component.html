@@ -1,0 +1,426 @@
+<!-- FILE: src/app/features/loyalty/loyalty-list/loyalty-list.component.html -->
+<div class="ll-page">
+
+  <!-- ── HEADER ─────────────────────────────────────────────── -->
+  <div class="ll-header">
+    <div class="ll-header-left">
+      <h2 class="ll-title">
+        <span class="ll-title-icon"><i class="fas fa-star"></i></span>
+        Loyalty Program
+      </h2>
+      <p class="ll-subtitle">Manage member accounts, points and tier progression</p>
+    </div>
+    <div class="ll-header-right">
+      <button type="button" class="ll-btn-outline" (click)="openEnrollModal()">
+        <i class="fas fa-user-plus"></i> Add Member
+      </button>
+      <a routerLink="/loyalty/tiers" class="ll-btn-outline">
+        <i class="fas fa-layer-group"></i> Tier Benefits
+      </a>
+      <a routerLink="/loyalty/redeem" class="ll-btn-primary">
+        <i class="fas fa-gift"></i> Redeem Points
+      </a>
+    </div>
+  </div>
+
+  <div class="ll-modal-backdrop" *ngIf="showEnrollModal" (click)="closeEnrollModal()">
+    <section class="ll-enroll-modal" (click)="$event.stopPropagation()">
+      <div class="ll-enroll-head">
+        <div>
+          <span class="ll-enroll-eyebrow">Loyalty Enrollment</span>
+          <h3>Add New Loyalty Member</h3>
+          <p>Select an existing passenger profile. The system will create a unique member number and start the account at Bronze tier.</p>
+        </div>
+        <button type="button" class="ll-modal-close" (click)="closeEnrollModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="ll-passenger-picker">
+        <label>Search Passenger</label>
+        <div class="ll-passenger-search">
+          <i class="fas fa-search"></i>
+          <input type="text"
+                 [(ngModel)]="passengerSearchText"
+                 placeholder="Type passenger name, email, phone, passport">
+        </div>
+        <div class="ll-passenger-suggestions" *ngIf="passengerSuggestions.length > 0">
+          <button type="button" *ngFor="let p of passengerSuggestions" (click)="selectPassenger(p)">
+            <strong>{{ getPassengerName(p) }}</strong>
+            <span>{{ p.email || 'email not set' }} | {{ p.phoneNumber || 'phone not set' }}</span>
+            <small>{{ p.passportNumber || 'passport not set' }}</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="ll-selected-passenger" *ngIf="selectedPassenger">
+        <span>Selected passenger</span>
+        <strong>{{ getPassengerName(selectedPassenger) }}</strong>
+        <small>{{ selectedPassenger.email }} | {{ selectedPassenger.phoneNumber }} | {{ selectedPassenger.passportNumber }}</small>
+      </div>
+
+      <div class="ll-enroll-actions">
+        <button type="button" class="ll-btn-outline" (click)="closeEnrollModal()">Cancel</button>
+        <button type="button" class="ll-btn-primary" (click)="enrollSelectedPassenger()" [disabled]="!selectedPassenger || enrollLoading">
+          <i class="fas fa-user-plus"></i> {{ enrollLoading ? 'Enrolling...' : 'Create Loyalty Member' }}
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── ALERT ──────────────────────────────────────────────── -->
+  <div class="ll-alert" *ngIf="alertMsg"
+       [class.ll-alert-success]="alertType==='success'"
+       [class.ll-alert-error]="alertType==='error'">
+    <i class="fas" [class.fa-check-circle]="alertType==='success'"
+                   [class.fa-times-circle]="alertType==='error'"></i>
+    {{ alertMsg }}
+  </div>
+
+  <!-- ── KPI STATS GRID ─────────────────────────────────────── -->
+  <div class="ll-stats-grid">
+    <div class="ll-stat ll-stat-indigo">
+      <div class="ll-stat-glow"></div>
+      <div class="ll-stat-icon"><i class="fas fa-users"></i></div>
+      <div class="ll-stat-body">
+        <span class="ll-stat-val">{{ stats.totalMembers | number }}</span>
+        <span class="ll-stat-lbl">Total Members</span>
+      </div>
+    </div>
+    <div class="ll-stat ll-stat-green">
+      <div class="ll-stat-glow"></div>
+      <div class="ll-stat-icon"><i class="fas fa-coins"></i></div>
+      <div class="ll-stat-body">
+        <span class="ll-stat-val">{{ (stats.totalAvailablePoints || 0) | number }}</span>
+        <span class="ll-stat-lbl">Available Points</span>
+      </div>
+    </div>
+    <div class="ll-stat ll-stat-amber">
+      <div class="ll-stat-glow"></div>
+      <div class="ll-stat-icon"><i class="fas fa-exchange-alt"></i></div>
+      <div class="ll-stat-body">
+        <span class="ll-stat-val">{{ (stats.totalPointsRedeemed || 0) | number }}</span>
+        <span class="ll-stat-lbl">Points Redeemed</span>
+      </div>
+    </div>
+    <div class="ll-stat ll-stat-purple">
+      <div class="ll-stat-glow"></div>
+      <div class="ll-stat-icon"><i class="fas fa-dollar-sign"></i></div>
+      <div class="ll-stat-body">
+        <span class="ll-stat-val">${{ (stats.totalRedeemedValueBDT || 0) | number:'1.0-0' }}</span>
+        <span class="ll-stat-lbl">Redemption Value</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TIER DISTRIBUTION ───────────────────────────────────── -->
+  <div class="ll-tier-dist">
+    <div class="ll-td-card"
+         *ngFor="let t of allTiers"
+         [class.ll-td-active]="tierFilter === t"
+         [style.--tc]="tierMeta[t].color"
+         (click)="tierFilter = tierFilter===t ? '' : t; applyFilter()">
+      <div class="ll-td-icon-wrap" [style.background]="tierMeta[t].gradient">
+        <i class="fas" [ngClass]="tierMeta[t].icon"></i>
+      </div>
+      <div class="ll-td-info">
+        <span class="ll-td-name" [style.color]="tierMeta[t].color">{{ tierMeta[t].label }}</span>
+        <span class="ll-td-count">{{ countTier(t) }} members</span>
+      </div>
+      <div class="ll-td-check" *ngIf="tierFilter === t">
+        <i class="fas fa-check-circle"></i>
+      </div>
+    </div>
+    <div class="ll-td-card ll-td-all"
+         [class.ll-td-active]="tierFilter === ''"
+         (click)="tierFilter=''; applyFilter()">
+      <div class="ll-td-icon-wrap" style="background: linear-gradient(135deg,#4a6cf7,#2563eb)">
+        <i class="fas fa-th-large"></i>
+      </div>
+      <div class="ll-td-info">
+        <span class="ll-td-name" style="color:#4a6cf7">All Tiers</span>
+        <span class="ll-td-count">{{ accounts.length }} members</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SEARCH + TOOLBAR ───────────────────────────────────── -->
+  <div class="ll-toolbar">
+
+    <!-- Autocomplete Search Box -->
+    <div class="ll-search-container">
+      <div class="ll-search-box" [class.ll-search-focused]="isSearchFocused">
+        <div class="ll-search-left">
+          <i class="fas fa-search ll-search-icon"></i>
+          <input
+            type="text"
+            class="ll-search-input"
+            placeholder="Search by name, email, member no., passport..."
+            [(ngModel)]="searchText"
+            (ngModelChange)="onSearchInput()"
+            (focus)="onSearchFocus()"
+            (blur)="onSearchBlur()"
+            (keydown)="onKeyDown($event)"
+            autocomplete="off"
+          />
+        </div>
+        <div class="ll-search-right">
+          <i class="fas fa-spinner fa-spin ll-spin-icon" *ngIf="searchLoading"></i>
+          <button class="ll-clear-btn" *ngIf="searchText && !searchLoading" (click)="clearSearch()">
+            <i class="fas fa-times"></i>
+          </button>
+          <div class="ll-search-kbd" *ngIf="!searchText && !searchLoading">
+            <kbd>⌘K</kbd>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Floating Suggestions Dropdown ───────────────────── -->
+      <div class="ll-suggestions-float" *ngIf="showSuggestions">
+        <div class="ll-sf-header">
+          <i class="fas fa-magic"></i> Suggestions
+          <span class="ll-sf-count">{{ suggestions.length }} found</span>
+        </div>
+        <div
+          class="ll-sf-item"
+          *ngFor="let s of suggestions; let i = index"
+          [class.ll-sf-highlighted]="i === highlightIdx"
+          (mouseenter)="highlightIdx = i"
+          (click)="selectSuggestion(s)">
+
+          <div class="ll-sf-avatar" [style.background]="getTierMeta(s.tier).gradient">
+            {{ s.passengerName?.charAt(0)?.toUpperCase() }}
+            <div class="ll-sf-tier-dot" [style.background]="getTierMeta(s.tier).color"></div>
+          </div>
+
+          <div class="ll-sf-body">
+            <div class="ll-sf-name">
+              {{ s.passengerName }}
+              <span class="ll-sf-member-num">{{ s.memberNumber }}</span>
+            </div>
+            <div class="ll-sf-meta">
+              <span><i class="fas fa-envelope"></i> {{ s.passengerEmail }}</span>
+              <span *ngIf="s.passportNumber"><i class="fas fa-passport"></i> {{ s.passportNumber }}</span>
+            </div>
+          </div>
+
+          <div class="ll-sf-right">
+            <div class="ll-sf-pts">{{ formatNum(s.availablePoints) }}</div>
+            <div class="ll-sf-pts-lbl">points</div>
+            <span class="ll-sf-tier-tag"
+                  [style.background]="getTierMeta(s.tier).bg"
+                  [style.color]="getTierMeta(s.tier).color"
+                  [style.border]="'1px solid ' + getTierMeta(s.tier).border">
+              <i class="fas" [ngClass]="getTierMeta(s.tier).icon"></i>
+              {{ getTierMeta(s.tier).label }}
+            </span>
+          </div>
+
+        </div>
+
+        <div class="ll-sf-footer">
+          <i class="fas fa-keyboard"></i>
+          Use <kbd>Up</kbd><kbd>Down</kbd> to navigate - <kbd>Enter</kbd> to select - <kbd>Esc</kbd> to close
+        </div>
+      </div>
+    </div>
+
+    <!-- Result count -->
+    <div class="ll-toolbar-meta">
+      <span class="ll-result-badge">
+        <i class="fas fa-users"></i>
+        {{ filtered.length }} members
+      </span>
+      <button *ngIf="tierFilter || searchText" class="ll-reset-btn"
+              (click)="tierFilter=''; clearSearch()">
+        <i class="fas fa-filter-circle-xmark"></i> Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- ── LOADING ────────────────────────────────────────────── -->
+  <div class="ll-loading" *ngIf="loading">
+    <div class="ll-loading-ring"><i class="fas fa-star fa-spin"></i></div>
+    <p>Loading member accounts...</p>
+  </div>
+
+  <!-- ── TABLE ──────────────────────────────────────────────── -->
+  <div class="ll-table-card" *ngIf="!loading">
+
+    <!-- EMPTY STATE -->
+    <div class="ll-empty" *ngIf="filtered.length === 0">
+      <div class="ll-empty-icon"><i class="fas fa-star-half-alt"></i></div>
+      <h3>No members found</h3>
+      <p>Try adjusting search or tier filter</p>
+    </div>
+
+    <!-- TABLE -->
+    <div class="ll-table-wrap" *ngIf="filtered.length > 0">
+      <table class="ll-table">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th class="ll-th-s" (click)="sortBy('tier')">
+              Tier <i class="fas" [ngClass]="getSortIcon('tier')"></i>
+            </th>
+            <th class="ll-th-s" (click)="sortBy('availablePoints')">
+              Available Pts <i class="fas" [ngClass]="getSortIcon('availablePoints')"></i>
+            </th>
+            <th class="ll-th-s" (click)="sortBy('totalPointsEarned')">
+              Total Earned <i class="fas" [ngClass]="getSortIcon('totalPointsEarned')"></i>
+            </th>
+            <th>Tier Progress</th>
+            <th class="ll-th-s" (click)="sortBy('totalFlightsTaken')">
+              Flights <i class="fas" [ngClass]="getSortIcon('totalFlightsTaken')"></i>
+            </th>
+            <th class="ll-th-s" (click)="sortBy('enrolledDate')">
+              Enrolled <i class="fas" [ngClass]="getSortIcon('enrolledDate')"></i>
+            </th>
+            <th class="ll-th-c">Status</th>
+            <th class="ll-th-c">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let acc of filtered">
+
+            <!-- MAIN ROW -->
+            <tr class="ll-row" [class.ll-row-exp]="isExpanded(acc)"
+                [class.ll-row-off]="!acc.isActive">
+              <!-- Member -->
+              <td>
+                <div class="ll-member">
+                  <div class="ll-avatar" [style.background]="getTierMeta(acc.tier).gradient">
+                    {{ acc.passengerName?.charAt(0)?.toUpperCase() }}
+                    <div class="ll-avatar-dot" [style.background]="getTierMeta(acc.tier).color"></div>
+                  </div>
+                  <div class="ll-member-info">
+                    <span class="ll-mname">{{ acc.passengerName }}</span>
+                    <span class="ll-mnum">{{ acc.memberNumber }}</span>
+                    <span class="ll-memail">{{ acc.passengerEmail }}</span>
+                  </div>
+                </div>
+              </td>
+              <!-- Tier -->
+              <td>
+                <span class="ll-tier-chip"
+                      [style.background]="getTierMeta(acc.tier).bg"
+                      [style.color]="getTierMeta(acc.tier).color"
+                      [style.border]="'1px solid ' + getTierMeta(acc.tier).border">
+                  <i class="fas" [ngClass]="getTierMeta(acc.tier).icon"></i>
+                  {{ getTierMeta(acc.tier).label }}
+                </span>
+              </td>
+              <!-- Available Points -->
+              <td><span class="ll-pts-avail">{{ formatNum(acc.availablePoints) }}</span></td>
+              <!-- Total Earned -->
+              <td><span class="ll-pts-earned">{{ formatNum(acc.totalPointsEarned) }}</span></td>
+              <!-- Progress -->
+              <td>
+                <div class="ll-prog-wrap">
+                  <div class="ll-prog-bar">
+                    <div class="ll-prog-fill"
+                         [style.width.%]="getProgressPct(acc)"
+                         [style.background]="getTierMeta(acc.tier).gradient"></div>
+                  </div>
+                  <div class="ll-prog-meta">
+                    <span>{{ formatNum(acc.tierQualifyingPoints) }} pts</span>
+                    <span *ngIf="acc.tier !== 'PLATINUM'" class="ll-next-lbl">
+                      {{ formatNum(pointsToNext(acc)) }} → {{ getNextTierLabel(acc) }}
+                    </span>
+                    <span *ngIf="acc.tier === 'PLATINUM'" class="ll-max-lbl">✦ MAX</span>
+                  </div>
+                </div>
+              </td>
+              <!-- Flights -->
+              <td><span class="ll-stat-num">{{ acc.totalFlightsTaken ?? 0 }}</span></td>
+              <!-- Enrolled -->
+              <td><span class="ll-date-txt">{{ formatDT(acc.enrolledDate) }}</span></td>
+              <!-- Status -->
+              <td class="ll-td-c">
+                <span class="ll-status-chip"
+                      [class.ll-active]="acc.isActive"
+                      [class.ll-inactive]="!acc.isActive">
+                  <i class="fas" [class.fa-check-circle]="acc.isActive"
+                                 [class.fa-pause-circle]="!acc.isActive"></i>
+                  {{ acc.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <!-- Actions -->
+              <td class="ll-td-c">
+                <div class="ll-actions">
+                  <button class="ll-act" [class.ll-act-exp]="isExpanded(acc)"
+                          (click)="toggleExpand(acc)" title="Details">
+                    <i class="fas" [class.fa-chevron-down]="!isExpanded(acc)"
+                                   [class.fa-chevron-up]="isExpanded(acc)"></i>
+                  </button>
+                  <button class="ll-act ll-act-redeem"
+                          (click)="navigateRedeem(acc)"
+                          [disabled]="!acc.isActive || acc.availablePoints < 100"
+                          title="Redeem points">
+                    <i class="fas fa-gift"></i>
+                  </button>
+                  <button class="ll-act"
+                          [class.ll-act-on]="acc.isActive"
+                          [class.ll-act-off]="!acc.isActive"
+                          (click)="toggleActive(acc)"
+                          [title]="acc.isActive ? 'Deactivate' : 'Activate'">
+                    <i class="fas" [class.fa-toggle-on]="acc.isActive"
+                                   [class.fa-toggle-off]="!acc.isActive"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- EXPANDED ROW -->
+            <tr class="ll-exp-row" *ngIf="isExpanded(acc)">
+              <td colspan="9">
+                <div class="ll-expand-panel">
+                  <div class="ll-ep-info">
+                    <div class="ll-epi"><label>Passport</label><span>{{ acc.passportNumber || '--' }}</span></div>
+                    <div class="ll-epi"><label>Phone</label><span>{{ acc.phoneNumber || '--' }}</span></div>
+                    <div class="ll-epi"><label>Total Redeemed</label><span>{{ formatNum(acc.totalPointsRedeemed) }} pts</span></div>
+                    <div class="ll-epi"><label>Miles Flown</label><span>{{ formatNum(acc.totalMilesFlown) }} km</span></div>
+                    <div class="ll-epi"><label>Last Flight</label><span>{{ acc.lastFlightNumber || '--' }}</span></div>
+                    <div class="ll-epi"><label>Points Expire</label><span>{{ formatDT(acc.pointsExpiryDate) }}</span></div>
+                    <div class="ll-epi"><label>Earn Rate</label><span>{{ getTierMeta(acc.tier).multiplier }}</span></div>
+                    <div class="ll-epi"><label>Last Activity</label><span>{{ formatDT(acc.lastActivityDate) }}</span></div>
+                  </div>
+                  <div class="ll-tx-panel">
+                    <h5><i class="fas fa-history"></i> Recent Transactions</h5>
+                    <div class="ll-tx-loading" *ngIf="txLoading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                    <div class="ll-tx-empty" *ngIf="!txLoading && transactions.length === 0">No transactions yet.</div>
+                    <div class="ll-tx-list" *ngIf="!txLoading && transactions.length > 0">
+                      <div class="ll-tx" *ngFor="let tx of transactions">
+                        <div class="ll-tx-icon"
+                             [style.background]="getTxMeta(tx.transactionType).color + '22'"
+                             [style.color]="getTxMeta(tx.transactionType).color">
+                          <i class="fas" [ngClass]="getTxMeta(tx.transactionType).icon"></i>
+                        </div>
+                        <div class="ll-tx-body">
+                          <span>{{ tx.description || getTxMeta(tx.transactionType).label }}</span>
+                          <small>{{ formatDT(tx.createdAt) }}</small>
+                        </div>
+                        <div class="ll-tx-pts"
+                             [class.ll-tx-pos]="tx.pointsAmount > 0"
+                             [class.ll-tx-neg]="tx.pointsAmount < 0">
+                          {{ tx.pointsAmount > 0 ? '+' : '' }}{{ formatNum(tx.pointsAmount) }} pts
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+          </ng-container>
+        </tbody>
+      </table>
+
+      <div class="ll-table-foot">
+        <span><i class="fas fa-info-circle"></i> Click <i class="fas fa-chevron-down"></i> to expand - <i class="fas fa-gift"></i> to redeem</span>
+        <span>{{ filtered.length }} of {{ accounts.length }} members</span>
+      </div>
+    </div>
+
+  </div>
+</div>

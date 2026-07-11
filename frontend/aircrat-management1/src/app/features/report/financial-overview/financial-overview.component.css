@@ -1,0 +1,322 @@
+/* ===== PART 1: OVERVIEW & CHART ===== */
+.overview-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.report-filter-card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto auto;
+  gap: 12px;
+  align-items: end;
+  background: #fff;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.report-filter-card label {
+  display: block;
+  margin-bottom: 6px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.report-filter-card input,
+.report-filter-card select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.btn-apply,
+.btn-clear {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-apply {
+  color: #fff;
+  background: #0ea5e9;
+}
+
+.btn-clear {
+  color: #075985;
+  background: #e0f2fe;
+}
+
+.report-alert {
+  margin-bottom: 15px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #991b1b;
+  background: #fee2e2;
+  font-weight: 700;
+}
+
+.report-alert.loading {
+  color: #075985;
+  background: #e0f2fe;
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border-left: 4px solid transparent;
+}
+.stat-card.sales { border-left-color: #22c55e; }
+.stat-card.expenses { border-left-color: #f59e0b; }
+.stat-card.profit { border-left-color: #3b82f6; }
+
+.stat-card i {
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  font-size: 16px;
+}
+.stat-card.sales i { background: #dcfce7; color: #16a34a; }
+.stat-card.expenses i { background: #fef3c7; color: #d97706; }
+.stat-card.profit i { background: #dbeafe; color: #2563eb; }
+
+.stat-info span { font-size: 12px; color: #64748b; display: block; }
+.stat-info h3 { margin: 5px 0 0; font-size: 20px; color: #0f172a; }
+.stat-info small { display: block; margin-top: 4px; color: #64748b; font-size: 11px; }
+
+.chart-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 25px;
+}
+.card-header h3 { margin: 0 0 15px; font-size: 16px; color: #1e293b; }
+
+.monthly-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 25px;
+}
+
+.monthly-table-wrap {
+  overflow-x: auto;
+}
+
+.monthly-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.monthly-table-wrap th {
+  color: #fff;
+  background: #1e3a8a;
+  text-align: left;
+  padding: 12px;
+}
+
+.monthly-table-wrap td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px;
+  color: #0f172a;
+}
+
+
+/* ===== PART 2: FINANCIAL REPORT WRAPPER ===== */
+.financial-report-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 4px solid #1e3a8a; 
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.section-header {
+  background-color: #1e3a8a; 
+  color: white;
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.report-card {
+  padding: 20px;
+  border-right: 1px solid #e2e8f0;
+}
+
+/* Debit Styles */
+.debit-section .section-label {
+  color: #b91c1c; 
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 15px;
+  display: block;
+  border-bottom: 2px solid #fecaca;
+  padding-bottom: 8px;
+}
+.debit-section .data-row strong { color: #b91c1c; }
+.debit-section .total-row strong { color: #991b1b; }
+.debit-section .total-row { color: #991b1b; }
+
+/* Credit Styles */
+.credit-section .section-label {
+  color: #15803d; 
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 15px;
+  display: block;
+  border-bottom: 2px solid #bbf7d0;
+  padding-bottom: 8px;
+}
+.credit-section .data-row strong { color: #15803d; }
+.credit-section .total-row strong { color: #166534; }
+.credit-section .total-row { color: #166534; }
+
+.sales-overview-label {
+  color: #1e3a8a; 
+  font-weight: 600;
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 14px;
+  border-bottom: 1px dashed #f1f5f9;
+}
+.text-muted { color: #94a3b8; font-size: 13px; }
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Balance Overview Styles */
+.balance-overview {
+  background-color: #f3e8ff; 
+  border: 1px solid #d8b4fe; 
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.balance-label {
+  font-size: 14px;
+  color: #7c3aed; 
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.balance-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #581c87; 
+}
+
+.loss-text {
+  color: #b91c1c !important; 
+}
+
+.status-indicator { text-align: right; }
+
+.status-badge {
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.profit-badge {
+  background-color: #dcfce7; 
+  color: #166534; 
+}
+
+.loss-badge {
+  background-color: #fee2e2; 
+  color: #991b1b; 
+}
+
+/* Action Buttons */
+.action-buttons {
+  padding: 20px;
+  background: #f1f5f9;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-cancel {
+  background-color: #b91c1c; 
+  color: white;
+  border: none;
+  padding: 12px 35px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-cancel:hover { opacity: 0.9; }
+
+.btn-save {
+  background-color: #15803d; 
+  color: white;
+  border: none;
+  padding: 12px 35px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-save:hover { opacity: 0.9; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .report-filter-card { grid-template-columns: 1fr; }
+  .summary-row { grid-template-columns: 1fr; }
+  .report-grid { grid-template-columns: 1fr; }
+  .report-card { border-right: none; border-bottom: 1px solid #e2e8f0; }
+}

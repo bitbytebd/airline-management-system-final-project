@@ -1,0 +1,334 @@
+/* =========================================
+   1. COMPONENT WRAPPER
+   ========================================= */
+.expense-wrapper { padding: 20px; background: linear-gradient(180deg, #e0f7ff, #fff); min-height: 100vh; }
+.expense-hero {
+  margin-bottom: 22px;
+  padding: 30px;
+  border-radius: 22px;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(5, 150, 105, .94), rgba(14, 165, 233, .78)), url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1500&q=85') center/cover;
+  background-blend-mode: multiply;
+  box-shadow: 0 20px 42px rgba(5, 150, 105, .2);
+}
+.expense-eyebrow { display: inline-flex; gap: 8px; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.16); font-weight: 900; }
+.expense-hero h1 { margin: 16px 0 8px; font-size: clamp(28px, 4vw, 46px); }
+.expense-hero p { max-width: 760px; margin: 0; color: rgba(255,255,255,.88); line-height: 1.6; }
+.expense-hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.btn-ghost { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 10px 16px; border-radius: 10px; color: #fff; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); font-weight: 800; cursor: pointer; }
+
+/* Summary Grid - Top Cards */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+/* =========================================
+   2. ENTERPRISE SUMMARY CARDS (Updated)
+   ========================================= */
+.summary-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  /* Enterprise Style Shadow */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-left: 5px solid transparent;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover Effect for Cards */
+.summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white; /* Icon গুলো সাদা হবে */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); /* Icon এর নিচে ছায়া */
+}
+
+.card-data .label { 
+  font-size: 13px; 
+  color: #64748b; 
+  display: block; 
+  margin-bottom: 5px; 
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.card-data h3 { 
+  margin: 0; 
+  font-size: 24px; 
+  color: #0f172a; 
+  font-weight: 700; 
+}
+.card-data .trend { 
+  font-size: 12px; 
+  font-weight: 600; 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+  margin-top: 5px; 
+}
+.trend.up { color: #16a34a; }
+.trend.down { color: #dc2626; }
+
+/* --- Card Specific Themes (Gradients) --- */
+
+/* 1. Total Expense (Deep Indigo) */
+.summary-card.total { 
+  border-left-color: #4f46e5; 
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%); 
+}
+.summary-card.total .card-icon { 
+  background: linear-gradient(135deg, #6366f1, #4f46e5); 
+}
+
+/* 2. Paid (Emerald Green) */
+.summary-card.paid { 
+  border-left-color: #059669; 
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); 
+}
+.summary-card.paid .card-icon { 
+  background: linear-gradient(135deg, #34d399, #059669); 
+}
+
+/* 3. Pending (Amber/Orange) */
+.summary-card.pending { 
+  border-left-color: #d97706; 
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%); 
+}
+.summary-card.pending .card-icon { 
+  background: linear-gradient(135deg, #fbbf24, #d97706); 
+}
+
+/* 4. Cancelled (Rose/Red) */
+.summary-card.cancelled { 
+  border-left-color: #dc2626; 
+  background: linear-gradient(135deg, #ffffff 0%, #fff1f2 100%); 
+}
+.summary-card.cancelled .card-icon { 
+  background: linear-gradient(135deg, #fb7185, #e11d48); 
+}
+
+/* =========================================
+   3. DEEP GREEN HEADER SECTION
+   ========================================= */
+.list-header-section {
+  /* Deep Green Gradient */
+  background: linear-gradient(135deg, #052e16 0%, #166534 100%);
+  border-radius: 12px;
+  padding: 20px 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(5, 46, 22, 0.2);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-content .icon-box {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+}
+
+.header-content .text-box h2 {
+  margin: 0;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.header-content .text-box p {
+  margin: 3px 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
+
+.btn-add-expense {
+  background-color: #22c55e; 
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+}
+.btn-add-expense:hover { background-color: #16a34a; transform: translateY(-1px); }
+
+/* =========================================
+   4. CARD & DEEP GREEN BORDER
+   ========================================= */
+.card-container { 
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
+  
+  /* 4-sided Deep Green Border */
+  border: 2px solid #166534;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================
+   5. TABLE STYLING (DARK GREEN HEADERS)
+   ========================================= */
+.enterprise-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+/* DARK GREEN TABLE HEADER */
+.enterprise-table thead th {
+  background-color: #052e16; /* Deep Green */
+  color: white;
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #166534;
+  white-space: nowrap;
+}
+
+.enterprise-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+.enterprise-table tbody tr:hover { background-color: #f0fdf4; } /* Light Green Hover */
+
+.enterprise-table td {
+  padding: 12px 15px;
+  vertical-align: middle;
+  color: #334155;
+  font-size: 13px;
+}
+
+.text-right { text-align: right; }
+
+/* =========================================
+   6. CELL INTERNAL STYLING
+   ========================================= */
+
+/* Transaction Cell */
+.transaction-cell { display: flex; align-items: center; gap: 12px; }
+.trans-icon {
+  width: 40px; height: 40px; border-radius: 8px; background: #f1f5f9; 
+  display: flex; align-items: center; justify-content: center; color: #64748b;
+}
+.trans-info { display: flex; flex-direction: column; }
+.trans-info .title { font-weight: 600; color: #0f172a; }
+.trans-info .vendor { font-size: 12px; color: #94a3b8; }
+
+.date-text { color: #475569; font-size: 13px; }
+.price-tag { color: #166534; font-weight: 700; }
+
+/* Badges */
+.badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+.badge-cat { background: #dcfce7; color: #166534; }
+
+/* Status Pills */
+.status-pill {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+.status-paid { background: #dcfce7; color: #16a34a; }
+.status-pending { background: #fef3c7; color: #d97706; }
+.status-cancelled { background: #fee2e2; color: #dc2626; }
+
+/* =========================================
+   7. ACTION BUTTONS
+   ========================================= */
+.action-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  margin-left: 5px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+.edit-btn:hover { background: #e2e8f0; color: #0f172a; }
+
+.delete-btn {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+.delete-btn:hover { background: #fee2e2; }
+
+/* =========================================
+   8. EMPTY STATE
+   ========================================= */
+.empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+.empty-state i { font-size: 50px; margin-bottom: 15px; display: block; }
+.empty-state h4 { margin: 0 0 5px; color: #475569; }
+.empty-state p { margin: 0; font-size: 13px; }
+
+/* =========================================
+   9. RESPONSIVE
+   ========================================= */
+@media (max-width: 1024px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) {
+  .expense-wrapper { padding: 14px; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .header-content { flex-direction: column; align-items: flex-start; }
+  .header-content .action-box { margin-top: 10px; }
+}

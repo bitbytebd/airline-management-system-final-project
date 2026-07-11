@@ -1,0 +1,77 @@
+<section class="um-page">
+  <div class="um-hero">
+    <div>
+      <a routerLink="/dashboard/overview" class="back-link"><i class="fas fa-arrow-left"></i> Workspace</a>
+      <div class="eyebrow"><i class="fas fa-user-shield"></i> Secure Access Control</div>
+      <h1>User Management</h1>
+      <p>Manage staff identity, role, station, department, and access readiness with a clear enterprise authorization view.</p>
+      <div class="hero-actions">
+        <button type="button" (click)="add()" class="primary-btn"><i class="fas fa-user-plus"></i> Add User</button>
+        <a routerLink="/users/roles" class="ghost-btn"><i class="fas fa-lock"></i> Role Matrix</a>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <span>Access Health</span>
+      <strong>{{ activeCount }}/{{ users.length }}</strong>
+      <small>active accounts</small>
+      <div><i class="fas fa-crown"></i> {{ adminCount }} privileged users</div>
+      <div><i class="fas fa-location-dot"></i> Station-level assignment ready</div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <article><i class="fas fa-users"></i><span>Total Users</span><strong>{{ users.length }}</strong></article>
+    <article><i class="fas fa-check-circle"></i><span>Active</span><strong>{{ activeCount }}</strong></article>
+    <article><i class="fas fa-user-lock"></i><span>Admins</span><strong>{{ adminCount }}</strong></article>
+    <article><i class="fas fa-filter"></i><span>Visible</span><strong>{{ filteredUsers.length }}</strong></article>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" [(ngModel)]="searchText" placeholder="Search name, username, email, phone, department, station">
+    </div>
+    <select [(ngModel)]="selectedRole">
+      <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+    </select>
+    <button type="button" (click)="load()" class="refresh-btn"><i class="fas fa-rotate"></i> Refresh</button>
+  </div>
+
+  <div class="user-table">
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Role</th>
+          <th>Department</th>
+          <th>Station</th>
+          <th>Status</th>
+          <th>Contact</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td>
+            <div class="user-cell">
+              <div class="avatar">{{ user.fullName.charAt(0) }}</div>
+              <div><strong>{{ user.fullName }}</strong><span>{{ user.employeeCode }} | {{ user.username }}</span></div>
+            </div>
+          </td>
+          <td><span class="role-pill">{{ user.role }}</span></td>
+          <td>{{ user.department }}</td>
+          <td>{{ user.station }}</td>
+          <td><span class="status-pill" [ngClass]="{'active': user.status === 'Active', 'inactive': user.status !== 'Active'}">{{ user.status }}</span></td>
+          <td><span>{{ user.email }}</span><small>{{ user.phoneNumber }}</small></td>
+          <td>
+            <button type="button" (click)="edit(user.id)" class="icon-btn edit"><i class="fas fa-edit"></i></button>
+            <button type="button" (click)="delete(user.id)" class="icon-btn delete"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredUsers.length === 0">
+          <td colspan="7" class="empty">No user matched this filter.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

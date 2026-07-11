@@ -1,0 +1,273 @@
+<div class="home-shell">
+  <header class="home-nav">
+    <a routerLink="/" class="brand" aria-label="Skyward Airlines home">
+      <img src="assets/skyward-logo.svg" alt="Skyward Airlines logo">
+    </a>
+
+    <button type="button" class="nav-toggle" (click)="toggleNav()" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav [class.open]="navOpen" class="primary-nav">
+      <a routerLink="/" class="home-link" (click)="closeMenus()">Home</a>
+
+      <div class="nav-group" *ngFor="let group of navGroups" [class.active]="activeMenu === group.title">
+        <button type="button" class="nav-group-btn" (click)="toggleMenu(group.title)">
+          {{ group.title }}
+          <span></span>
+        </button>
+        <div class="mega-menu">
+          <div class="mega-inner">
+            <section class="mega-column" *ngFor="let column of group.columns">
+              <h3>{{ column.title }}</h3>
+              <ng-container *ngFor="let link of column.links">
+                <a *ngIf="link.route" [routerLink]="link.route" [queryParams]="link.queryParams" (click)="closeMenus()">
+                  <strong>{{ link.label }}</strong>
+                  <small>{{ link.description }}</small>
+                </a>
+                <a *ngIf="link.href" [href]="link.href" (click)="goToHref($event, link.href)">
+                  <strong>{{ link.label }}</strong>
+                  <small>{{ link.description }}</small>
+                </a>
+              </ng-container>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <a routerLink="/user-portal" class="portal-link" (click)="closeMenus()">User Portal</a>
+      <a routerLink="/auth/login" class="admin-link" (click)="closeMenus()">Admin Login</a>
+    </nav>
+  </header>
+
+  <section class="hero" [style.background-image]="'linear-gradient(90deg, rgba(63,5,30,.78), rgba(63,5,30,.36), rgba(255,255,255,.08)), url(' + heroImage + ')'">
+    <div class="hero-content">
+      <p class="eyebrow">International reservation experience</p>
+      <h1>Skyward Airlines</h1>
+      <p class="hero-copy">Premium journeys, smarter booking, loyalty rewards, and real-time customer travel visibility in one enterprise reservation platform.</p>
+      <div class="hero-actions">
+        <a routerLink="/flights/search" class="primary-btn" (click)="closeMenus()">Book a Flight</a>
+        <a routerLink="/user-portal" class="secondary-btn">Open User Portal</a>
+      </div>
+      <div class="admin-guide">
+        <strong>Need the previous admin project view?</strong>
+        <span>Staff can sign in first, then continue to the protected sidebar dashboard and airline operation modules.</span>
+        <a routerLink="/auth/login">Admin Login</a>
+      </div>
+    </div>
+
+    <form id="flight-search" class="booking-panel" (submit)="$event.preventDefault(); searchFlights()">
+      <div class="booking-panel-head">
+        <div>
+          <span>Flight search</span>
+          <strong>Where would you like to fly?</strong>
+        </div>
+        <button type="button" class="swap-route-btn" (click)="swapRoute()" aria-label="Swap route">⇄</button>
+      </div>
+
+      <label class="airport-field">
+        From
+        <span class="airport-code">{{ searchFrom ? (searchFrom.slice(0, 3) | uppercase) : 'FROM' }}</span>
+        <input
+          type="text"
+          name="from"
+          [(ngModel)]="searchFrom"
+          (ngModelChange)="onAirportInput('from', $event)"
+          (focus)="onAirportInput('from', searchFrom)"
+          (keydown)="onAirportKeydown($event, 'from')"
+          autocomplete="off"
+          placeholder="City or airport code"
+          aria-label="From city">
+        <button *ngIf="searchFrom" type="button" class="clear-field" (click)="clearAirport('from')" aria-label="Clear from">×</button>
+        <div class="airport-dropdown" *ngIf="activeAirportField === 'from' && filteredFromOptions.length">
+          <button
+            type="button"
+            *ngFor="let option of filteredFromOptions; let i = index"
+            [class.active]="i === fromHighlightIndex"
+            (mousedown)="selectAirport('from', option)">
+            <span>{{ option.city }} / Airport</span>
+            <strong>{{ option.code }}</strong>
+            <small>{{ option.country }}</small>
+          </button>
+        </div>
+      </label>
+
+      <label class="airport-field">
+        To
+        <span class="airport-code">{{ searchTo ? (searchTo.slice(0, 3) | uppercase) : 'TO' }}</span>
+        <input
+          type="text"
+          name="to"
+          [(ngModel)]="searchTo"
+          (ngModelChange)="onAirportInput('to', $event)"
+          (focus)="onAirportInput('to', searchTo)"
+          (keydown)="onAirportKeydown($event, 'to')"
+          autocomplete="off"
+          placeholder="City or airport code"
+          aria-label="To city">
+        <button *ngIf="searchTo" type="button" class="clear-field" (click)="clearAirport('to')" aria-label="Clear to">×</button>
+        <div class="airport-dropdown" *ngIf="activeAirportField === 'to' && filteredToOptions.length">
+          <button
+            type="button"
+            *ngFor="let option of filteredToOptions; let i = index"
+            [class.active]="i === toHighlightIndex"
+            (mousedown)="selectAirport('to', option)">
+            <span>{{ option.city }} / Airport</span>
+            <strong>{{ option.code }}</strong>
+            <small>{{ option.country }}</small>
+          </button>
+        </div>
+      </label>
+
+      <label>
+        Date
+        <input type="date" name="date" [(ngModel)]="searchDate" [min]="minTravelDate" aria-label="Departure date">
+      </label>
+
+      <div class="search-error" *ngIf="searchError">{{ searchError }}</div>
+      <button type="submit" [disabled]="searchLoading">{{ searchLoading ? 'Searching...' : 'Search Flights' }}</button>
+    </form>
+  </section>
+
+  <main>
+    <section id="destinations" class="section">
+      <div class="section-head">
+        <p>Signature routes</p>
+        <h2>Global destinations prepared for premium travelers</h2>
+      </div>
+      <div class="destination-grid">
+        <article class="destination-card" *ngFor="let destination of destinations">
+          <img [src]="destination.image" [alt]="destination.city + ' destination'">
+          <div>
+            <span>{{ destination.fare }}</span>
+            <h3>{{ destination.city }}</h3>
+            <p>{{ destination.route }}</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="experience" class="experience-band">
+      <div class="experience-copy">
+        <p>Passenger-first airline operations</p>
+        <h2>Reservation, payment, coupon, loyalty, and waitlist flows connected together.</h2>
+      </div>
+      <div class="experience-grid">
+        <article>
+          <strong>01</strong>
+          <h3>Smart Booking</h3>
+          <p>Route, seat class, coupon and loyalty discounts are handled inside the booking journey.</p>
+        </article>
+        <article>
+          <strong>02</strong>
+          <h3>Secure Portal</h3>
+          <p>Phone OTP login gives passengers a fast way to view ticket, payment, and loyalty history.</p>
+        </article>
+        <article>
+          <strong>03</strong>
+          <h3>Enterprise Admin</h3>
+          <p>Back-office modules remain connected for airline staff, reports, payments, and operations.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="about-us" class="feature-section about-section">
+      <div class="section-head">
+        <p>About Skyward</p>
+        <h2>Built like a global airline story, tailored for your reservation system.</h2>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card" *ngFor="let card of aboutCards">
+          <img [src]="card.image" [alt]="card.title">
+          <div>
+            <h3>{{ card.title }}</h3>
+            <p>{{ card.description }}</p>
+            <a *ngIf="card.route" [routerLink]="card.route" [queryParams]="card.queryParams">{{ card.action }}</a>
+            <a *ngIf="card.href" [href]="card.href" (click)="goToHref($event, card.href)">{{ card.action }}</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="fleet" class="feature-section fleet-section">
+      <div class="fleet-intro">
+        <p>Our fleet</p>
+        <h2>Modern aircraft profiles for premium international operations.</h2>
+        <span>Inspired by airline fleet pages, this section highlights aircraft types, cabin comfort and operational capability while routing into your aircraft and tracking modules.</span>
+      </div>
+      <div class="fleet-grid">
+        <article class="fleet-card" *ngFor="let aircraft of fleetCards">
+          <img [src]="aircraft.image" [alt]="aircraft.title">
+          <div>
+            <h3>{{ aircraft.title }}</h3>
+            <p>{{ aircraft.description }}</p>
+            <a *ngIf="aircraft.route" [routerLink]="aircraft.route" [queryParams]="aircraft.queryParams">{{ aircraft.action }}</a>
+            <a *ngIf="aircraft.href" [href]="aircraft.href" (click)="goToHref($event, aircraft.href)">{{ aircraft.action }}</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="help-centre" class="feature-section help-section">
+      <div class="section-head">
+        <p>Help centre</p>
+        <h2>Fast support paths for the most common passenger requests.</h2>
+      </div>
+      <div class="help-grid">
+        <article class="help-card" *ngFor="let item of helpCards">
+          <div class="help-icon">{{ item.title.charAt(0) }}</div>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+          <a *ngIf="item.route" [routerLink]="item.route" [queryParams]="item.queryParams">{{ item.action }}</a>
+          <a *ngIf="item.href" [href]="item.href" (click)="goToHref($event, item.href)">{{ item.action }}</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="home-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="assets/skyward-logo.svg" alt="Skyward Airlines logo">
+        <p>Skyward Airlines brings booking, payment, loyalty, waitlist, and passenger self-service into one polished reservation experience.</p>
+      </div>
+      <div class="footer-action">
+        <strong>Need your trip information?</strong>
+        <span>Open the User Portal with your phone number or email.</span>
+        <a routerLink="/user-portal">Open User Portal</a>
+      </div>
+    </div>
+
+    <div class="footer-grid">
+      <section *ngFor="let group of footerGroups">
+        <h3>{{ group.title }}</h3>
+        <ng-container *ngFor="let link of group.links">
+          <a *ngIf="link.route" [routerLink]="link.route" [queryParams]="link.queryParams">{{ link.label }}</a>
+          <a *ngIf="link.href" [href]="link.href" (click)="goToHref($event, link.href)">{{ link.label }}</a>
+        </ng-container>
+      </section>
+    </div>
+
+    <div class="footer-contact">
+      <div>
+        <h3>Contact Us</h3>
+        <p>Skyward support desk | Dhaka, Bangladesh | support@skyward-airlines.local</p>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.youtube.com/" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.whatsapp.com/" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+
+    <div class="footer-legal">
+      <span>Accessibility</span>
+      <span>Privacy & Cookie Policy</span>
+      <span>Legal Notice</span>
+      <span>Passenger Rights</span>
+      <span>Skyward Airlines Copyright © 2026</span>
+    </div>
+  </footer>
+</div>

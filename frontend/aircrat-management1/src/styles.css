@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #0f172a;
+    --accent: #3b82f6;
+    --bg-light: #f4f7fe;
+    --text-dark: #1e293b;
+    --text-gray: #64748b;
+    --white: #ffffff;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --stat-blue: #3b82f6;
+    --stat-yellow: #f59e0b;
+}
+/* ==========================================
+   GLOBAL INVOICE MODE CONFIGURATION
+   ========================================== */
+
+/* when active the invoice mode */
+body.invoice-mode .sidebar,
+body.invoice-mode .main-header,     
+body.invoice-mode .main-footer,      
+body.invoice-mode app-header,       
+body.invoice-mode app-footer,
+body.invoice-mode nav.top-nav {
+    display: none !important;
+}
+
+/* main content styles */
+body.invoice-mode .main-content,
+body.invoice-mode .content-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+/* background white in printing time*/
+body.invoice-mode {
+    background: #3b82f6;;
+}
+
+body.boarding-print-mode app-sidebar,
+body.boarding-print-mode app-header,
+body.boarding-print-mode app-footer,
+body.boarding-print-mode .sidebar,
+body.boarding-print-mode .main-header,
+body.boarding-print-mode .main-footer,
+body.boarding-print-mode .app-footer,
+body.boarding-print-mode .footer {
+    display: none !important;
+}
+
+body.boarding-print-mode .app-container,
+body.boarding-print-mode .main-wrapper,
+body.boarding-print-mode main.content,
+body.boarding-print-mode .content {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+}
+
+@media print {
+    body.boarding-print-mode app-sidebar,
+    body.boarding-print-mode app-header,
+    body.boarding-print-mode app-footer,
+    body.boarding-print-mode .sidebar,
+    body.boarding-print-mode .main-header,
+    body.boarding-print-mode .main-footer,
+    body.boarding-print-mode .app-footer,
+    body.boarding-print-mode .footer {
+        display: none !important;
+    }
+    body.boarding-print-mode .app-container,
+    body.boarding-print-mode .main-wrapper,
+    body.boarding-print-mode main.content,
+    body.boarding-print-mode .content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: #fff !important;
+    }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { width: 100%; max-width: 100%; overflow-x: hidden; }
+body { font-family: 'Poppins', sans-serif; background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }
+
+/* ==========================================
+   FINAL PRESENTATION RESPONSIVE GUARDRAILS
+   Small, reusable UI fixes only. Business logic and page structure stay untouched.
+   ========================================== */
+img,
+svg,
+canvas,
+video {
+    max-width: 100%;
+}
+
+table {
+    max-width: 100%;
+}
+
+.table-responsive,
+.table-scroll,
+.table-wrapper,
+.table-container,
+.table-wrap,
+.monthly-table-wrap,
+.schedule-table,
+.user-table,
+.bpp-table-wrap,
+.report-table,
+.modern-table-wrap,
+.mini-table-wrap {
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.chart-card,
+.chart-wrapper,
+.panel,
+.card,
+.dashboard-card,
+.summary-card,
+.kpi-card,
+.metric-card,
+.stat-card {
+    min-width: 0;
+}
+
+.chart-wrapper canvas,
+.chart-card canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+input,
+select,
+textarea,
+button {
+    max-width: 100%;
+}
+
+input,
+select,
+button {
+    min-height: 42px;
+}
+
+button,
+.btn,
+.primary-btn,
+.ghost-btn,
+.action-btn,
+.mini-btn,
+.icon-btn {
+    white-space: nowrap;
+}
+
+.suggestion-list,
+.search-results,
+.autocomplete-panel,
+.dropdown-menu {
+    z-index: 1200 !important;
+}
+
+td,
+th {
+    vertical-align: middle;
+}
+
+td,
+th,
+.truncate,
+.ellipsis {
+    min-width: 0;
+}
+
+@media (max-width: 1024px) {
+    .chart-card,
+    .panel,
+    .card,
+    .dashboard-card {
+        border-radius: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    table {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 430px) {
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 13px;
+    }
+
+    .table-responsive,
+    .table-scroll,
+    .table-wrapper,
+    .table-container,
+    .table-wrap,
+    .monthly-table-wrap,
+    .schedule-table,
+    .user-table,
+    .bpp-table-wrap {
+        border-radius: 14px;
+    }
+}

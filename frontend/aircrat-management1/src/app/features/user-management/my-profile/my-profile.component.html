@@ -1,0 +1,70 @@
+<section class="profile-page">
+  <div class="profile-shell">
+    <div class="profile-banner">
+      <div>
+        <span>Skyward enterprise account</span>
+        <h1>My Profile</h1>
+      </div>
+      <i class="fas fa-id-badge"></i>
+    </div>
+
+    <div class="profile-card">
+      <div class="avatar-wrap">
+        <img [src]="profileImage" [alt]="displayName + ' profile photo'">
+        <label class="photo-btn">
+          <i class="fas fa-camera"></i>
+          Change Photo
+          <input type="file" accept="image/*" (change)="onPhotoSelected($event)">
+        </label>
+      </div>
+
+      <div class="profile-heading">
+        <h2>{{ displayName }}</h2>
+        <span class="role-badge">{{ role }}</span>
+        <p>{{ department }}</p>
+      </div>
+
+      <div class="profile-grid">
+        <article class="info-card identity-card">
+          <div class="card-title">
+            <i class="fas fa-user"></i>
+            <h3>Identity Information</h3>
+          </div>
+          <dl>
+            <div><dt>Employee Code</dt><dd>{{ currentUser?.employeeCode || 'N/A' }}</dd></div>
+            <div><dt>Full Name</dt><dd>{{ displayName }}</dd></div>
+            <div><dt>Username</dt><dd>{{ currentUser?.username || 'N/A' }}</dd></div>
+            <div><dt>Email</dt><dd>{{ currentUser?.email || 'N/A' }}</dd></div>
+            <div><dt>Phone Number</dt><dd>{{ currentUser?.phoneNumber || 'N/A' }}</dd></div>
+          </dl>
+        </article>
+
+        <article class="info-card access-card">
+          <div class="card-title">
+            <i class="fas fa-shield-halved"></i>
+            <h3>Access Information</h3>
+          </div>
+          <dl>
+            <div><dt>Role</dt><dd>{{ role }}</dd></div>
+            <div><dt>Department</dt><dd>{{ department }}</dd></div>
+            <div><dt>Station</dt><dd>{{ currentUser?.station || 'N/A' }}</dd></div>
+            <div><dt>Status</dt><dd><span class="status-chip">{{ currentUser?.status || 'Active' }}</span></dd></div>
+          </dl>
+        </article>
+
+        <article class="info-card permission-card">
+          <div class="card-title">
+            <i class="fas fa-key"></i>
+            <h3>Permission Summary</h3>
+          </div>
+          <div class="permission-list" *ngIf="permissionPreview.length; else noPermissions">
+            <span *ngFor="let permission of permissionPreview">{{ permission }}</span>
+          </div>
+          <ng-template #noPermissions>
+            <p class="empty-state">No module permissions are assigned for this account.</p>
+          </ng-template>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>

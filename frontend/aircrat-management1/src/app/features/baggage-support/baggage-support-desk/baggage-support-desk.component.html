@@ -1,0 +1,82 @@
+<div class="ops-page">
+  <section class="hero">
+    <div>
+      <span class="eyebrow">Baggage Operations</span>
+      <h1>Baggage & Open Support</h1>
+      <p>Manage extra baggage pricing, baggage incidents and open passenger support cases with booking context.</p>
+      <button type="button" (click)="createCase()" [disabled]="!selectedBooking || loading">
+        <i class="fas fa-suitcase-rolling"></i> Open Case
+      </button>
+    </div>
+    <div class="hero-meter">
+      <span>USD {{ estimatedFee | number:'1.0-0' }}</span>
+      <small>Estimated excess fee</small>
+    </div>
+  </section>
+
+  <section class="search-panel">
+    <div class="field-wrap">
+      <label>Find booking</label>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="searchText" (focus)="showSuggestions = true" (input)="showSuggestions = true" placeholder="Search reference, passenger, flight or route">
+      </div>
+      <div class="suggestions" *ngIf="showSuggestions && suggestions.length">
+        <button type="button" *ngFor="let booking of suggestions" (click)="selectBooking(booking)">
+          <span>{{ booking.passengerName }}</span>
+          <small>{{ booking.bookingReference }} | {{ booking.flightNumber }} | {{ booking.origin }} to {{ booking.destination }}</small>
+        </button>
+      </div>
+    </div>
+    <div class="booking-summary" *ngIf="selectedBooking">
+      <span>{{ selectedBooking.flightNumber }}</span>
+      <strong>{{ selectedBooking.origin }} to {{ selectedBooking.destination }}</strong>
+      <small>{{ selectedBooking.passengerName }} | {{ selectedBooking.classType }}</small>
+    </div>
+  </section>
+
+  <main class="workspace">
+    <section class="calculator">
+      <h2>Allowance Calculator</h2>
+      <div class="form-grid">
+        <label>Issue Type<select [(ngModel)]="issueType"><option *ngFor="let type of issueTypes">{{ type }}</option></select></label>
+        <label>Checked Bags<input type="number" min="0" [(ngModel)]="checkedBags"></label>
+        <label>Checked Weight (kg)<input type="number" min="0" [(ngModel)]="checkedWeightKg"></label>
+        <label>Cabin Weight (kg)<input type="number" min="0" [(ngModel)]="cabinWeightKg"></label>
+      </div>
+      <textarea rows="4" [(ngModel)]="notes" placeholder="Support notes"></textarea>
+      <button type="button" class="primary" (click)="createCase()" [disabled]="!selectedBooking || loading">Save Support Case</button>
+    </section>
+
+    <aside class="insights">
+      <div><span>Allowance</span><strong>{{ allowanceKg }} kg</strong></div>
+      <div><span>Excess</span><strong>{{ excessKg }} kg</strong></div>
+      <div><span>Fee</span><strong>USD {{ estimatedFee | number:'1.0-2' }}</strong></div>
+      <p>Economy 30kg, premium 35kg, business 40kg and first class 50kg allowance rules are applied automatically.</p>
+    </aside>
+  </main>
+
+  <section class="queue">
+    <div class="section-title">
+      <span class="eyebrow">Open Cases</span>
+      <h2>Baggage Support Queue</h2>
+    </div>
+    <div class="case-grid">
+      <article class="case-card" *ngFor="let item of cases">
+        <div>
+          <span class="chip" [class.done]="item.status === 'RESOLVED'">{{ item.status }}</span>
+          <strong>{{ item.caseReference || 'Pending' }}</strong>
+        </div>
+        <h3>{{ item.issueType }}</h3>
+        <p>{{ item.passengerName }} | {{ item.bookingReference }}</p>
+        <small>{{ item.flightNumber }} | {{ item.route }}</small>
+        <div class="case-metrics">
+          <span>{{ item.checkedWeightKg }} kg</span>
+          <span>Excess {{ item.excessKg }} kg</span>
+          <span>USD {{ item.estimatedFee }}</span>
+        </div>
+        <button type="button" (click)="resolveCase(item)" [disabled]="item.status === 'RESOLVED'">Resolve</button>
+      </article>
+    </div>
+  </section>
+</div>

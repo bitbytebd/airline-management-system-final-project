@@ -1,0 +1,125 @@
+<section class="wl-page">
+  <div class="wl-hero">
+    <div>
+      <span class="eyebrow">Passenger recovery operations</span>
+      <h1>Waitlist Queue</h1>
+      <p>Prioritize standby passengers, notify eligible travelers, and convert high-demand requests into confirmed sales.</p>
+    </div>
+    <div class="hero-actions">
+      <button class="ghost" (click)="showGuide = true"><i class="fas fa-circle-info"></i> Guide</button>
+      <button class="ghost" routerLink="/waitlist/overbooking"><i class="fas fa-chart-line"></i> Overbooking</button>
+      <button class="primary" (click)="openCreate()"><i class="fas fa-plus"></i> Add Waitlist</button>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card"><i class="fas fa-list-check"></i><span>Total Entries</span><strong>{{ stats.totalEntries }}</strong></div>
+    <div class="metric-card green"><i class="fas fa-hourglass-half"></i><span>Active Queue</span><strong>{{ stats.activeQueue }}</strong></div>
+    <div class="metric-card amber"><i class="fas fa-star"></i><span>Priority</span><strong>{{ stats.priorityEntries }}</strong></div>
+    <div class="metric-card blue"><i class="fas fa-chair"></i><span>Requested Seats</span><strong>{{ stats.requestedSeats }}</strong></div>
+  </div>
+
+  <div class="filter-card">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input [(ngModel)]="query" (input)="onSearch()" placeholder="Search passenger, email, flight, booking, or waitlist ref">
+      <div class="suggestions" *ngIf="query && suggestions.length">
+        <button type="button" *ngFor="let item of suggestions" (click)="pickSuggestion(item)">
+          <strong>{{ item.passengerName }}</strong>
+          <span>{{ item.waitlistReference }} · {{ item.flightNumber }} · {{ item.passengerEmail }}</span>
+        </button>
+      </div>
+    </div>
+    <select [(ngModel)]="status" (change)="load()">
+      <option value="">All Status</option>
+      <option value="WAITING">Waiting</option>
+      <option value="PRIORITY">Priority</option>
+      <option value="NOTIFIED">Notified</option>
+      <option value="CONFIRMED">Confirmed</option>
+      <option value="CANCELLED">Cancelled</option>
+    </select>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Passenger</th>
+          <th>Flight</th>
+          <th>Class</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Offer</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of entries">
+          <td>
+            <div class="person">
+              <div class="avatar">{{ item.passengerName.charAt(0) }}</div>
+              <div><strong>{{ item.passengerName }}</strong><span>{{ item.passengerEmail }}</span><small>{{ item.waitlistReference }}</small></div>
+            </div>
+          </td>
+          <td><strong>{{ item.flightNumber }}</strong><span class="route">{{ item.origin }} to {{ item.destination }}</span><small>{{ item.departureDate | date:'mediumDate' }}</small></td>
+          <td><span class="tag">{{ item.classType }}</span><small>{{ item.requestedSeats }} seat(s)</small></td>
+          <td><div class="score"><b>{{ item.priorityScore }}</b><span [style.width.%]="item.priorityScore || 0"></span></div></td>
+          <td><span class="status" [ngClass]="item.status.toLowerCase()">{{ item.status }}</span></td>
+          <td><strong class="money">{{ formatMoney(item.fareOffer, item.currency) }}</strong><small>{{ item.loyaltyTier }}</small></td>
+          <td>
+            <div class="actions">
+              <button title="Notify" (click)="notify(item)"><i class="fas fa-bell"></i></button>
+              <button title="Confirm" (click)="confirm(item)"><i class="fas fa-check"></i></button>
+              <button title="Edit" (click)="edit(item)"><i class="fas fa-edit"></i></button>
+              <button title="Cancel" (click)="cancel(item)"><i class="fas fa-ban"></i></button>
+              <button title="Delete" (click)="remove(item)"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && entries.length === 0">
+          <td colspan="7" class="empty"><i class="fas fa-inbox"></i><h3>No waitlist entries found</h3></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal" *ngIf="showGuide">
+    <div class="modal-box guide">
+      <button class="x" (click)="showGuide = false">&times;</button>
+      <span class="eyebrow">How to use</span>
+      <h2>Waitlist Operating Flow</h2>
+      <p *ngFor="let item of instructions"><i class="fas fa-check-circle"></i>{{ item }}</p>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="showForm">
+    <form class="modal-box form" [formGroup]="form" (ngSubmit)="save()">
+      <button type="button" class="x" (click)="showForm = false">&times;</button>
+      <h2>{{ editingId ? 'Edit Waitlist Entry' : 'Add Waitlist Entry' }}</h2>
+
+      <label class="wide">Import Existing Booking
+        <input type="text" (input)="searchBooking($any($event.target).value)" placeholder="Type booking reference, passenger name, email">
+        <div class="booking-suggestions" *ngIf="bookingSuggestions.length">
+          <button type="button" *ngFor="let b of bookingSuggestions" (click)="useBooking(b)">
+            {{ b.bookingReference }} · {{ b.passengerName }} · {{ b.flightNumber }}
+          </button>
+        </div>
+      </label>
+
+      <label>Passenger Name<input formControlName="passengerName"></label>
+      <label>Email<input formControlName="passengerEmail"></label>
+      <label>Phone<input formControlName="phoneNumber"></label>
+      <label>Flight Number<input formControlName="flightNumber"></label>
+      <label>Origin<input formControlName="origin"></label>
+      <label>Destination<input formControlName="destination"></label>
+      <label>Departure Date<input type="date" formControlName="departureDate"></label>
+      <label>Class<select formControlName="classType"><option>ECONOMY</option><option>PREMIUM</option><option>BUSINESS</option><option>FIRST_CLASS</option></select></label>
+      <label>Requested Seats<input type="number" formControlName="requestedSeats"></label>
+      <label>Loyalty Tier<select formControlName="loyaltyTier"><option>BRONZE</option><option>SILVER</option><option>GOLD</option><option>PLATINUM</option></select></label>
+      <label>Fare Offer<input type="number" formControlName="fareOffer"></label>
+      <label>Status<select formControlName="status"><option>WAITING</option><option>PRIORITY</option><option>NOTIFIED</option><option>CONFIRMED</option><option>CANCELLED</option></select></label>
+      <label class="wide">Notes<textarea formControlName="notes" rows="3"></textarea></label>
+      <button class="save" type="submit" [disabled]="form.invalid"><i class="fas fa-save"></i> Save Waitlist</button>
+    </form>
+  </div>
+</section>

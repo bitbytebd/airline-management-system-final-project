@@ -1,0 +1,202 @@
+<section class="public-page">
+  <header class="public-nav">
+    <a routerLink="/" class="brand">
+      <img src="assets/skyward-logo.svg" alt="Skyward Airlines">
+    </a>
+    <nav>
+      <a routerLink="/">Home</a>
+      <a routerLink="/flights/search">Search Flights</a>
+      <a routerLink="/user-portal">User Portal</a>
+      <a routerLink="/auth/login">Admin Login</a>
+    </nav>
+  </header>
+
+  <main class="booking-shell">
+    <section class="loading-card" *ngIf="loading">
+      <div></div><div></div><div></div>
+    </section>
+
+    <section class="confirmation-card" *ngIf="!loading && savedBooking">
+      <i class="fas fa-check-circle"></i>
+      <p>Booking request submitted</p>
+      <h1>{{ savedBooking.bookingReference || 'PNR Pending' }}</h1>
+      <span>Status: Pending Review</span>
+      <strong>Your booking request has been submitted for airline review. Once approved, payment can be completed through the authorized payment flow.</strong>
+      <div class="confirmation-actions">
+        <a routerLink="/booking-status" [queryParams]="{ ref: savedBooking.bookingReference }">Check Approval Status</a>
+        <a routerLink="/user-portal" [queryParams]="{ mode: 'manage' }">Open User Portal</a>
+        <a routerLink="/">Back Home</a>
+      </div>
+    </section>
+
+    <ng-container *ngIf="!loading && !savedBooking">
+      <section class="booking-hero">
+        <div>
+          <p>Public booking request</p>
+          <h1>Complete your booking details</h1>
+          <span>No admin sidebar, no payment queue, no internal dashboard access.</span>
+        </div>
+        <button type="button" (click)="selectAnotherFlight()">Change Flight</button>
+      </section>
+
+      <div class="alert error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <section class="booking-grid" *ngIf="flight">
+        <aside class="flight-summary">
+          <span>Selected flight</span>
+          <h2>{{ flight.flightNumber }}</h2>
+          <div class="route">
+            <strong>{{ flight.origin }}</strong>
+            <i class="fas fa-plane"></i>
+            <strong>{{ flight.destination }}</strong>
+          </div>
+          <dl>
+            <div><dt>Departure</dt><dd>{{ flight.departureDate }} {{ flight.departureTime }}</dd></div>
+            <div><dt>Arrival</dt><dd>{{ flight.arrivalTime || 'TBA' }}</dd></div>
+            <div><dt>Status</dt><dd>{{ flight.status || 'SCHEDULED' }}</dd></div>
+          </dl>
+
+          <div class="fare-list">
+            <span>Economy <b>{{ formatMoney(classPrice('ECONOMY')) }}</b></span>
+            <span>Premium <b>{{ formatMoney(classPrice('PREMIUM')) }}</b></span>
+            <span>Business <b>{{ formatMoney(classPrice('BUSINESS')) }}</b></span>
+            <span>First Class <b>{{ formatMoney(classPrice('FIRST_CLASS')) }}</b></span>
+          </div>
+        </aside>
+
+        <form class="booking-form" [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
+          <section class="form-card">
+            <h2>Passenger Information</h2>
+            <div class="form-grid">
+              <label>
+                Full Name *
+                <input type="text" formControlName="passengerName" placeholder="As per passport">
+              </label>
+              <label>
+                Email *
+                <input type="email" formControlName="email" placeholder="name@example.com">
+              </label>
+              <label>
+                Phone *
+                <input type="text" formControlName="phone" placeholder="+880...">
+              </label>
+              <label>
+                Passport / NID
+                <input type="text" formControlName="passportNumber" placeholder="Optional">
+              </label>
+            </div>
+          </section>
+
+          <section class="form-card">
+            <h2>Trip Preferences</h2>
+            <div class="form-grid">
+              <label>
+                Cabin Class *
+                <select formControlName="classType" (change)="onClassTypeChange()">
+                  <option *ngFor="let cabin of classOptions" [value]="cabin.value">{{ cabin.label }}</option>
+                </select>
+              </label>
+              <label>
+                Adults *
+                <input type="number" min="1" formControlName="adultCount" (change)="syncSeatCount()">
+              </label>
+              <label>
+                Children
+                <input type="number" min="0" formControlName="childCount" (change)="syncSeatCount()">
+              </label>
+              <label>
+                Infants
+                <input type="number" min="0" formControlName="infantCount">
+              </label>
+              <div class="seat-map-card">
+                <div class="seat-map-head">
+                  <div>
+                    <span>Seat Selection</span>
+                    <strong>{{ selectedSeats.length }} / {{ requiredSeatCount() }} selected</strong>
+                  </div>
+                  <em>{{ selectedSeats.join(', ') || 'Choose seat' }}</em>
+                </div>
+                <div class="seat-legend">
+                  <span><i class="available"></i>Available</span>
+                  <span><i class="selected"></i>Selected</span>
+                  <span><i class="booked"></i>Booked</span>
+                  <span><i class="pending"></i>Pending</span>
+                </div>
+                <p class="seat-helper">Please select seats from your chosen cabin class.</p>
+                <div class="seat-cabin">
+                  <div
+                    class="cabin-section"
+                    *ngFor="let section of cabinSections"
+                    [class.selected-cabin]="isSelectedCabin(section)"
+                    [class.dimmed-cabin]="!isSelectedCabin(section)">
+                    <div class="cabin-divider">
+                      <span>{{ section.label }}</span>
+                      <small>Rows {{ section.rows[0] }}-{{ section.rows[section.rows.length - 1] }}</small>
+                    </div>
+                    <div class="seat-row" *ngFor="let row of section.rows">
+                      <small>{{ row }}</small>
+                      <button
+                        type="button"
+                        *ngFor="let column of seatColumns()"
+                        [class.available]="seatStatus(row + column) === 'AVAILABLE'"
+                        [class.selected]="seatStatus(row + column) === 'SELECTED'"
+                        [class.booked]="seatStatus(row + column) === 'BOOKED'"
+                        [class.pending]="seatStatus(row + column) === 'PENDING'"
+                        [disabled]="!canSelectSeat(row + column)"
+                        (click)="toggleSeat(row + column)">
+                        {{ row }}{{ column }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <p class="seat-message" *ngIf="seatMessage">{{ seatMessage }}</p>
+              </div>
+              <div class="coupon-field">
+                <label>
+                  Coupon Code
+                  <input
+                    type="text"
+                    formControlName="couponCode"
+                    placeholder="Optional"
+                    autocomplete="off"
+                    (input)="onCouponInput()"
+                    (focus)="onCouponInput()">
+                </label>
+                <div class="coupon-suggestions" *ngIf="showCouponSuggestions && filteredCoupons.length">
+                  <button type="button" *ngFor="let coupon of filteredCoupons" (mousedown)="selectCoupon(coupon)">
+                    <strong>{{ coupon.code }}</strong>
+                    <span>{{ coupon.title || coupon.description || 'Skyward offer' }}</span>
+                    <small>{{ couponSummary(coupon) }}</small>
+                  </button>
+                </div>
+                <button type="button" class="apply-coupon-btn" (click)="applyCoupon()" [disabled]="validatingCoupon">
+                  {{ validatingCoupon ? 'Checking...' : 'Apply Coupon' }}
+                </button>
+                <p class="coupon-message" *ngIf="couponMessage">{{ couponMessage }}</p>
+              </div>
+              <label>
+                Loyalty Member
+                <input type="text" formControlName="loyaltyMemberNumber" placeholder="Optional">
+              </label>
+              <label>
+                Redeem Points
+                <input type="number" min="0" step="100" formControlName="loyaltyPointsUsed">
+              </label>
+            </div>
+          </section>
+
+          <section class="fare-preview">
+            <div>
+              <span>Estimated Total</span>
+              <strong>{{ formatMoney(previewTotal()) }}</strong>
+              <small>Final fare is recalculated by Skyward before saving.</small>
+            </div>
+            <button type="submit" [disabled]="submitting || bookingForm.invalid || !flight">
+              {{ submitting ? 'Submitting...' : 'Submit Booking Request' }}
+            </button>
+          </section>
+        </form>
+      </section>
+    </ng-container>
+  </main>
+</section>

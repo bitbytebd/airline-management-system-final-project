@@ -1,0 +1,50 @@
+<section class="detail-page">
+  <div class="detail-hero">
+    <div>
+      <a routerLink="/airline" class="back-link"><i class="fas fa-arrow-left"></i> Airline directory</a>
+      <h1>{{ isEdit ? 'Update Airline Partner' : 'Register Airline Partner' }}</h1>
+      <p>Maintain international airline identity, airline_code, hub, alliance, support channels, and logo profile for enterprise operations.</p>
+    </div>
+    <i class="fas fa-building-circle-check"></i>
+  </div>
+
+  <form class="detail-card" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="section-title"><i class="fas fa-id-badge"></i> Airline Identity</div>
+    <div class="form-grid">
+      <label>Airline Name <input type="text" formControlName="airlineName" placeholder="e.g. Qatar Airways"></label>
+      <label>Airline Code <input type="text" formControlName="airlineCode" placeholder="e.g. QR"></label>
+      <label>Country <input type="text" formControlName="country" placeholder="e.g. Qatar"></label>
+      <label>Headquarters <input type="text" formControlName="headquarters" placeholder="e.g. Doha"></label>
+      <label>Primary Hub <input type="text" formControlName="primaryHub" placeholder="e.g. Hamad International Airport"></label>
+      <label>IATA Prefix <input type="text" formControlName="iataPrefix" placeholder="e.g. 157"></label>
+    </div>
+
+    <div class="section-title"><i class="fas fa-network-wired"></i> Commercial & Support Profile</div>
+    <div class="form-grid">
+      <label>Alliance
+        <select formControlName="alliance">
+          <option value="Independent">Independent</option>
+          <option value="Star Alliance">Star Alliance</option>
+          <option value="Oneworld">Oneworld</option>
+          <option value="SkyTeam">SkyTeam</option>
+        </select>
+      </label>
+      <label>Fleet Size <input type="number" formControlName="fleetSize"></label>
+      <label>Support Email <input type="email" formControlName="supportEmail" placeholder="support@example.com"></label>
+      <label>Support Phone <input type="text" formControlName="supportPhone" placeholder="+974 ..."></label>
+      <label>Logo URL <input type="url" formControlName="logoUrl" placeholder="https://..."></label>
+      <label>Status
+        <select formControlName="status">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Suspended">Suspended</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn-save" [disabled]="form.invalid"><i class="fas fa-check"></i> Save Airline</button>
+    </div>
+  </form>
+</section>

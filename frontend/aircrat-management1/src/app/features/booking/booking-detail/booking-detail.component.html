@@ -1,0 +1,400 @@
+<div class="main-wrapper">
+  
+  <header class="hero-header">
+    <div class="hero-content">
+      <h1>{{ isEdit ? 'Modify Your Trip' : 'Find Your Perfect Flight' }}</h1>
+      <p>Safe & Secure Booking</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="search-widget">
+      
+      <!-- Trip Tabs -->
+      <div class="trip-tabs">
+        <button [class.active]="tripType==='ONE_WAY'" (click)="setTripType('ONE_WAY')">
+          <i class="fas fa-arrow-right"></i> One Way
+        </button>
+        <button [class.active]="tripType==='ROUND_TRIP'" (click)="setTripType('ROUND_TRIP')">
+          <i class="fas fa-exchange-alt"></i> Round Trip
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        
+        <!-- SEARCH ROW -->
+        <div class="search-row">
+          <!-- From -->
+          <div class="search-field from-field">
+            <label>From</label>
+            <input type="text" 
+              [ngModel]="selectedOriginText" 
+              (ngModelChange)="filterOrigin($event)"
+              (blur)="form.patchValue({origin: selectedOriginText})"
+              [ngModelOptions]="{standalone: true}" 
+              placeholder="City or Airport" autocomplete="off">
+            <div class="airport-dropdown" *ngIf="filteredOrigins.length > 0">
+              <div class="airport-item" *ngFor="let apt of filteredOrigins" (click)="selectOrigin(apt)">
+                <div class="apt-info"><strong>{{ apt }}</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="swap-btn-container">
+            <button type="button" class="swap-btn" (click)="swapLocations()"><i class="fas fa-exchange-alt"></i></button>
+          </div>
+
+          <!-- To -->
+          <div class="search-field to-field">
+            <label>To</label>
+            <input type="text" 
+              [ngModel]="selectedDestText" 
+              (ngModelChange)="filterDestination($event)"
+              (blur)="form.patchValue({destination: selectedDestText})"
+              [ngModelOptions]="{standalone: true}" 
+              placeholder="City or Airport" autocomplete="off">
+            <div class="airport-dropdown" *ngIf="filteredDestinations.length > 0">
+              <div class="airport-item" *ngFor="let apt of filteredDestinations" (click)="selectDestination(apt)">
+                <div class="apt-info"><strong>{{ apt }}</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="search-field date-field">
+            <label>Departure</label>
+            <input type="date" formControlName="departureDate">
+          </div>
+
+          <div class="search-field date-field" *ngIf="tripType === 'ROUND_TRIP'">
+            <label>Return</label>
+            <input type="date" formControlName="returnDate">
+          </div>
+
+          <!-- Passengers -->
+          <div class="search-field passenger-field">
+            <label>Travellers</label>
+            <div class="passenger-selector" (click)="showPassengerDropdown = !showPassengerDropdown">
+              <span>{{ getTotalPassengers() }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            
+            <div class="passenger-dropdown" *ngIf="showPassengerDropdown">
+              <div class="pax-row">
+                <div class="pax-label"><strong>Adults</strong></div>
+                <div class="pax-control">
+                  <button type="button" (click)="updatePassengerCount('adult', 'remove')">-</button>
+                  <span>{{ adults }}</span>
+                  <button type="button" (click)="updatePassengerCount('adult', 'add')">+</button>
+                </div>
+              </div>
+              <div class="pax-row">
+                <div class="pax-label"><strong>Children</strong></div>
+                <div class="pax-control">
+                  <button type="button" (click)="updatePassengerCount('child', 'remove')">-</button>
+                  <span>{{ children }}</span>
+                  <button type="button" (click)="updatePassengerCount('child', 'add')">+</button>
+                </div>
+              </div>
+              <div class="pax-row">
+                <div class="pax-label"><strong>Infants</strong></div>
+                <div class="pax-control">
+                  <button type="button" (click)="updatePassengerCount('infant', 'remove')">-</button>
+                  <span>{{ infants }}</span>
+                  <button type="button" (click)="updatePassengerCount('infant', 'add')">+</button>
+                </div>
+              </div>
+              <button class="done-btn" (click)="showPassengerDropdown=false; calculatePrice()">Done</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="search-btn-wrapper">
+          <button type="button" class="btn-modern search" (click)="searchFlights()">
+            <i class="fas fa-search"></i> Search Flights
+          </button>
+        </div>
+
+        <!-- FLIGHT RESULTS -->
+        <div class="flight-results" *ngIf="showResults">
+          <h4 class="result-title">Select Flight</h4>
+          <div *ngIf="filteredFlights.length === 0" class="no-flights">
+            <p>No flights available for the selected route and date.</p>
+          </div>
+
+          <div class="flight-card" *ngFor="let f of filteredFlights" (click)="selectFlight(f)">
+            <div class="airline-logo"><i class="fas fa-plane"></i></div>
+            <div class="flight-time">
+              <strong>{{ f.flightNumber || 'Flight' }}</strong>
+              <span>{{ formatFlightDate(f.departureDate) }} | {{ f.departureTime }}</span>
+              <span>{{ f.origin }}</span>
+            </div>
+            <div class="flight-duration"><small>Direct</small></div>
+            <div class="flight-time text-right">
+              <strong>{{ f.destination }}</strong>
+              <span *ngIf="shouldShowArrivalDate(f)">Arrives {{ formatFlightDate(f.arrivalDate) }}</span>
+              <span>{{ f.arrivalTime }}</span>
+            </div>
+            <div class="flight-price"><strong>$ {{ f.economyPrice || f.basePrice || 0 }}</strong><small>Starts from</small></div>
+            <button type="button" class="btn-select-flight">Select</button>
+          </div>
+        </div>
+
+        <!-- PASSENGER DETAILS -->
+        <div class="passenger-form-section" *ngIf="form.value.flightId">
+          <h4>Passenger Details</h4>
+          
+          <div class="passenger-grid">
+            <div class="field">
+              <label>Full Name <span class="req">*</span></label>
+              <input type="text" formControlName="passengerName" placeholder="As per Passport">
+            </div>
+            <div class="field">
+              <label>Passport No</label>
+              <input type="text" formControlName="passportNumber">
+            </div>
+            <div class="field">
+              <label>Email Address</label>
+              <input type="email" formControlName="email">
+            </div>
+            <div class="field">
+              <label>Phone Number</label>
+              <input type="text" formControlName="phone" placeholder="Passenger phone">
+            </div>
+          </div>
+
+          <div class="additional-passengers" *ngIf="additionalPassengerFields.length">
+            <div class="additional-head">
+              <h4>Additional Passenger Names</h4>
+              <small>Primary adult passenger is already captured above.</small>
+            </div>
+            <div class="passenger-grid additional-grid">
+              <div class="field" *ngFor="let passenger of additionalPassengerFields">
+                <label>{{ passenger.label }} <span class="req">*</span></label>
+                <input
+                  type="text"
+                  [(ngModel)]="passenger.name"
+                  [ngModelOptions]="{standalone: true}"
+                  (ngModelChange)="onExtraPassengerNameChange()"
+                  placeholder="Passenger full name">
+              </div>
+            </div>
+            <div class="extra-passenger-error" *ngIf="extraPassengerError">
+              <i class="fas fa-exclamation-circle"></i>
+              {{ extraPassengerError }}
+            </div>
+          </div>
+
+          <!-- SEAT & CLASS ROW (Professional Layout) -->
+          <div class="seat-class-row">
+            
+            <!-- Seat Input with Popup Trigger -->
+            <div class="field">
+              <label>Seat Numbers</label>
+              <div class="input-action-group">
+                <input type="text" formControlName="seatNumber" readonly placeholder="Click icon to select seats">
+                <button type="button" class="btn-seat-popup" (click)="openSeatModal()">
+                  <i class="fas fa-chair"></i>
+                </button>
+              </div>
+              <div class="selected-seat-list" *ngIf="selectedSeats.length">
+                <span *ngFor="let seat of selectedSeats">{{ seat }}</span>
+              </div>
+              <small class="seat-helper">Required seats: {{ getRequiredSeatCount() }} (adults + children)</small>
+              <div class="extra-passenger-error" *ngIf="seatSelectionError">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ seatSelectionError }}
+              </div>
+            </div>
+
+            <!-- Class Selection -->
+            <div class="field">
+              <label>Class</label>
+              <select formControlName="classType">
+                <option value="ECONOMY">Economy</option>
+                <option value="PREMIUM">Premium</option>
+                <option value="BUSINESS">Business</option>
+                <option value="FIRST_CLASS">First Class</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="addon-section">
+            <div class="addon-card">
+              <h4>Baggage Add-on</h4>
+              <div class="addon-grid">
+                <div class="field">
+                  <label>Checked Bags</label>
+                  <input type="number" formControlName="checkedBags" min="0" (input)="calculatePrice()">
+                </div>
+                <div class="field">
+                  <label>Checked Weight (kg)</label>
+                  <input type="number" formControlName="checkedWeightKg" min="0" step="0.5">
+                </div>
+                <div class="field">
+                  <label>Cabin Weight (kg)</label>
+                  <input type="number" formControlName="cabinWeightKg" min="0" step="0.5">
+                </div>
+              </div>
+              <small>Checked allowance: {{ getBaggageAllowanceKg() }}kg. Cabin allowance: 7kg. Excess checked baggage: $15/kg.</small>
+            </div>
+
+            <div class="addon-card">
+              <h4>Special Services</h4>
+              <div class="service-grid">
+                <label *ngFor="let service of ['Wheelchair Assistance', 'Medical Support', 'Infant Assistance', 'Special Meal', 'Priority Boarding']">
+                  <input
+                    type="checkbox"
+                    [checked]="isSpecialServiceSelected(service)"
+                    (change)="toggleSpecialService(service, $any($event.target).checked)">
+                  <span>{{ service }}</span>
+                  <em>$ {{ specialServiceFees[service] || 0 }}</em>
+                </label>
+              </div>
+              <div class="field service-notes">
+                <label>Special Service Notes</label>
+                <input type="text" formControlName="specialServiceNotes" placeholder="Optional notes for airport team">
+              </div>
+            </div>
+          </div>
+
+          <div class="offer-section">
+            <div class="field offer-field">
+              <label>Coupon Code</label>
+              <div class="input-action-group">
+                <input type="text" formControlName="couponCode" (input)="loadCouponSuggestions($any($event.target).value)" placeholder="Type coupon code">
+                <button type="button" class="btn-seat-popup offer-btn" (click)="applyCoupon()">
+                  <i class="fas fa-tags"></i>
+                </button>
+              </div>
+              <div class="offer-dropdown" *ngIf="couponSuggestions.length">
+                <button type="button" *ngFor="let c of couponSuggestions" (click)="selectCoupon(c)">
+                  <strong>{{ c.code }}</strong><span>{{ c.title }} - {{ c.discountType === 'PERCENTAGE' ? c.discountValue + '%' : '$' + c.discountValue }}</span>
+                </button>
+              </div>
+              <small class="offer-msg" *ngIf="couponMessage">{{ couponMessage }}</small>
+            </div>
+
+            <div class="field offer-field">
+              <label>Loyalty Member</label>
+              <input type="text" formControlName="loyaltyMemberNumber" (input)="loadLoyaltySuggestions($any($event.target).value)" placeholder="Member number or passenger name">
+              <div class="offer-dropdown" *ngIf="loyaltySuggestions.length">
+                <button type="button" *ngFor="let l of loyaltySuggestions" (click)="selectLoyalty(l)">
+                  <strong>{{ l.memberNumber }}</strong><span>{{ l.passengerName }} - {{ l.tier }} - {{ l.availablePoints }} pts</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Redeem Points</label>
+              <div class="input-action-group">
+                <input type="number" formControlName="loyaltyPointsUsed" min="0" step="100" placeholder="Multiple of 100">
+                <button type="button" class="btn-seat-popup offer-btn" (click)="applyLoyaltyPoints()">
+                  <i class="fas fa-star"></i>
+                </button>
+              </div>
+              <small class="offer-msg" *ngIf="loyaltyMessage">{{ loyaltyMessage }}</small>
+            </div>
+          </div>
+
+          <!-- PRICE SUMMARY -->
+          <div class="price-card">
+            <div class="price-row">
+              <span>Class Fare ({{ form.value.classType }})</span>
+              <!-- Shows Calculated Price -->
+              <span>$ {{ getSelectedClassFare().toFixed(2) }}</span>
+            </div>
+            <div class="price-row">
+              <span>Trip Type</span>
+              <span>{{ tripType === 'ROUND_TRIP' ? 'Round Trip' : 'One Way' }}</span>
+            </div>
+            <div class="price-row">
+              <span>Adult Fare ({{ adults }})</span>
+              <span>$ {{ form.value.adultFareTotal | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row" *ngIf="children > 0">
+              <span>Child Fare ({{ children }})</span>
+              <span>$ {{ form.value.childFareTotal | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row" *ngIf="infants > 0">
+              <span>Infant Fare ({{ infants }})</span>
+              <span>$ {{ form.value.infantFareTotal | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row">
+              <span>Passenger Fare Total</span>
+              <span>$ {{ form.value.passengerFareTotal | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row">
+              <span>Baggage Fee</span>
+              <span>$ {{ form.value.baggageFee | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row">
+              <span>Special Service Fee</span>
+              <span>$ {{ form.value.specialServiceFee | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row">
+              <span>Taxes & Fees</span>
+              <span>$ {{ form.value.tax | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row discount" *ngIf="form.value.couponDiscount">
+              <span>Coupon Discount</span>
+              <span>- $ {{ form.value.couponDiscount | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row discount" *ngIf="form.value.loyaltyDiscount">
+              <span>Loyalty Discount</span>
+              <span>- $ {{ form.value.loyaltyDiscount | number:'1.2-2' }}</span>
+            </div>
+            <hr>
+            <div class="price-row total">
+              <strong>Total Payable</strong>
+              <strong class="big">$ {{ form.value.totalPrice | number:'1.2-2' }}</strong>
+            </div>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="submit-error" *ngIf="submitError">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ submitError }}
+          </div>
+          <div class="action-bar">
+            <button type="button" class="btn-modern cancel" (click)="router.navigate(['/booking'])">Cancel</button>
+            <button type="button" class="btn-modern submit" (click)="onSubmit()" [disabled]="form.invalid || submitting">
+              {{ submitting ? 'Submitting...' : (isEdit ? 'Update Booking' : 'Submit for Review') }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- SEAT MAP POPUP MODAL -->
+<div class="modal-overlay" [class.active]="isSeatModalOpen" (click)="closeSeatModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>Select Your Seat</h3>
+          <button class="close-modal" (click)="closeSeatModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Legend -->
+            <div class="seat-legend">
+              <span><i class="fas fa-square" style="color:white; border:1px solid #ccc"></i> Available</span>
+              <span><i class="fas fa-square" style="color:#ef4444"></i> Occupied</span>
+              <span><i class="fas fa-square" style="color:#22c55e"></i> Selected</span>
+            </div>
+            <p class="seat-class-helper">Only seats from the selected cabin class are available.</p>
+
+            <!-- The Seat Map Component -->
+            <div class="seat-map-area">
+                <app-seat-selection 
+                    *ngIf="form.value.flightId" 
+                    [flightId]="form.value.flightId" 
+                    [maxSeats]="getRequiredSeatCount()"
+                    [selectedSeats]="selectedSeats"
+                    [selectedClassType]="form.value.classType"
+                    (seatsChanged)="onSeatSelected($event)">
+                </app-seat-selection>
+            </div>
+        </div>
+    </div>
+</div>

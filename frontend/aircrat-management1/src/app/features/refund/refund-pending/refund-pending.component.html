@@ -1,0 +1,335 @@
+<!-- FILE: src/app/features/refund/refund-pending/refund-pending.component.html -->
+<div class="rp-page">
+
+  <!-- ── HEADER ─────────────────────────────────────────────── -->
+  <div class="refund-hero rp-hero">
+    <div class="rp-header-left">
+      <a routerLink="/refund" class="rp-back">
+        <i class="fas fa-arrow-left"></i> All Refunds
+      </a>
+      <span class="refund-eyebrow">Refund Control Tower</span>
+      <div class="rp-title-row">
+        <h2 class="rp-title">
+          <span class="rp-title-icon"><i class="fas fa-tasks"></i></span>
+          Refund Approvals
+        </h2>
+        <div class="rp-live-badge">
+          <span class="rp-live-dot"></span> Live Queue
+        </div>
+      </div>
+      <p class="rp-subtitle">Review, approve and process pending passenger refund requests</p>
+    </div>
+    <div class="rp-header-right">
+      <button class="rp-btn-refresh" (click)="loadAll()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+      <a routerLink="/refund/initiate" class="rp-btn-new">
+        <i class="fas fa-plus"></i> New Refund
+      </a>
+    </div>
+    <div class="refund-hero-panel">
+      <span>Queue value</span>
+      <strong>{{ getTotalPendingAmount() }}</strong>
+      <small>Visible refund amount under current filter</small>
+    </div>
+  </div>
+
+  <!-- ── ALERT ──────────────────────────────────────────────── -->
+  <div class="rp-alert" *ngIf="alertMsg"
+       [class.rp-alert-success]="alertType === 'success'"
+       [class.rp-alert-warn]="alertType === 'warn'"
+       [class.rp-alert-error]="alertType === 'error'">
+    <div class="rp-alert-icon">
+      <i class="fas"
+         [class.fa-check-circle]="alertType === 'success'"
+         [class.fa-exclamation-triangle]="alertType === 'warn'"
+         [class.fa-times-circle]="alertType === 'error'"></i>
+    </div>
+    <span>{{ alertMsg }}</span>
+    <button class="rp-alert-close" (click)="alertMsg = ''">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- ── KPI STATS ───────────────────────────────────────────── -->
+  <div class="rp-stats-row">
+
+    <div class="rp-stat rp-stat-amber">
+      <div class="rp-stat-left">
+        <div class="rp-stat-icon"><i class="fas fa-clock"></i></div>
+      </div>
+      <div class="rp-stat-right">
+        <span class="rp-stat-val">{{ stats.pendingCount }}</span>
+        <span class="rp-stat-lbl">Awaiting Approval</span>
+        <span class="rp-stat-sub" *ngIf="stats.pendingCount > 0">Needs action</span>
+        <span class="rp-stat-sub" *ngIf="stats.pendingCount === 0">All clear</span>
+      </div>
+      <div class="rp-stat-pulse" *ngIf="stats.pendingCount > 0"></div>
+    </div>
+
+    <div class="rp-stat rp-stat-blue">
+      <div class="rp-stat-left">
+        <div class="rp-stat-icon"><i class="fas fa-check-circle"></i></div>
+      </div>
+      <div class="rp-stat-right">
+        <span class="rp-stat-val">{{ stats.approvedCount }}</span>
+        <span class="rp-stat-lbl">Approved</span>
+        <span class="rp-stat-sub">Ready to process</span>
+      </div>
+    </div>
+
+    <div class="rp-stat rp-stat-green">
+      <div class="rp-stat-left">
+        <div class="rp-stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+      </div>
+      <div class="rp-stat-right">
+        <span class="rp-stat-val rp-stat-val-sm">
+          $USD {{ (stats.totalRefunded || 0) | number:'1.0-0' }}
+        </span>
+        <span class="rp-stat-lbl">Total Refunded</span>
+        <span class="rp-stat-sub">Processed payments</span>
+      </div>
+    </div>
+
+    <div class="rp-stat rp-stat-red">
+      <div class="rp-stat-left">
+        <div class="rp-stat-icon"><i class="fas fa-cut"></i></div>
+      </div>
+      <div class="rp-stat-right">
+        <span class="rp-stat-val rp-stat-val-sm">
+          $USD {{ (stats.totalPenalty || 0) | number:'1.0-0' }}
+        </span>
+        <span class="rp-stat-lbl">Total Penalties</span>
+        <span class="rp-stat-sub">Revenue retained</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── TAB SWITCHER ───────────────────────────────────────── -->
+  <div class="rp-tabs">
+    <button class="rp-tab"
+            [class.rp-tab-active]="activeTab === 'pending'"
+            (click)="activeTab = 'pending'; sortField = 'requestedAt'; sortAsc = true">
+      <i class="fas fa-clock"></i>
+      Pending Approval
+      <span class="rp-tab-badge rp-badge-amber">{{ stats.pendingCount }}</span>
+    </button>
+    <button class="rp-tab"
+            [class.rp-tab-active]="activeTab === 'approved'"
+            (click)="activeTab = 'approved'; sortField = 'requestedAt'; sortAsc = false">
+      <i class="fas fa-check-circle"></i>
+      Approved — Awaiting Payment
+      <span class="rp-tab-badge rp-badge-blue">{{ stats.approvedCount }}</span>
+    </button>
+  </div>
+
+  <div class="rp-search-panel">
+    <i class="fas fa-search"></i>
+    <input type="text" [(ngModel)]="searchQuery" placeholder="Search reference, booking, passenger, flight or reason">
+    <button type="button" *ngIf="searchQuery" (click)="searchQuery = ''"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- ── LOADING ────────────────────────────────────────────── -->
+  <div class="rp-loading" *ngIf="currentLoading">
+    <div class="rp-loading-spinner">
+      <i class="fas fa-circle-notch fa-spin"></i>
+    </div>
+    <p>Loading refund requests...</p>
+  </div>
+
+  <!-- ── TABLE WRAP ─────────────────────────────────────────── -->
+  <div class="rp-table-wrap" *ngIf="!currentLoading">
+
+    <!-- EMPTY STATE -->
+    <div class="rp-empty" *ngIf="visibleList.length === 0">
+      <div class="rp-empty-icon">
+        <i class="fas"
+           [class.fa-inbox]="activeTab === 'pending'"
+           [class.fa-check-double]="activeTab === 'approved'"></i>
+      </div>
+      <h3 *ngIf="activeTab === 'pending'">No Pending Refunds</h3>
+      <h3 *ngIf="activeTab === 'approved'">No Approved Refunds Awaiting Payment</h3>
+      <p *ngIf="activeTab === 'pending'">All refund requests have been reviewed.</p>
+      <p *ngIf="activeTab === 'approved'">All approved refunds have been processed.</p>
+      <a routerLink="/refund" class="rp-btn-view-all">
+        <i class="fas fa-list"></i> View All Refunds
+      </a>
+    </div>
+
+    <!-- TABLE -->
+    <table class="rp-table" *ngIf="visibleList.length > 0">
+      <thead>
+        <tr>
+          <th class="rp-th-sort" (click)="sortBy('refundReference')">
+            Ref # <i class="fas" [ngClass]="getSortIcon('refundReference')"></i>
+          </th>
+          <th>Passenger</th>
+          <th class="rp-th-sort" (click)="sortBy('flightNumber')">
+            Flight <i class="fas" [ngClass]="getSortIcon('flightNumber')"></i>
+          </th>
+          <th class="rp-th-sort" (click)="sortBy('departureDate')">
+            Departure <i class="fas" [ngClass]="getSortIcon('departureDate')"></i>
+          </th>
+          <th class="rp-th-sort" (click)="sortBy('originalAmount')">
+            Original <i class="fas" [ngClass]="getSortIcon('originalAmount')"></i>
+          </th>
+          <th>Penalty</th>
+          <th class="rp-th-sort" (click)="sortBy('refundAmount')">
+            Refund Amt <i class="fas" [ngClass]="getSortIcon('refundAmount')"></i>
+          </th>
+          <th>Reason</th>
+          <th class="rp-th-sort" (click)="sortBy('requestedAt')">
+            Requested <i class="fas" [ngClass]="getSortIcon('requestedAt')"></i>
+          </th>
+          <th class="rp-th-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of visibleList"
+            class="rp-row"
+            [ngClass]="getUrgencyClass(r)">
+
+          <!-- REF # + URGENCY TAG -->
+          <td>
+            <div class="rp-ref-cell">
+              <span class="rp-ref">{{ r.refundReference }}</span>
+              <span class="rp-urgency-tag"
+                    *ngIf="getUrgencyLabel(r)"
+                    [class.rp-tag-critical]="getUrgencyClass(r) === 'urgent-critical'"
+                    [class.rp-tag-high]="getUrgencyClass(r) === 'urgent-high'"
+                    [class.rp-tag-past]="getUrgencyClass(r) === 'urgent-past'">
+                <i class="fas fa-fire"
+                   *ngIf="getUrgencyClass(r) === 'urgent-critical'"></i>
+                {{ getUrgencyLabel(r) }}
+              </span>
+            </div>
+          </td>
+
+          <!-- PASSENGER -->
+          <td>
+            <div class="rp-passenger-cell">
+              <div class="rp-avatar">{{ r.passengerName.charAt(0).toUpperCase() }}</div>
+              <div class="rp-passenger-info">
+                <span class="rp-pname">{{ r.passengerName }}</span>
+                <small>{{ r.bookingReference }}</small>
+                <small>{{ r.classType }}</small>
+              </div>
+            </div>
+          </td>
+
+          <!-- FLIGHT -->
+          <td>
+            <div class="rp-flight-cell">
+              <span class="rp-fnum">{{ r.flightNumber }}</span>
+              <small class="rp-route">{{ r.flightRoute }}</small>
+            </div>
+          </td>
+
+          <!-- DEPARTURE -->
+          <td>
+            <span class="rp-date">{{ formatDate(r.departureDate) }}</span>
+          </td>
+
+          <!-- ORIGINAL AMOUNT -->
+          <td>
+            <span class="rp-orig-amt">{{ formatAmount(r.originalAmount) }}</span>
+          </td>
+
+          <!-- PENALTY -->
+          <td>
+            <div class="rp-penalty-cell">
+              <span class="rp-penalty-pct"
+                    [ngClass]="getPenaltyClass(r.penaltyPercentage)">
+                {{ r.penaltyPercentage }}%
+              </span>
+              <small class="rp-penalty-amt">{{ formatAmount(r.penaltyAmount) }}</small>
+            </div>
+          </td>
+
+          <!-- REFUND AMOUNT -->
+          <td>
+            <span class="rp-refund-amt">{{ formatAmount(r.refundAmount) }}</span>
+          </td>
+
+          <!-- REASON -->
+          <td>
+            <!-- FIXED: Call TS method formatReason() -->
+            <span class="rp-reason-tag">
+              {{ formatReason(r.refundReason) }}
+            </span>
+          </td>
+
+          <!-- REQUESTED AT -->
+          <td>
+            <span class="rp-dt">{{ formatDT(r.requestedAt) }}</span>
+          </td>
+
+          <!-- ACTIONS — PENDING TAB -->
+          <td *ngIf="activeTab === 'pending'">
+            <div class="rp-actions">
+              <button class="rp-action-btn rp-approve"
+                      [disabled]="isActionLoading(r.id!)"
+                      (click)="approve(r)"
+                      title="Approve this refund">
+                <i class="fas"
+                   [class.fa-check]="!isActionLoading(r.id!)"
+                   [class.fa-spinner]="isActionLoading(r.id!)"
+                   [class.fa-spin]="isActionLoading(r.id!)"></i>
+                <span>Approve</span>
+              </button>
+              <button class="rp-action-btn rp-reject"
+                      [disabled]="isActionLoading(r.id!)"
+                      (click)="reject(r)"
+                      title="Reject this refund">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </td>
+
+          <!-- ACTIONS — APPROVED TAB -->
+          <td *ngIf="activeTab === 'approved'">
+            <div class="rp-actions">
+              <button class="rp-action-btn rp-process"
+                      [disabled]="isActionLoading(r.id!)"
+                      (click)="process(r)"
+                      title="Mark as payment processed">
+                <i class="fas"
+                   [class.fa-paper-plane]="!isActionLoading(r.id!)"
+                   [class.fa-spinner]="isActionLoading(r.id!)"
+                   [class.fa-spin]="isActionLoading(r.id!)"></i>
+                <span>Mark Processed</span>
+              </button>
+              <button class="rp-action-btn rp-reject"
+                      [disabled]="isActionLoading(r.id!)"
+                      (click)="reject(r)"
+                      title="Reject">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- TABLE FOOTER -->
+    <div class="rp-table-footer" *ngIf="visibleList.length > 0">
+      <span class="rp-footer-count">
+        <i class="fas fa-list-ul"></i>
+        {{ visibleList.length }} refund{{ visibleList.length !== 1 ? 's' : '' }}
+      </span>
+      <span class="rp-footer-total">
+        <i class="fas fa-sigma"></i>
+        Total:
+        <strong>{{ getTotalPendingAmount() }}</strong>
+      </span>
+      <span class="rp-footer-hint">
+        <i class="fas fa-info-circle"></i>
+        Click column headers to sort
+      </span>
+    </div>
+
+  </div>
+
+</div>

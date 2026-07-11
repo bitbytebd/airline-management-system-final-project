@@ -1,0 +1,13 @@
+<router-outlet *ngIf="isPublicRoute"></router-outlet>
+
+<div class="app-container" *ngIf="!isPublicRoute">
+    <app-sidebar></app-sidebar>
+    
+    <div class="main-wrapper">
+        <app-header></app-header>
+        <main class="content">
+            <router-outlet></router-outlet>
+        </main>
+        <app-footer></app-footer>
+    </div>
+</div>

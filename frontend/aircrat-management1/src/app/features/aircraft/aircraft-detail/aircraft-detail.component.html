@@ -1,0 +1,50 @@
+<section class="detail-page">
+  <div class="detail-hero">
+    <div>
+      <a routerLink="/aircraft" class="back-link"><i class="fas fa-arrow-left"></i> Aircraft list</a>
+      <h1>{{ isEdit ? 'Update Aircraft Profile' : 'Register Enterprise Aircraft' }}</h1>
+      <p>Maintain aircraft code, registration, cabin configuration, capacity, range, speed, and image data used across flight operations.</p>
+    </div>
+    <i class="fas fa-plane-circle-check"></i>
+  </div>
+
+  <form class="detail-card" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="section-title"><i class="fas fa-fingerprint"></i> Aircraft Identity</div>
+    <div class="form-grid">
+      <label>Aircraft Code <input type="text" formControlName="aircraftCode" placeholder="e.g. A350-SKY-01"></label>
+      <label>Aircraft Name <input type="text" formControlName="aircraftName" placeholder="e.g. Sky Pearl"></label>
+      <label>Model Name <input type="text" formControlName="modelName" placeholder="e.g. Airbus A350-900"></label>
+      <label>Registration No <input type="text" formControlName="registrationNumber" placeholder="e.g. S2-SKY"></label>
+      <label>Manufacturer <input type="text" formControlName="manufacturer" placeholder="e.g. Airbus"></label>
+      <label>Aircraft Type
+        <select formControlName="aircraftType">
+          <option value="Narrow-body">Narrow-body</option>
+          <option value="Wide-body">Wide-body</option>
+          <option value="Regional">Regional</option>
+          <option value="Cargo">Cargo</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="section-title"><i class="fas fa-gauge-high"></i> Operating Profile</div>
+    <div class="form-grid">
+      <label>Capacity <input type="number" formControlName="capacity"></label>
+      <label>Cabin Classes <input type="text" formControlName="cabinClasses" placeholder="Economy, Business, First"></label>
+      <label>Range KM <input type="number" formControlName="rangeKm"></label>
+      <label>Cruise Speed KM/H <input type="number" formControlName="cruiseSpeedKmh"></label>
+      <label>Image URL <input type="url" formControlName="imageUrl" placeholder="https://..."></label>
+      <label>Status
+        <select formControlName="status">
+          <option value="Active">Active</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Grounded">Grounded</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="goBack()">Cancel</button>
+      <button type="submit" class="btn-save" [disabled]="form.invalid"><i class="fas fa-check"></i> Save Aircraft</button>
+    </div>
+  </form>
+</section>

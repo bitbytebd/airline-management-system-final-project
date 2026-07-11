@@ -1,0 +1,214 @@
+<!-- ==================== ১. MAIN PAGE (Flight List) ==================== -->
+<div class="dashboard-wrapper">
+  
+  <header class="dash-header">
+    <div class="header-inner">
+      <div class="icon-box"><i class="fas fa-chart-line"></i></div>
+      <div class="text-box">
+        <h2>Flight Analytics Dashboard</h2>
+        <p>Select a flight to view detailed analytics</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-section">
+    <h3 class="section-title"><i class="fas fa-plane-departure"></i> Active Flights</h3>
+    
+    <div class="flight-grid">
+      <div class="flight-card" *ngFor="let f of flights" (click)="openReportModal(f)">
+        <div class="card-top">
+          <span class="flight-no">{{ f.flightNumber }}</span>
+          <span class="date">{{ f.departureDate | date:'MMM dd' }}</span>
+        </div>
+        <div class="card-body">
+          <div class="route">
+            <span class="city">{{ f.origin }}</span>
+            <div class="plane-line"><i class="fas fa-plane"></i></div>
+            <span class="city">{{ f.destination }}</span>
+          </div>
+        </div>
+        <div class="card-action">
+          <span>Analytics</span> <i class="fas fa-arrow-right"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== ২. MAIN REPORT MODAL (Summary Dashboard) ==================== -->
+<div class="modal-overlay" [class.active]="isReportModalOpen" (click)="closeReportModal()">
+  <div class="modal-dashboard glass-effect" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header-custom">
+      <div class="mh-left">
+        <div class="header-icon-lg"><i class="fas fa-chart-pie"></i></div>
+        <div>
+          <h3>Flight Report</h3>
+          <span>{{ selectedFlight?.flightNumber }} | {{ selectedFlight?.origin }} → {{ selectedFlight?.destination }}</span>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeReportModal()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="modal-body">
+      
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div> Loading Analytics...
+      </div>
+
+      <div *ngIf="reportData" class="dashboard-content">
+        
+        <!-- Visual Stats Row -->
+        <div class="visual-row-new">
+          
+          <!-- Donut Chart -->
+          <div class="chart-box">
+            <div class="donut-chart">
+              <div class="donut-inner" [ngStyle]="{
+                'background': 'conic-gradient(#22c55e 0% ' + getPercentage(reportData.bookedSeats) + '%, #f59e0b ' + getPercentage(reportData.bookedSeats) + '% ' + (getPercentage(reportData.bookedSeats) + getPercentage(reportData.pendingSeats)) + '%, #e2e8f0 0% 100%)'
+              }">
+                <div class="donut-text">
+                  <span class="value">{{ getPercentage(reportData.bookedSeats + reportData.pendingSeats) }}%</span>
+                  <span class="label">Occupied</span>
+                </div>
+              </div>
+            </div>
+            <div class="chart-legend">
+              <div class="leg-item"><span class="dot booked"></span> Booked</div>
+              <div class="leg-item"><span class="dot pending"></span> Pending</div>
+              <div class="leg-item"><span class="dot avail"></span> Available</div>
+            </div>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="summary-cards-col">
+            <div class="info-card total-seats">
+              <div class="card-icon"><i class="fas fa-chair"></i></div>
+              <div class="card-data">
+                <h2>{{ reportData.totalSeats }}</h2>
+                <p>Total Seats</p>
+              </div>
+            </div>
+            <div class="info-card avail-seats">
+              <div class="card-icon"><i class="fas fa-door-open"></i></div>
+              <div class="card-data">
+                <h2>{{ reportData.availableSeats }}</h2>
+                <p>Available</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons Area -->
+        <div class="action-buttons-area">
+            <p class="action-info">Detailed analytics are just a click away</p>
+            <div class="btn-group">
+                <!-- Button 1: Seat Status -->
+                <button class="action-btn status-btn" (click)="openStatusPopup()">
+                    <i class="fas fa-layer-group"></i>
+                    <div class="btn-text">
+                        <span>Seat Status Overview</span>
+                        <small>View comparison table</small>
+                    </div>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+
+                <!-- Button 2: Sold Tickets -->
+                <button class="action-btn ticket-btn" (click)="openTicketPopup()">
+                    <i class="fas fa-ticket-alt"></i>
+                    <div class="btn-text">
+                        <span>Sold Ticket Details</span>
+                        <small>View passenger list</small>
+                    </div>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== ৩. POPUP: Seat Status Overview ==================== -->
+<div class="inner-popup-overlay" [class.active]="isStatusModalOpen" (click)="closeInnerPopups()">
+  <div class="inner-popup-card" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <h4><i class="fas fa-layer-group"></i> Seat Status Overview</h4>
+      <button class="popup-close" (click)="closeInnerPopups()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="popup-body">
+      <table class="status-table">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Count</th>
+            <th>Percentage</th>
+            <th>Visual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-booked">Booked</span></td>
+            <td><strong>{{ reportData?.bookedSeats }}</strong></td>
+            <td>{{ getPercentage(reportData?.bookedSeats) }}%</td>
+            <td><div class="bar-bg"><div class="bar-fill booked" [style.width.%]="getPercentage(reportData?.bookedSeats)"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-pending">Pending</span></td>
+            <td><strong>{{ reportData?.pendingSeats }}</strong></td>
+            <td>{{ getPercentage(reportData?.pendingSeats) }}%</td>
+            <td><div class="bar-bg"><div class="bar-fill pending" [style.width.%]="getPercentage(reportData?.pendingSeats)"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-available">Available</span></td>
+            <td><strong>{{ reportData?.availableSeats }}</strong></td>
+            <td>{{ getPercentage(reportData?.availableSeats) }}%</td>
+            <td><div class="bar-bg"><div class="bar-fill available" [style.width.%]="getPercentage(reportData?.availableSeats)"></div></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== ৪. POPUP: Sold Ticket Details ==================== -->
+<div class="inner-popup-overlay" [class.active]="isTicketModalOpen" (click)="closeInnerPopups()">
+  <div class="inner-popup-card large" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <h4><i class="fas fa-ticket-alt"></i> Sold Ticket List</h4>
+      <button class="popup-close" (click)="closeInnerPopups()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="popup-body">
+      <div *ngIf="soldTickets.length > 0" class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>PNR</th>
+              <th>Passenger</th>
+              <th>Seat</th>
+              <th>Class</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of soldTickets">
+              <td><span class="pnr-link">{{ b.bookingReference }}</span></td>
+              <td><strong>{{ b.passengerName }}</strong></td>
+              <td><span class="seat-badge">{{ b.seatNumber || 'N/A' }}</span></td>
+              <td>{{ b.classType }}</td>
+              <td><strong>$ {{ b.totalPrice | number:'1.2-2' }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="soldTickets.length === 0" class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>No sold tickets found.</p>
+      </div>
+    </div>
+  </div>
+</div>

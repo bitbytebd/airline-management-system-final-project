@@ -1,0 +1,127 @@
+<div class="list-wrapper">
+  
+  <!-- ==================== DEEP GREEN HEADER SECTION ==================== -->
+  <div class="list-header-section">
+    <div class="header-content">
+      <div class="icon-box">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="text-box">
+        <h2>Passenger Management</h2>
+        <p>Manage profiles, documents, and travel history</p>
+      </div>
+      <div class="action-box">
+        <button routerLink="/passenger/new" class="btn-add-passenger">
+          <i class="fas fa-plus-circle"></i> Add New Passenger
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TABLE CARD SECTION ==================== -->
+  <div class="card-container">
+    <div class="card">
+      <div class="table-responsive">
+        <table class="enterprise-table">
+          <thead>
+            <tr>
+              <!-- Dark Green Headers -->
+              <th>PASSENGER</th>
+              <th>PASSPORT</th>
+              <th>CONTACT INFO</th>
+              <th>NATIONALITY</th>
+              <th>LOYALTY POINTS</th>
+              <th>TOTAL BOOKINGS</th>
+              <th>STATUS</th>
+              <th style="text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of passengers">
+              
+              <!-- Passenger Cell -->
+              <td>
+                <div class="user-info">
+                  <div class="avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="details">
+                    <span class="name">{{ p.firstName }} {{ p.lastName }}</span>
+                    <span class="meta">ID: {{ p.id }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Passport Cell -->
+              <td>
+                <div class="passport-badge">
+                  <i class="fas fa-passport"></i>
+                  <span>{{ p.passportNumber }}</span>
+                </div>
+              </td>
+
+              <!-- Contact Cell -->
+              <td>
+                <div class="contact-cell">
+                  <div class="item">
+                    <i class="fas fa-envelope"></i> {{ p.email }}
+                  </div>
+                  <div class="item text-muted">
+                    <i class="fas fa-phone"></i> {{ p.phoneNumber }}
+                  </div>
+                </div>
+              </td>
+
+              <!-- Nationality Cell -->
+              <td>
+                <span class="date-text">{{ p.nationality }}</span>
+              </td>
+
+              <td>
+                <span class="metric-badge loyalty">{{ p.loyaltyPoints || 0 }}</span>
+              </td>
+
+              <td>
+                <span class="metric-badge bookings">{{ p.totalBookings || 0 }}</span>
+              </td>
+
+              <!-- Status Cell -->
+              <td>
+                <span class="status-pill" [ngClass]="{
+                  'status-active': p.status==='Active',
+                  'status-inactive': p.status!=='Active'
+                }">
+                  {{ p.status }}
+                </span>
+              </td>
+
+              <!-- Actions Cell -->
+              <td style="text-align: right;">
+                <div class="action-group">
+                  <button (click)="onEdit(p.id)" class="action-btn edit-btn" title="Edit Passenger">
+                    <i class="fas fa-edit"></i>
+                  </button>
+              
+                  <button (click)="onDelete(p.id)" class="action-btn delete-btn" title="Delete Passenger">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+            
+            <!-- Empty State -->
+            <tr *ngIf="passengers.length === 0">
+              <td colspan="8" class="empty-state">
+                <i class="fas fa-users-slash"></i>
+                <h4>No Passengers Found</h4>
+                <p>Add your first passenger to get started.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>

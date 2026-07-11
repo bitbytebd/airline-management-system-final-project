@@ -1,0 +1,160 @@
+<section class="admin-overview">
+  <div class="overview-topbar">
+    <div>
+      <span>Admin Overview</span>
+      <h2>Airline Executive Snapshot</h2>
+    </div>
+    <button type="button" (click)="loadOverview()">
+      <i class="fas fa-sync-alt"></i>
+      Refresh
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <i class="fas fa-circle-notch fa-spin"></i>
+    <strong>Loading admin overview...</strong>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <section class="kpi-grid">
+      <article class="kpi-card" *ngFor="let item of kpis" [ngClass]="item.tone">
+        <div class="kpi-icon"><i [class]="item.icon"></i></div>
+        <div>
+          <span>{{ item.label }}</span>
+          <strong>{{ item.value }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="chart-grid">
+      <article class="overview-card chart-card wide">
+        <div class="card-head">
+          <div>
+            <span>Tickets</span>
+            <h3>Monthly Ticket Sales</h3>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas #monthlyTicketChart></canvas>
+        </div>
+      </article>
+
+      <article class="overview-card chart-card">
+        <div class="card-head">
+          <div>
+            <span>Finance</span>
+            <h3>Revenue vs Expense</h3>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas #revenueExpenseChart></canvas>
+        </div>
+      </article>
+
+      <article class="overview-card chart-card">
+        <div class="card-head">
+          <div>
+            <span>Cabin</span>
+            <h3>Ticket Class Distribution</h3>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas #ticketClassChart></canvas>
+        </div>
+      </article>
+
+      <article class="overview-card chart-card">
+        <div class="card-head">
+          <div>
+            <span>Routes</span>
+            <h3>Top Routes Booking</h3>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas #topRoutesChart></canvas>
+        </div>
+      </article>
+    </section>
+
+    <section class="summary-grid">
+      <article class="overview-card table-card">
+        <div class="card-head">
+          <div>
+            <span>Bookings</span>
+            <h3>Recent Bookings</h3>
+          </div>
+        </div>
+        <div class="table-wrap" *ngIf="recentBookings.length; else noBookings">
+          <table>
+            <thead>
+              <tr>
+                <th>PNR</th>
+                <th>Passenger</th>
+                <th>Route</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let booking of recentBookings">
+                <td><strong>{{ booking.bookingReference || 'N/A' }}</strong></td>
+                <td>{{ booking.passengerName || 'Passenger' }}</td>
+                <td>{{ booking.origin || 'N/A' }} to {{ booking.destination || 'N/A' }}</td>
+                <td><span class="status-pill">{{ booking.status || 'N/A' }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noBookings>
+          <div class="empty-state">No booking data available.</div>
+        </ng-template>
+      </article>
+
+      <article class="overview-card table-card">
+        <div class="card-head">
+          <div>
+            <span>Operations</span>
+            <h3>Upcoming Departures</h3>
+          </div>
+        </div>
+        <div class="table-wrap" *ngIf="upcomingDepartures.length; else noDepartures">
+          <table>
+            <thead>
+              <tr>
+                <th>Flight</th>
+                <th>Route</th>
+                <th>Departure</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let flight of upcomingDepartures">
+                <td><strong>{{ flight.flightNumber || 'N/A' }}</strong></td>
+                <td>{{ flight.origin || 'N/A' }} to {{ flight.destination || 'N/A' }}</td>
+                <td>{{ flight.departureDate || 'N/A' }} {{ flight.departureTime || '' }}</td>
+                <td><span class="status-pill">{{ flight.status || 'Scheduled' }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noDepartures>
+          <div class="empty-state">No upcoming departure data available.</div>
+        </ng-template>
+      </article>
+
+      <article class="overview-card quick-card">
+        <div class="card-head">
+          <div>
+            <span>Action Center</span>
+            <h3>Quick Actions</h3>
+          </div>
+        </div>
+        <div class="quick-actions">
+          <button type="button" routerLink="/booking/new"><i class="fas fa-plus"></i><span>New Booking</span></button>
+          <button type="button" routerLink="/payment/booking-pending"><i class="fas fa-credit-card"></i><span>Payment Queue</span></button>
+          <button type="button" routerLink="/tracking"><i class="fas fa-location-arrow"></i><span>Flight Tracking</span></button>
+          <button type="button" routerLink="/report/financial-overview"><i class="fas fa-chart-pie"></i><span>Financial Reports</span></button>
+        </div>
+      </article>
+    </section>
+  </ng-container>
+</section>

@@ -1,0 +1,122 @@
+<section class="airline-page">
+  <div class="airline-hero">
+    <div>
+      <a routerLink="/dashboard/overview" class="back-link"><i class="fas fa-arrow-left"></i> Workspace</a>
+      <div class="eyebrow"><i class="fas fa-globe"></i> Airline Partnership Desk</div>
+      <h1>Airline Enterprise Directory</h1>
+      <p>Manage airline codes, alliance profile, support channels, primary hub, country, logo, and partner readiness for international flight operations.</p>
+      <div class="hero-actions">
+        <a routerLink="/airline/new" class="primary-btn"><i class="fas fa-plus"></i> Add Airline</a>
+        <button type="button" (click)="openFlights()" class="ghost-btn"><i class="fas fa-plane-departure"></i> Flight Network</button>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <span>Partner Network</span>
+      <strong>{{ activeCount }}</strong>
+      <small>active airlines</small>
+      <div><i class="fas fa-plane"></i> {{ fleetTotal }} registered partner aircraft</div>
+      <div><i class="fas fa-headset"></i> Support and station metadata ready</div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <article><i class="fas fa-building"></i><span>Total Airlines</span><strong>{{ airlines.length }}</strong></article>
+    <article><i class="fas fa-check-circle"></i><span>Active Partners</span><strong>{{ activeCount }}</strong></article>
+    <article><i class="fas fa-plane"></i><span>Fleet Size</span><strong>{{ fleetTotal }}</strong></article>
+    <article><i class="fas fa-route"></i><span>Network Ready</span><strong>{{ filteredAirlines.length }}</strong></article>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text"
+             [(ngModel)]="searchText"
+             (input)="onSearchChange()"
+             (focus)="onSearchFocus()"
+             (blur)="showSuggestions = false"
+             placeholder="Search airline code, name, country, hub, alliance">
+      <div class="suggestion-panel" *ngIf="showSuggestions && airlineSuggestions.length > 0">
+        <button type="button" class="suggestion-item" *ngFor="let a of airlineSuggestions" (mousedown)="selectSuggestion(a)">
+          <span class="suggestion-icon"><i class="fas fa-building"></i></span>
+          <span>
+            <strong>{{ a.airlineCode }} - {{ a.airlineName }}</strong>
+            <small>{{ a.country }} | {{ a.primaryHub }} | {{ a.status }}</small>
+          </span>
+        </button>
+      </div>
+    </div>
+    <div class="view-toggle">
+      <button type="button" [class.active]="viewMode === 'card'" (click)="viewMode = 'card'"><i class="fas fa-grip"></i> Cards</button>
+      <button type="button" [class.active]="viewMode === 'table'" (click)="viewMode = 'table'"><i class="fas fa-table"></i> Table</button>
+    </div>
+    <button type="button" (click)="loadAirlines()" class="refresh-btn"><i class="fas fa-rotate"></i> Refresh</button>
+  </div>
+
+  <div class="airline-grid" *ngIf="viewMode === 'card' && filteredAirlines.length > 0; else tableOrEmpty">
+    <article class="airline-card" *ngFor="let a of filteredAirlines">
+      <div class="brand-row">
+        <img [src]="a.logoUrl || 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80'" [alt]="a.airlineName">
+        <div>
+          <span class="code">{{ a.airlineCode }}</span>
+          <h2>{{ a.airlineName }}</h2>
+          <p>{{ a.country }} | {{ a.primaryHub || 'Primary hub N/A' }}</p>
+        </div>
+        <span class="status-pill" [ngClass]="{'active': a.status === 'Active', 'inactive': a.status !== 'Active'}">{{ a.status }}</span>
+      </div>
+      <div class="metric-grid">
+        <span><b>{{ a.fleetSize || 0 }}</b> Fleet</span>
+        <span><b>{{ a.alliance || 'Independent' }}</b> Alliance</span>
+        <span><b>{{ a.iataPrefix || 'N/A' }}</b> IATA Prefix</span>
+        <span><b>{{ a.headquarters || 'N/A' }}</b> HQ</span>
+      </div>
+      <div class="contact-row">
+        <span><i class="fas fa-envelope"></i> {{ a.supportEmail || 'support not set' }}</span>
+        <span><i class="fas fa-phone"></i> {{ a.supportPhone || 'phone not set' }}</span>
+      </div>
+      <div class="card-actions">
+        <button type="button" (click)="onEdit(a.id)" class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+        <button type="button" (click)="onDelete(a.id)" class="delete-btn"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #tableOrEmpty>
+    <div class="table-card" *ngIf="viewMode === 'table' && filteredAirlines.length > 0; else emptyState">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th><th>Name</th><th>Country</th><th>HQ</th><th>Hub</th><th>Alliance</th><th>Fleet</th><th>IATA</th><th>Email</th><th>Status</th><th class="actions-heading">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of filteredAirlines">
+            <td><strong>{{ a.airlineCode }}</strong></td>
+            <td>{{ a.airlineName }}</td>
+            <td>{{ a.country }}</td>
+            <td>{{ a.headquarters }}</td>
+            <td>{{ a.primaryHub }}</td>
+            <td>{{ a.alliance }}</td>
+            <td>{{ a.fleetSize }}</td>
+            <td>{{ a.iataPrefix }}</td>
+            <td>{{ a.supportEmail }}</td>
+            <td><span class="status-pill" [ngClass]="{'active': a.status === 'Active', 'inactive': a.status !== 'Active'}">{{ a.status }}</span></td>
+            <td class="table-actions-cell">
+              <div class="table-actions">
+                <button type="button" (click)="onEdit(a.id)" class="mini-btn edit" title="Edit airline"><i class="fas fa-edit"></i></button>
+                <button type="button" (click)="onDelete(a.id)" class="mini-btn delete" title="Delete airline"><i class="fas fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-template>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <i class="fas fa-building-circle-exclamation"></i>
+      <h3>No airline matched</h3>
+      <p>Add a partner airline or adjust the search keyword.</p>
+    </div>
+  </ng-template>
+</section>

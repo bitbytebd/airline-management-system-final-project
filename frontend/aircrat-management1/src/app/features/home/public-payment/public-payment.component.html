@@ -1,0 +1,120 @@
+<div class="public-payment-shell">
+  <header class="public-nav">
+    <a routerLink="/" class="brand"><img src="assets/skyward-logo.svg" alt="Skyward Airlines logo"></a>
+    <nav>
+      <a routerLink="/">Home</a>
+      <a routerLink="/user-portal" [queryParams]="{ mode: 'manage' }">User Portal</a>
+    </nav>
+  </header>
+
+  <main class="payment-main">
+    <section class="payment-hero">
+      <p>Secure public payment</p>
+      <h1>Complete Your Booking Payment</h1>
+      <span>Pay only for the booking verified through your passenger portal session.</span>
+    </section>
+
+    <section class="payment-card" *ngIf="loading">
+      <div class="skeleton title"></div>
+      <div class="skeleton line"></div>
+      <div class="skeleton line short"></div>
+    </section>
+
+    <section class="payment-card state-card" *ngIf="!loading && blockedMessage">
+      <h2>Payment unavailable</h2>
+      <p>{{ blockedMessage }}</p>
+      <div class="action-row">
+        <a
+          *ngIf="booking?.bookingReference; else approvalStatusLink"
+          routerLink="/booking-status"
+          [queryParams]="{ ref: booking?.bookingReference }">
+          Check Approval Status
+        </a>
+        <ng-template #approvalStatusLink>
+          <a routerLink="/booking-status">Check Approval Status</a>
+        </ng-template>
+        <button type="button" class="ghost" (click)="backHome()">Back Home</button>
+        <button type="button" class="ghost" (click)="backToPortal()">Open User Portal</button>
+      </div>
+    </section>
+
+    <section class="payment-card success-card" *ngIf="!loading && success && booking">
+      <span class="success-icon">✓</span>
+      <h2>Payment Successful</h2>
+      <p>Your booking payment has been received by Skyward Airlines.</p>
+      <div class="success-ref">
+        <span>Payment Reference</span>
+        <strong>{{ payment?.paymentReference || payment?.transactionReference || 'Processed' }}</strong>
+      </div>
+      <div class="success-ref">
+        <span>Booking Reference</span>
+        <strong>{{ booking.bookingReference || 'PNR Pending' }}</strong>
+      </div>
+      <div class="success-ref">
+        <span>Paid Amount</span>
+        <strong>{{ formatAmount(payment?.totalAmount || payment?.amount || finalPayableAmount()) }}</strong>
+      </div>
+      <div class="action-row">
+        <button type="button" (click)="viewInvoice()">View Invoice</button>
+        <button type="button" (click)="viewTicket()">View Ticket</button>
+        <button type="button" class="ghost" (click)="backToPortal()">Back to User Portal</button>
+        <button type="button" class="ghost" (click)="backHome()">Back Home</button>
+      </div>
+    </section>
+
+    <section class="payment-grid" *ngIf="!loading && !blockedMessage && !success && booking">
+      <article class="payment-card booking-summary">
+        <div class="card-heading">
+          <span>Booking Summary</span>
+          <strong>{{ booking.bookingReference || 'PNR Pending' }}</strong>
+        </div>
+        <dl>
+          <div><dt>Passenger</dt><dd>{{ booking.passengerName || 'Passenger' }}</dd></div>
+          <div><dt>Route</dt><dd>{{ booking.origin }} to {{ booking.destination }}</dd></div>
+          <div><dt>Flight</dt><dd>{{ booking.flightNumber || 'N/A' }}</dd></div>
+          <div><dt>Date / Time</dt><dd>{{ booking.departureDate || 'TBA' }} {{ booking.departureTime || '' }}</dd></div>
+          <div><dt>Booking Status</dt><dd><span class="status-pill" [ngClass]="statusClass(booking.status)">{{ booking.status }}</span></dd></div>
+          <div><dt>Payment Status</dt><dd><span class="status-pill" [ngClass]="statusClass(booking.paymentStatus)">{{ booking.paymentStatus }}</span></dd></div>
+        </dl>
+        <div class="payable">
+          <span>Final Payable Amount</span>
+          <strong>{{ formatAmount(finalPayableAmount()) }}</strong>
+        </div>
+      </article>
+
+      <article class="payment-card">
+        <div class="card-heading">
+          <span>Payment Details</span>
+          <strong>BOOKING_PAYMENT</strong>
+        </div>
+        <form [formGroup]="paymentForm" (ngSubmit)="processPayment()">
+          <label>
+            Payment Method
+            <select formControlName="paymentMethod">
+              <option *ngFor="let method of paymentMethods" [value]="method">{{ method }}</option>
+            </select>
+          </label>
+          <label>
+            Gateway
+            <input type="text" formControlName="gatewayName" placeholder="Gateway name">
+          </label>
+          <label>
+            Card Last 4
+            <input type="text" inputmode="numeric" maxlength="4" formControlName="cardLastFour" placeholder="1234">
+          </label>
+          <small *ngIf="paymentForm.get('cardLastFour')?.touched && paymentForm.get('cardLastFour')?.invalid">
+            Enter exactly 4 digits, or leave it blank for non-card payments.
+          </small>
+          <label>
+            Notes
+            <textarea rows="4" formControlName="notes" placeholder="Optional payment note"></textarea>
+          </label>
+          <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+          <button type="submit" [disabled]="processing || paymentForm.invalid">
+            {{ processing ? 'Processing...' : 'Pay ' + formatAmount(finalPayableAmount()) }}
+          </button>
+        </form>
+      </article>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,44 @@
+<section class="detail-page">
+  <div class="detail-hero">
+    <div>
+      <a routerLink="/users" class="back-link"><i class="fas fa-arrow-left"></i> User management</a>
+      <h1>{{ isEdit ? 'Update Workspace User' : 'Create Workspace User' }}</h1>
+      <p>Assign enterprise role, department, station, contact identity, and account status for secure airline operations.</p>
+    </div>
+    <i class="fas fa-user-shield"></i>
+  </div>
+
+  <form class="detail-card" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="section-title"><i class="fas fa-id-card"></i> Identity</div>
+    <div class="form-grid">
+      <label>Employee Code <input type="text" formControlName="employeeCode" placeholder="EMP-SKY-001"></label>
+      <label>Full Name <input type="text" formControlName="fullName" placeholder="Mousumi Akter"></label>
+      <label>Username <input type="text" formControlName="username" placeholder="mousumi.akter"></label>
+      <label>Email <input type="email" formControlName="email" placeholder="name@skyward.com"></label>
+      <label>Phone Number <input type="text" formControlName="phoneNumber" placeholder="+880..."></label>
+      <label *ngIf="!isEdit">Password <input type="password" formControlName="password" placeholder="Set initial password"></label>
+      <label>Last Login <input type="datetime-local" formControlName="lastLoginAt"></label>
+    </div>
+
+    <div class="section-title"><i class="fas fa-lock"></i> Access Control</div>
+    <div class="form-grid">
+      <label>Role
+        <select formControlName="role">
+          <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+        </select>
+      </label>
+      <label>Department <input type="text" formControlName="department" placeholder="Reservations"></label>
+      <label>Station <input type="text" formControlName="station" placeholder="Dhaka"></label>
+      <label>Status
+        <select formControlName="status">
+          <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn-save" [disabled]="form.invalid"><i class="fas fa-check"></i> Save User</button>
+    </div>
+  </form>
+</section>

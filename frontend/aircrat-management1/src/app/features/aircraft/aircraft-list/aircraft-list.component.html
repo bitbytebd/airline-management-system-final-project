@@ -1,0 +1,121 @@
+<section class="fleet-page">
+  <div class="fleet-hero">
+    <div>
+      <a routerLink="/dashboard/overview" class="back-link"><i class="fas fa-arrow-left"></i> Workspace</a>
+      <div class="eyebrow"><i class="fas fa-plane"></i> Fleet Operations</div>
+      <h1>Aircraft Fleet Management</h1>
+      <p>Control aircraft identity, capacity, operating status, cabin capability, and aircraft visuals from one enterprise-grade fleet desk.</p>
+      <div class="hero-actions">
+        <button type="button" (click)="onAdd()" class="primary-btn"><i class="fas fa-plus"></i> Add Aircraft</button>
+        <button type="button" (click)="openFlights()" class="ghost-btn"><i class="fas fa-route"></i> View Flight Routes</button>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <span>Fleet Readiness</span>
+      <strong>{{ activeCount }}/{{ aircrafts.length }}</strong>
+      <small>active aircraft</small>
+      <div class="panel-row"><i class="fas fa-chair"></i> {{ totalSeats }} available seat capacity</div>
+      <div class="panel-row"><i class="fas fa-shield-alt"></i> Ops, cabin, maintenance ready</div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <article><i class="fas fa-plane-up"></i><span>Total Aircraft</span><strong>{{ aircrafts.length }}</strong></article>
+    <article><i class="fas fa-check-circle"></i><span>Active</span><strong>{{ activeCount }}</strong></article>
+    <article><i class="fas fa-chair"></i><span>Seat Capacity</span><strong>{{ totalSeats }}</strong></article>
+    <article><i class="fas fa-screwdriver-wrench"></i><span>Maintenance</span><strong>{{ aircrafts.length - activeCount }}</strong></article>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text"
+             [(ngModel)]="searchText"
+             (input)="onSearchChange()"
+             (focus)="onSearchFocus()"
+             (blur)="showSuggestions = false"
+             placeholder="Search aircraft code, name, model, registration, manufacturer">
+      <div class="suggestion-panel" *ngIf="showSuggestions && aircraftSuggestions.length > 0">
+        <button type="button" class="suggestion-item" *ngFor="let a of aircraftSuggestions" (mousedown)="selectSuggestion(a)">
+          <span class="suggestion-icon"><i class="fas fa-plane"></i></span>
+          <span>
+            <strong>{{ a.aircraftCode }} - {{ a.aircraftName || a.modelName }}</strong>
+            <small>{{ a.modelName }} | {{ a.registrationNumber }} | {{ a.status }}</small>
+          </span>
+        </button>
+      </div>
+    </div>
+    <div class="view-toggle">
+      <button type="button" [class.active]="viewMode === 'card'" (click)="viewMode = 'card'"><i class="fas fa-grip"></i> Cards</button>
+      <button type="button" [class.active]="viewMode === 'table'" (click)="viewMode = 'table'"><i class="fas fa-table"></i> Table</button>
+    </div>
+    <button type="button" (click)="load()" class="refresh-btn"><i class="fas fa-rotate"></i> Refresh</button>
+  </div>
+
+  <div class="fleet-grid" *ngIf="viewMode === 'card' && filteredAircrafts.length > 0; else tableOrEmpty">
+    <article class="fleet-card" *ngFor="let a of filteredAircrafts">
+      <div class="aircraft-media" [style.backgroundImage]="'linear-gradient(135deg, rgba(3,105,161,.78), rgba(14,165,233,.58)), url(' + (a.imageUrl || 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&w=900&q=80') + ')'">
+        <span class="code">{{ a.aircraftCode || a.registrationNumber }}</span>
+        <span class="status-pill" [ngClass]="{'active': a.status === 'Active', 'maintenance': a.status !== 'Active'}">{{ a.status }}</span>
+      </div>
+      <div class="fleet-body">
+        <h2>{{ a.aircraftName || a.modelName }}</h2>
+        <p>{{ a.modelName }} | {{ a.manufacturer || 'Manufacturer N/A' }}</p>
+        <div class="spec-grid">
+          <span><b>{{ a.capacity || 0 }}</b> Seats</span>
+          <span><b>{{ a.rangeKm || 0 }}</b> KM Range</span>
+          <span><b>{{ a.cruiseSpeedKmh || 0 }}</b> KM/H</span>
+          <span><b>{{ a.aircraftType || 'Type N/A' }}</b> Type</span>
+        </div>
+        <div class="meta-row">
+          <span><i class="fas fa-id-card"></i> {{ a.registrationNumber }}</span>
+          <span><i class="fas fa-couch"></i> {{ a.cabinClasses || 'Economy, Business' }}</span>
+        </div>
+        <div class="card-actions">
+          <button type="button" (click)="onEdit(a.id)" class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+          <button type="button" (click)="onDelete(a.id)" class="delete-btn"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #tableOrEmpty>
+    <div class="table-card" *ngIf="viewMode === 'table' && filteredAircrafts.length > 0; else emptyState">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th><th>Name</th><th>Model</th><th>Reg.</th><th>Mfr.</th><th>Type</th><th>Seats</th><th>Range</th><th>Speed</th><th>Status</th><th class="actions-heading">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of filteredAircrafts">
+            <td><strong>{{ a.aircraftCode }}</strong></td>
+            <td>{{ a.aircraftName }}</td>
+            <td>{{ a.modelName }}</td>
+            <td>{{ a.registrationNumber }}</td>
+            <td>{{ a.manufacturer }}</td>
+            <td>{{ a.aircraftType }}</td>
+            <td>{{ a.capacity }}</td>
+            <td>{{ a.rangeKm }} km</td>
+            <td>{{ a.cruiseSpeedKmh }} km/h</td>
+            <td><span class="status-pill" [ngClass]="{'active': a.status === 'Active', 'maintenance': a.status !== 'Active'}">{{ a.status }}</span></td>
+            <td class="table-actions-cell">
+              <div class="table-actions">
+                <button type="button" (click)="onEdit(a.id)" class="mini-btn edit" title="Edit aircraft"><i class="fas fa-edit"></i></button>
+                <button type="button" (click)="onDelete(a.id)" class="mini-btn delete" title="Delete aircraft"><i class="fas fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-template>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <i class="fas fa-plane-slash"></i>
+      <h3>No aircraft matched</h3>
+      <p>Add a new aircraft or change your search keyword.</p>
+    </div>
+  </ng-template>
+</section>

@@ -1,0 +1,216 @@
+/* ==================== 1. CONTAINER & LAYOUT ==================== */
+.track-page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  background: #f0f4f8;
+  min-height: 100vh;
+}
+
+/* ==================== 2. HEADER (ROYAL BLUE POPUP BOX) ==================== */
+.page-header {
+  /* Royal Blue Background */
+  background: linear-gradient(135deg, #003366 0%, #0056b3 100%);
+  color: white;
+  
+  /* Popup Box Sizing & Position */
+  max-width: 600px; /* Search Box er sathe width match kora */
+  margin: 0 auto 30px; /* Center kora */
+  padding: 20px;
+  
+  /* Popup Box Styling */
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 51, 102, 0.15); /* Floating Shadow */
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.page-header h2 { 
+  margin: 0; 
+  font-size: 22px; 
+  font-weight: 700; 
+}
+.page-header p { 
+  color: rgba(255, 255, 255, 0.85); 
+  margin-top: 5px; 
+  font-size: 13px; 
+}
+
+/* ==================== 3. SEARCH POPUP ==================== */
+.search-popup-card {
+  background: white;
+  max-width: 600px;
+  margin: 0 auto 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 51, 102, 0.08);
+  position: relative;
+  padding-top: 40px; /* Space for icon */
+  border: 1px solid #e2e8f0;
+}
+
+.search-icon-circle {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background: #0056b3;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  box-shadow: 0 4px 10px rgba(0, 86, 179, 0.3);
+  border: 4px solid white;
+}
+
+.search-content { padding: 20px 25px 25px; text-align: center; }
+.search-content h4 { margin: 0 0 20px; color: #334155; }
+
+.search-box-wrapper { display: flex; gap: 10px; }
+.input-container { flex: 1; position: relative; }
+.input-container > i {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: #94a3b8; font-size: 16px;
+}
+.input-container input {
+  width: 100%; padding: 12px 12px 12px 38px;
+  border: 1px solid #cbd5e1; border-radius: 8px;
+  font-size: 14px; transition: 0.2s;
+}
+.input-container input:focus { border-color: #0056b3; outline: none; box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.1); }
+
+.find-btn {
+  background: #0056b3; color: white; border: none;
+  padding: 0 25px; border-radius: 8px; font-weight: 600;
+  cursor: pointer; transition: 0.2s;
+}
+.find-btn:hover { background: #003366; }
+
+/* Dropdown */
+.dropdown-menu {
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: white; border: 1px solid #e2e8f0;
+  border-radius: 8px; margin-top: 5px; z-index: 100;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: left;
+}
+.dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px; cursor: pointer; }
+.dropdown-item:hover { background: #f8fafc; }
+.avatar-sm { width: 30px; height: 30px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #475569; }
+.item-info strong { display: block; font-size: 12px; color: #0f172a; }
+.item-info span { font-size: 10px; color: #64748b; }
+
+/* ==================== 4. RESULTS GRID ==================== */
+.results-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+/* ==================== 5. TICKET CARD (LIGHT BLUE THEME) ==================== */
+.ticket-card {
+  background: #eff6ff; /* Light Blue Background */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 86, 179, 0.08); 
+  border: 1px solid #bfdbfe;
+  transition: 0.3s;
+}
+
+.ticket-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 86, 179, 0.15);
+  border-color: #93c5fd;
+}
+
+.card-header-bar {
+  background: white;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0f2fe;
+}
+.airline-info { display: flex; align-items: center; gap: 10px; }
+.airline-info > i { font-size: 20px; color: #003366; }
+.airline-text { display: flex; flex-direction: column; }
+.airline-text .name { font-size: 12px; font-weight: 700; color: #0f172a; }
+.airline-text .flight-no { font-size: 10px; color: #64748b; }
+
+.status-label { padding: 3px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.status-confirmed { background: #dcfce7; color: #16a34a; }
+.status-pending { background: #fef3c7; color: #d97706; }
+
+.flight-path-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 15px 10px;
+}
+.location-block { display: flex; flex-direction: column; }
+.location-block .time { font-size: 20px; font-weight: 700; color: #0f172a; }
+.location-block .city { font-size: 12px; color: #334155; font-weight: 500; }
+.text-right { text-align: right; }
+
+.duration-line { flex: 1; position: relative; margin: 0 10px; display: flex; align-items: center; }
+.dots { border-top: 2px dotted #93c5fd; width: 100%; }
+.plane-icon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #eff6ff; padding: 0 5px; color: #0056b3; font-size: 14px; }
+
+.passenger-box {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 15px;
+  background: white;
+  margin: 10px 15px;
+  border-radius: 6px;
+  border-left: 4px solid #0056b3;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.row-item { display: flex; flex-direction: column; }
+.row-item .label { font-size: 10px; color: #64748b; text-transform: uppercase; }
+.row-item .value { font-size: 13px; font-weight: 600; color: #0f172a; }
+
+.details-row {
+  display: flex;
+  gap: 10px;
+  padding: 0 15px 10px;
+}
+.tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: white; border: 1px solid #bfdbfe; color: #1d4ed8; }
+
+.card-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  border-top: 1px solid #e0f2fe;
+  background: white;
+}
+.pnr-badge {
+  background: #e0f2fe;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+.pnr-badge span { display: block; font-size: 9px; color: #3b82f6; }
+.pnr-badge strong { font-size: 12px; color: #003366; font-family: monospace; }
+
+.view-ticket-btn {
+  background: #0056b3;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.view-ticket-btn:hover { background: #003366; }
+.view-ticket-btn i { margin-left: 5px; }
+
+/* ==================== 6. RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .search-box-wrapper { flex-direction: column; }
+  .find-btn { padding: 12px; width: 100%; }
+  .results-list { grid-template-columns: 1fr; }
+}

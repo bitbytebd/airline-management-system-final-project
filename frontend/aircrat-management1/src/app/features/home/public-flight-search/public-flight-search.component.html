@@ -1,0 +1,97 @@
+<section class="public-page">
+  <header class="public-nav">
+    <a routerLink="/" class="brand">
+      <img src="assets/skyward-logo.svg" alt="Skyward Airlines">
+    </a>
+    <nav>
+      <a routerLink="/">Home</a>
+      <a routerLink="/user-portal">User Portal</a>
+      <a routerLink="/flight-tracker">Track Flight</a>
+      <a routerLink="/auth/login">Admin Login</a>
+    </nav>
+  </header>
+
+  <main class="search-shell">
+    <section class="search-hero">
+      <p>Public flight search</p>
+      <h1>Find a Skyward flight</h1>
+      <span>Only future bookable flights are shown. Admin-only modules remain protected.</span>
+    </section>
+
+    <section class="search-panel">
+      <label>
+        From
+        <input type="text" [(ngModel)]="from" placeholder="Dhaka">
+      </label>
+      <label>
+        To
+        <input type="text" [(ngModel)]="to" placeholder="London">
+      </label>
+      <label>
+        Date
+        <input type="date" [(ngModel)]="date" [min]="minTravelDate">
+      </label>
+      <button type="button" (click)="search()">Search Flights</button>
+    </section>
+
+    <div class="alert warning" *ngIf="validationMessage">{{ validationMessage }}</div>
+    <div class="alert error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <section class="result-meta">
+      <h2>Available Flights</h2>
+      <span>{{ loading ? 'Loading...' : filteredFlights.length + ' flight(s) found' }}</span>
+    </section>
+
+    <section class="loading-grid" *ngIf="loading">
+      <div class="skeleton-card" *ngFor="let item of [1,2,3]"></div>
+    </section>
+
+    <section class="empty-state" *ngIf="!loading && !filteredFlights.length && !errorMessage">
+      <i class="fas fa-plane-slash"></i>
+      <h3>No available flights found for this route and date.</h3>
+      <p>Try another route or date. Past, departed, landed and cancelled flights are hidden from public booking.</p>
+    </section>
+
+    <section class="flight-grid" *ngIf="!loading && filteredFlights.length">
+      <article class="flight-card" *ngFor="let flight of filteredFlights">
+        <div class="flight-top">
+          <div>
+            <span>Flight</span>
+            <strong>{{ flight.flightNumber || 'N/A' }}</strong>
+          </div>
+          <em [ngClass]="statusClass(flight.status)">{{ flight.status || 'SCHEDULED' }}</em>
+        </div>
+
+        <div class="route-line">
+          <div>
+            <small>From</small>
+            <strong>{{ routeLabel(flight.origin) }}</strong>
+            <span>{{ airportCode(flight.origin) }}</span>
+          </div>
+          <i class="fas fa-plane"></i>
+          <div>
+            <small>To</small>
+            <strong>{{ routeLabel(flight.destination) }}</strong>
+            <span>{{ airportCode(flight.destination) }}</span>
+          </div>
+        </div>
+
+        <div class="time-grid">
+          <span><b>Date</b>{{ flight.departureDate || 'TBA' }}</span>
+          <span><b>Depart</b>{{ flight.departureTime || 'TBA' }}</span>
+          <span><b>Arrive</b>{{ flight.arrivalTime || 'TBA' }}</span>
+          <span><b>Duration</b>{{ formatDuration(flight) }}</span>
+        </div>
+
+        <div class="price-grid">
+          <span><b>Economy</b>{{ formatMoney(flight.economyPrice || flight.basePrice) }}</span>
+          <span><b>Premium</b>{{ formatMoney(flight.premiumPrice) }}</span>
+          <span><b>Business</b>{{ formatMoney(flight.businessPrice) }}</span>
+          <span><b>First</b>{{ formatMoney(flight.firstClassPrice) }}</span>
+        </div>
+
+        <button type="button" class="select-btn" (click)="selectFlight(flight)">Select Flight</button>
+      </article>
+    </section>
+  </main>
+</section>

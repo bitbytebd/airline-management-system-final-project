@@ -1,0 +1,322 @@
+<!-- ═══════════════════════════════════════════════════════════════
+     FILE: src/app/features/refund/refund-initiate/refund-initiate.component.html
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="ri-page">
+
+  <!-- PAGE HEADER -->
+  <div class="refund-hero ri-hero">
+    <div class="ri-header-left">
+      <a routerLink="/refund" class="ri-back">
+        <i class="fas fa-arrow-left"></i> Back to Refunds
+      </a>
+      <span class="refund-eyebrow">Controlled Cancellation Flow</span>
+      <h2 class="ri-title"><i class="fas fa-undo-alt"></i> Initiate Refund Request</h2>
+      <p>Find a confirmed booking, calculate airline-standard penalty, and submit the refund request for approval.</p>
+    </div>
+    <div class="refund-hero-panel">
+      <span>Workflow</span>
+      <strong>3 Steps</strong>
+      <small>Find booking, select reason, confirm refund</small>
+    </div>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div class="ri-steps">
+    <div class="ri-step" [class.ri-step-done]="currentStep > 1" [class.ri-step-active]="currentStep === 1">
+      <div class="ri-step-circle">
+        <i class="fas fa-check" *ngIf="currentStep > 1"></i>
+        <span *ngIf="currentStep <= 1">1</span>
+      </div>
+      <span class="ri-step-label">Find Booking</span>
+    </div>
+    <div class="ri-step-line" [class.ri-step-line-done]="currentStep > 1"></div>
+
+    <div class="ri-step" [class.ri-step-done]="currentStep > 2" [class.ri-step-active]="currentStep === 2">
+      <div class="ri-step-circle">
+        <i class="fas fa-check" *ngIf="currentStep > 2"></i>
+        <span *ngIf="currentStep <= 2">2</span>
+      </div>
+      <span class="ri-step-label">Select Reason</span>
+    </div>
+    <div class="ri-step-line" [class.ri-step-line-done]="currentStep > 2"></div>
+
+    <div class="ri-step" [class.ri-step-active]="currentStep === 3">
+      <div class="ri-step-circle"><span>3</span></div>
+      <span class="ri-step-label">Confirm</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       STEP 1 — FIND BOOKING (WITH AUTO SUGGESTION)
+       ═══════════════════════════════ -->
+  <div class="ri-card" *ngIf="currentStep === 1">
+    <div class="ri-card-header">
+      <i class="fas fa-search"></i>
+      <h3>Find Booking by Reference</h3>
+    </div>
+
+    <div class="ri-search-section">
+      <label class="ri-label">Booking Reference Number</label>
+      
+      <!-- NEW AUTOCOMPLETE WRAPPER -->
+      <div class="ri-autocomplete-wrapper">
+        <div class="ri-search-row">
+          <div class="ri-search-input" [class.ri-search-input-focus]="bookingRef.length > 0">
+            <i class="fas fa-ticket-alt"></i>
+            <input
+              type="text"
+              placeholder="Type first letter, booking ref, passenger, or flight"
+              [(ngModel)]="bookingRef"
+              (ngModelChange)="bookingRef = $event"
+              (input)="onInputSearch($event)"
+              (keyup.enter)="searchBooking()"
+              [disabled]="searching"
+              autocomplete="off"
+            />
+          </div>
+          <button class="ri-btn-search" (click)="searchBooking()" [disabled]="!bookingRef || searching">
+            <i class="fas" [class.fa-search]="!searching" [class.fa-spinner]="searching" [class.fa-spin]="searching"></i>
+            {{ searching ? 'Searching...' : 'Find Booking' }}
+          </button>
+        </div>
+
+        <!-- SUGGESTION DROPDOWN -->
+        <ul class="ri-autocomplete-dropdown" *ngIf="showDropdown && suggestions.length > 0">
+          <li 
+            *ngFor="let s of suggestions" 
+            class="ri-suggestion-item"
+            (click)="selectSuggestion(s)"
+          >
+            <div class="ri-suggestion-main">
+              <span class="ri-sg-ref">{{ s.bookingReference }}</span>
+              <span class="ri-sg-name">{{ s.passengerName }}</span>
+            </div>
+            <small class="ri-sg-route">{{ s.origin }} → {{ s.destination }}</small>
+          </li>
+        </ul>
+      </div>
+
+      <!-- ERROR -->
+      <div class="ri-error" *ngIf="searchError">
+        <i class="fas fa-exclamation-circle"></i> {{ searchError }}
+      </div>
+    </div>
+
+    <!-- BOOKING RESULT CARD -->
+    <div class="ri-booking-card" *ngIf="foundBooking">
+      <div class="ri-bc-header">
+        <div class="ri-bc-ref">
+          <i class="fas fa-check-circle"></i>
+          <span>{{ foundBooking.bookingReference }}</span>
+        </div>
+        <span class="ri-bc-status" [class.ri-status-active]="foundBooking.status === 'CONFIRMED'"
+                                   [class.ri-status-pending]="foundBooking.status !== 'CONFIRMED'">
+          {{ foundBooking.status }}
+        </span>
+      </div>
+
+      <div class="ri-bc-grid">
+        <div class="ri-bc-field">
+          <label>Passenger</label>
+          <span><i class="fas fa-user"></i> {{ foundBooking.passengerName }}</span>
+        </div>
+        <div class="ri-bc-field">
+          <label>Flight</label>
+          <span><i class="fas fa-plane"></i> {{ foundBooking.flightNumber }}</span>
+        </div>
+        <div class="ri-bc-field">
+          <label>Route</label>
+          <span>{{ foundBooking.origin }} → {{ foundBooking.destination }}</span>
+        </div>
+        <div class="ri-bc-field">
+          <label>Departure</label>
+          <span>{{ formatDate(foundBooking.departureDate) }} {{ foundBooking.departureTime }}</span>
+        </div>
+        <div class="ri-bc-field">
+          <label>Class</label>
+          <span>{{ foundBooking.classType }}</span>
+        </div>
+        <div class="ri-bc-field">
+          <label>Seat</label>
+          <span>{{ foundBooking.seatNumber || 'N/A' }}</span>
+        </div>
+        <div class="ri-bc-field">
+          <label>Total Paid</label>
+          <span class="ri-amount">{{ formatAmount(foundBooking.totalPrice) }}</span>
+        </div>
+        <div class="ri-bc-field">
+          <label>Payment Method</label>
+          <span>{{ foundBooking.paymentMethod }}</span>
+        </div>
+      </div>
+
+      <div class="ri-bc-actions">
+        <button class="ri-btn-next" (click)="proceedToStep2()">
+          Continue <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════
+       STEP 2 — SELECT REASON + PREVIEW
+       ═══════════════════════════════ -->
+  <div class="ri-card" *ngIf="currentStep === 2">
+    <div class="ri-card-header">
+      <i class="fas fa-list-ul"></i>
+      <h3>Select Cancellation Reason</h3>
+    </div>
+
+    <form [formGroup]="refundForm">
+      <!-- REASON CARDS -->
+      <div class="ri-reason-grid">
+        <div
+          class="ri-reason-card"
+          *ngFor="let r of reasons"
+          [class.ri-reason-selected]="refundForm.get('reason')?.value === r"
+          [class.ri-reason-airline]="['FLIGHT_CANCEL','FLIGHT_DELAY','OVERBOOKING','WEATHER'].includes(r)"
+          (click)="refundForm.get('reason')?.setValue(r)"
+        >
+          <div class="ri-rc-radio">
+            <div class="ri-radio-dot" *ngIf="refundForm.get('reason')?.value === r"></div>
+          </div>
+          <div class="ri-rc-content">
+            <span class="ri-rc-label">{{ reasonLabels[r] }}</span>
+            <span class="ri-rc-hint" *ngIf="['FLIGHT_CANCEL','FLIGHT_DELAY','OVERBOOKING','WEATHER'].includes(r)">
+              <i class="fas fa-star"></i> Full refund — no penalty
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="ri-field ri-field-full">
+        <label class="ri-label">Additional Notes <span class="ri-optional">(optional)</span></label>
+        <textarea class="ri-textarea" formControlName="notes"
+                  placeholder="Provide any supporting details..."
+                  rows="3"></textarea>
+      </div>
+    </form>
+
+    <!-- PENALTY PREVIEW SECTION -->
+    <div class="ri-preview-section">
+      <h4 class="ri-preview-title"><i class="fas fa-calculator"></i> Refund & Penalty Breakdown</h4>
+
+      <div class="ri-preview-loading" *ngIf="loadingPreview">
+        <i class="fas fa-spinner fa-spin"></i> Calculating penalty...
+      </div>
+
+      <div class="ri-preview-box" *ngIf="preview && !loadingPreview" [ngClass]="getPenaltyColorClass()">
+        <div class="ri-preview-info">
+          <i class="fas fa-info-circle"></i>
+          {{ preview.penaltyReason }}
+        </div>
+        <div class="ri-preview-amounts">
+          <div class="ri-pa-row">
+            <span>Original Amount</span>
+            <span>{{ formatAmount(preview.originalAmount) }}</span>
+          </div>
+          <div class="ri-pa-row ri-pa-penalty">
+            <span>Penalty ({{ preview.penaltyPercentage }}%)</span>
+            <span class="ri-minus">- {{ formatAmount(preview.penaltyAmount) }}</span>
+          </div>
+          <div class="ri-pa-divider"></div>
+          <div class="ri-pa-row ri-pa-total">
+            <span>Refund Amount</span>
+            <span class="ri-refund-total">{{ formatAmount(preview.refundAmount) }}</span>
+          </div>
+        </div>
+        <div class="ri-preview-airline-badge" *ngIf="isAirlineFault()">
+          <i class="fas fa-shield-alt"></i>
+          Airline-initiated cancellation — Full refund guaranteed
+        </div>
+      </div>
+    </div>
+
+    <div class="ri-step-actions">
+      <button class="ri-btn-back" (click)="goBack(1)">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+      <button class="ri-btn-next" (click)="proceedToStep3()" [disabled]="refundForm.invalid || !preview">
+        Review & Confirm <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════
+       STEP 3 — CONFIRM & SUBMIT
+       ═══════════════════════════════ -->
+  <div class="ri-card" *ngIf="currentStep === 3">
+    <div class="ri-card-header">
+      <i class="fas fa-check-double"></i>
+      <h3>Review and Confirm Refund Request</h3>
+    </div>
+
+    <div class="ri-confirm-grid" *ngIf="foundBooking && preview">
+
+      <!-- Booking Summary -->
+      <div class="ri-confirm-section">
+        <h4><i class="fas fa-ticket-alt"></i> Booking Details</h4>
+        <div class="ri-summary-rows">
+          <div class="ri-sr"><span>Booking Ref</span><strong>{{ foundBooking.bookingReference }}</strong></div>
+          <div class="ri-sr"><span>Passenger</span><strong>{{ foundBooking.passengerName }}</strong></div>
+          <div class="ri-sr"><span>Email</span><strong>{{ foundBooking.email }}</strong></div>
+          <div class="ri-sr"><span>Flight</span><strong>{{ foundBooking.flightNumber }}</strong></div>
+          <div class="ri-sr"><span>Route</span><strong>{{ foundBooking.origin }} → {{ foundBooking.destination }}</strong></div>
+          <div class="ri-sr"><span>Departure</span><strong>{{ formatDate(foundBooking.departureDate) }}</strong></div>
+          <div class="ri-sr"><span>Class</span><strong>{{ foundBooking.classType }}</strong></div>
+          <div class="ri-sr"><span>Seat</span><strong>{{ foundBooking.seatNumber || 'N/A' }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Refund Summary -->
+      <div class="ri-confirm-section">
+        <h4><i class="fas fa-calculator"></i> Refund Summary</h4>
+        <div class="ri-summary-rows">
+          <div class="ri-sr"><span>Reason</span><strong>{{ selectedReasonLabel }}</strong></div>
+          <div class="ri-sr"><span>Original Amount</span><strong>{{ formatAmount(preview.originalAmount) }}</strong></div>
+          <div class="ri-sr ri-sr-penalty">
+            <span>Penalty ({{ preview.penaltyPercentage }}%)</span>
+            <strong class="ri-text-red">- {{ formatAmount(preview.penaltyAmount) }}</strong>
+          </div>
+          <div class="ri-sr ri-sr-total">
+            <span>Refund Amount</span>
+            <strong class="ri-text-green">{{ formatAmount(preview.refundAmount) }}</strong>
+          </div>
+          <div class="ri-sr"><span>Refund To</span><strong>{{ foundBooking.paymentMethod }}</strong></div>
+        </div>
+        <div class="ri-notes-display" *ngIf="refundForm.get('notes')?.value">
+          <label>Notes:</label>
+          <p>{{ refundForm.get('notes')?.value }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warning -->
+    <div class="ri-warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>
+        By confirming, booking will be <strong>cancelled immediately</strong> and a refund request will be submitted for admin processing.
+        This action <strong>cannot be undone</strong>.
+      </p>
+    </div>
+
+    <!-- Error -->
+    <div class="ri-error" *ngIf="submitError">
+      <i class="fas fa-times-circle"></i> {{ submitError }}
+    </div>
+
+    <div class="ri-step-actions">
+      <button class="ri-btn-back" (click)="goBack(2)" [disabled]="submitting">
+        <i class="fas fa-arrow-left"></i> Edit
+      </button>
+      <button class="ri-btn-confirm" (click)="confirmSubmit()" [disabled]="submitting">
+        <i class="fas" [class.fa-check]="!submitting" [class.fa-spinner]="submitting" [class.fa-spin]="submitting"></i>
+        {{ submitting ? 'Submitting...' : 'Confirm Refund Request' }}
+      </button>
+    </div>
+  </div>
+
+</div>

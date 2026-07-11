@@ -1,0 +1,84 @@
+<div class="report-container">
+  <!-- Existing Header -->
+  <div class="header-card sales-gradient">
+    <div class="icon-box"><i class="fas fa-dollar-sign"></i></div>
+    <div class="info-box">
+      <span class="label">Total Sales</span>
+      <h1 class="value">${{ totalSales | number:'1.2-2' }}</h1>
+    </div>
+  </div>
+
+  <!-- Existing Filter -->
+  <div class="filter-bar">
+    <select [(ngModel)]="selectedPeriod" (change)="loadData()" class="filter-select">
+      <option value="daily">Today</option>
+      <option value="weekly">This Week</option>
+      <option value="monthly">This Month</option>
+      <option value="6months">Last 6 Months</option>
+    </select>
+  </div>
+
+  <!-- Existing Chart -->
+  <div class="chart-card">
+    <div class="card-header"><h3>Sales Performance</h3></div>
+    <div class="chart-wrapper">
+      <canvas baseChart 
+        [data]="chartData" 
+        [type]="chartType" 
+        [options]="chartOptions">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- NEW: Sold Tickets List Table -->
+  <div class="list-card">
+    <div class="card-header">
+      <h3><i class="fas fa-credit-card"></i> Completed Payment Sales</h3>
+      <button type="button" class="sales-toggle" (click)="showAllSales = !showAllSales">
+        <i class="fas" [class.fa-list]="!showAllSales" [class.fa-compress]="showAllSales"></i>
+        {{ showAllSales ? 'Show Compact View' : 'Show Full Sales Report' }}
+      </button>
+    </div>
+    <div class="table-responsive">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Passenger</th>
+            <th>Flight</th>
+            <th>Route</th>
+            <th>Method</th>
+            <th>Reference</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of visiblePayments">
+            <td>
+              <strong>{{ t.passengerName }}</strong>
+              <small>{{ t.passengerEmail }}</small>
+            </td>
+            <td>{{ t.flightNumber }}</td>
+            <td>
+              <span class="route-badge">
+                {{ t.flightRoute }}
+              </span>
+            </td>
+            <td><span class="class-tag">{{ t.paymentMethod }}</span></td>
+            <td>{{ t.paymentReference }}</td>
+            <td><strong class="price">{{ formatMoney(t.totalAmount, t.currency) }}</strong></td>
+          </tr>
+          <tr *ngIf="completedPayments.length === 0">
+            <td colspan="6" style="text-align:center; color:#94a3b8; padding:20px;">
+              No completed payment sales yet.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="sales-insight" *ngIf="completedPayments.length > 5 && !showAllSales">
+      <i class="fas fa-lightbulb"></i>
+      Showing top 5 completed payments. Click "Show Full Sales Report" to review every sales transaction.
+    </div>
+  </div>
+
+</div>

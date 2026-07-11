@@ -1,0 +1,126 @@
+<div class="track-page-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <h2><i class="fas fa-search-location"></i> Manage Your Booking</h2>
+    <p>Find your reservation details instantly</p>
+  </div>
+
+  <!-- Search Card (Popup Style) -->
+  <div class="search-popup-card">
+    <div class="search-icon-circle">
+      <i class="fas fa-ticket-alt"></i>
+    </div>
+    
+    <div class="search-content">
+      <h4>Find Your Booking</h4>
+      
+      <div class="search-box-wrapper">
+        <div class="input-container">
+          <i class="fas fa-user-circle"></i>
+          <input type="text" 
+                 [(ngModel)]="searchTerm" 
+                 (input)="onSearchInput()"
+                 (blur)="onBlur()"
+                 placeholder="Enter Name, Email or PNR">
+          
+          <!-- Autocomplete Dropdown -->
+          <div class="dropdown-menu" *ngIf="showDropdown && suggestions.length > 0">
+            <div class="dropdown-item" *ngFor="let item of suggestions" (click)="selectSuggestion(item.bookingReference)">
+              <div class="avatar-sm"><i class="fas fa-user"></i></div>
+              <div class="item-info">
+                <strong>{{ item.passengerName }}</strong>
+                <span>{{ item.email }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="find-btn" (click)="onSearch()" [disabled]="isLoading">
+          <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+          <span *ngIf="!isLoading">Find Booking</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results List -->
+  <div class="results-list" *ngIf="results.length > 0">
+    
+    <!-- Loop Starts -->
+    <div class="ticket-card" *ngFor="let b of results">
+      
+      <!-- Card Header -->
+      <div class="card-header-bar">
+        <div class="airline-info">
+          <i class="fas fa-plane"></i>
+          <div class="airline-text">
+            <span class="name">Skyward Airlines</span>
+            <span class="flight-no">{{ b.flightNumber }}</span>
+          </div>
+        </div>
+        <div class="status-label" [ngClass]="{
+          'status-confirmed': b.status==='CONFIRMED',
+          'status-pending': b.status==='PENDING'
+        }">{{ b.status }}</div>
+      </div>
+
+      <!-- Card Body: Flight Path -->
+      <div class="flight-path-box">
+        <div class="location-block">
+          <span class="time">{{ b.departureTime?.substring(0,5) || '00:00' }}</span>
+          <span class="city">{{ b.origin }}</span>
+        </div>
+        
+        <div class="duration-line">
+          <div class="plane-icon"><i class="fas fa-plane"></i></div>
+          <div class="dots"></div>
+        </div>
+
+        <div class="location-block text-right">
+          <span class="time">{{ b.arrivalTime?.substring(0,5) || '00:00' }}</span>
+          <span class="city">{{ b.destination }}</span>
+        </div>
+      </div>
+
+      <!-- Passenger Info Box -->
+      <div class="passenger-box">
+        <div class="row-item">
+          <span class="label">Passenger</span>
+          <span class="value">{{ b.passengerName }}</span>
+        </div>
+        <div class="row-item">
+          <span class="label">Date</span>
+          <span class="value">{{ b.departureDate | date:'dd MMM yyyy' }}</span>
+        </div>
+      </div>
+
+      <!-- Class & Seat Row -->
+      <div class="details-row">
+        <div class="tag class-tag">{{ b.classType }}</div>
+        <div class="tag seat-tag">Seat: {{ b.seatNumber || 'N/A' }}</div>
+      </div>
+
+      <!-- Footer: PNR & Action -->
+      <div class="card-footer-actions">
+        <div class="pnr-badge">
+          <span>PNR</span>
+          <strong>{{ b.bookingReference }}</strong>
+        </div>
+        <button class="view-ticket-btn" (click)="viewTicket(b.bookingReference)">
+          View Ticket <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+    <!-- Loop Ends -->
+
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state-box" *ngIf="results.length === 0 && !isLoading && searchTerm.length > 2">
+    <i class="fas fa-search"></i>
+    <p>No results found.</p>
+  </div>
+
+</div>

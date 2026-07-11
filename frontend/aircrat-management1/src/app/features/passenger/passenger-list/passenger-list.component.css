@@ -1,0 +1,282 @@
+/* =========================================
+   1. COMPONENT WRAPPER
+   ========================================= */
+.list-wrapper {
+  padding: 10px;
+  max-width: 100%;
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #dff7ff 0%, #f8fdff 55%, #fff 100%);
+}
+
+/* =========================================
+   2. DEEP GREEN HEADER SECTION
+   ========================================= */
+.list-header-section {
+  background:
+    linear-gradient(135deg, rgba(2,132,199,.92), rgba(56,189,248,.76)),
+    url('https://images.unsplash.com/photo-1517999349371-c43520457b23?auto=format&fit=crop&w=1600&q=80') center/cover;
+  background-blend-mode: multiply;
+  border-radius: 24px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 22px 48px rgba(2,132,199,.22);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-content .icon-box {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+}
+
+.header-content .text-box h2 {
+  margin: 0;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.header-content .text-box p {
+  margin: 3px 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
+
+.btn-add-passenger {
+  background: #ffffff;
+  color: #075985;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+  box-shadow: 0 12px 24px rgba(8,126,173,.18);
+}
+.btn-add-passenger:hover { 
+  transform: translateY(-1px); 
+}
+
+/* override old green card border for airline style */
+.card {
+  border: 1px solid #cfeef8 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 16px 38px rgba(14,116,144,.1) !important;
+}
+.enterprise-table thead th {
+  background-color: #075985 !important;
+  color: white;
+}
+
+/* =========================================
+   3. CARD & THIN GREEN BORDER
+   ========================================= */
+.card-container { 
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
+  
+  /* Thin Green Border */
+  border: 1px solid #16a34a;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================
+   4. TABLE STYLING (DARK GREEN HEADERS)
+   ========================================= */
+.enterprise-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 0;
+}
+
+/* DARK GREEN TABLE HEADER */
+.enterprise-table thead th {
+  background-color: #052e16; /* Dark Green */
+  color: white;
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #166534;
+  white-space: nowrap;
+}
+
+.enterprise-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+.enterprise-table tbody tr:hover {
+  background-color: #f0fdf4; /* Light Green Hover */
+}
+
+.enterprise-table td {
+  padding: 12px 10px;
+  vertical-align: middle;
+  color: #334155;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.enterprise-table th:nth-child(1), .enterprise-table td:nth-child(1) { width: 20%; }
+.enterprise-table th:nth-child(2), .enterprise-table td:nth-child(2) { width: 13%; }
+.enterprise-table th:nth-child(3), .enterprise-table td:nth-child(3) { width: 24%; }
+.enterprise-table th:nth-child(4), .enterprise-table td:nth-child(4) { width: 10%; }
+.enterprise-table th:nth-child(5), .enterprise-table td:nth-child(5) { width: 10%; }
+.enterprise-table th:nth-child(6), .enterprise-table td:nth-child(6) { width: 10%; }
+.enterprise-table th:nth-child(7), .enterprise-table td:nth-child(7) { width: 7%; }
+.enterprise-table th:nth-child(8), .enterprise-table td:nth-child(8) { width: 6%; }
+
+/* =========================================
+   5. CELL INTERNAL STYLING
+   ========================================= */
+
+/* User Info */
+.user-info { display: flex; align-items: center; gap: 15px; }
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0); /* Green Tint */
+  color: #166534;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.details { display: flex; flex-direction: column; }
+.details .name { font-weight: 600; color: #1e293b; font-size: 15px; }
+.details .meta { font-size: 12px; color: #94a3b8; }
+
+/* Passport Badge */
+.passport-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #475569;
+  font-size: 13px;
+}
+
+/* Contact Cell */
+.contact-cell { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.contact-cell .item { display: flex; align-items: center; gap: 8px; }
+.text-muted { color: #94a3b8; }
+
+.date-text { color: #475569; font-size: 13px; }
+
+.metric-badge {
+  display: inline-flex;
+  min-width: 42px;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.metric-badge.loyalty { background: #e0f2fe; color: #075985; }
+.metric-badge.bookings { background: #eef2ff; color: #4338ca; }
+
+/* =========================================
+   6. STATUS PILLS
+   ========================================= */
+.status-pill {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+.status-active { background: #dcfce7; color: #16a34a; }
+.status-inactive { background: #fee2e2; color: #dc2626; }
+
+/* =========================================
+   7. ACTION BUTTONS
+   ========================================= */
+.action-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+.edit-btn:hover { background: #e2e8f0; color: #0f172a; }
+
+.delete-btn {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+.delete-btn:hover { background: #fee2e2; }
+
+/* =========================================
+   8. EMPTY STATE
+   ========================================= */
+.empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+.empty-state i { font-size: 50px; margin-bottom: 15px; display: block; }
+.empty-state h4 { margin: 0 0 5px; color: #475569; }
+.empty-state p { margin: 0; font-size: 13px; }
+
+/* =========================================
+   9. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .header-content { flex-direction: column; align-items: flex-start; }
+  .header-content .action-box { margin-top: 10px; width: 100%; }
+  .btn-add-passenger { width: 100%; justify-content: center; }
+  .table-responsive { overflow-x: auto; }
+  .enterprise-table { min-width: 980px; }
+}

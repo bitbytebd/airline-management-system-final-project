@@ -1,0 +1,313 @@
+<!-- FILE: src/app/features/loyalty/loyalty-redeem/loyalty-redeem.component.html -->
+<div class="lr-page">
+
+  <!-- ── HEADER ─────────────────────────────────────────────── -->
+  <div class="lr-header">
+    <div class="lr-header-left">
+      <a routerLink="/loyalty" class="lr-back"><i class="fas fa-arrow-left"></i> Loyalty Accounts</a>
+      <h2 class="lr-title"><span class="lr-title-icon"><i class="fas fa-gift"></i></span>Redeem Points</h2>
+      <p class="lr-subtitle">Exchange loyalty points for travel discounts (100 pts = USD 1.00)</p>
+    </div>
+  </div>
+
+  <!-- ── STEP INDICATOR ─────────────────────────────────────── -->
+  <div class="lr-steps" *ngIf="step < 4">
+    <div class="lr-step" [class.lr-step-done]="step > 1" [class.lr-step-active]="step === 1">
+      <div class="lr-step-dot"><i class="fas fa-check" *ngIf="step > 1"></i><span *ngIf="step <= 1">1</span></div>
+      <span>Find Member</span>
+    </div>
+    <div class="lr-step-line" [class.lr-step-line-done]="step > 1"></div>
+    <div class="lr-step" [class.lr-step-done]="step > 2" [class.lr-step-active]="step === 2">
+      <div class="lr-step-dot"><i class="fas fa-check" *ngIf="step > 2"></i><span *ngIf="step <= 2">2</span></div>
+      <span>Enter Points</span>
+    </div>
+    <div class="lr-step-line" [class.lr-step-line-done]="step > 2"></div>
+    <div class="lr-step" [class.lr-step-active]="step === 3">
+      <div class="lr-step-dot"><span>3</span></div>
+      <span>Confirm</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       STEP 1 — FIND MEMBER
+       ══════════════════════════════════════════════════════════ -->
+  <div class="lr-card" *ngIf="step === 1">
+    <div class="lr-card-header"><i class="fas fa-user-circle"></i><h3>Search Loyalty Member</h3></div>
+
+    <div class="lr-section">
+      <label class="lr-label">Member Name, Email, Member Number or Passport</label>
+      <div class="lr-search-wrap">
+        <div class="lr-search-box" [class.lr-search-active]="showSuggestions || searchFocused">
+          <div class="lr-search-mark"><i class="fas fa-user-check"></i></div>
+          <input type="text" placeholder="Type first letter to see matching members..." [(ngModel)]="searchText" (ngModelChange)="onSearchInput()" (focus)="onSearchFocus()" (keydown)="onSearchKeydown($event)" autocomplete="off" />
+          <i class="fas fa-spinner fa-spin lr-spin" *ngIf="searchLoading"></i>
+          <button class="lr-clear-btn" *ngIf="searchText" (click)="clearMember()"><i class="fas fa-times"></i></button>
+        </div>
+        <!-- Dropdown -->
+        <div class="lr-dropdown" *ngIf="showSuggestions && suggestions.length > 0">
+          <div class="lr-drop-item" *ngFor="let s of suggestions; let i = index"
+               [class.lr-drop-highlight]="i === highlightIdx"
+               [class.lr-drop-inactive]="!s.isActive || s.availablePoints < 100"
+               (mouseenter)="highlightIdx = i"
+               (click)="selectSuggestion(s)">
+            <div class="lr-drop-avatar" [style.background]="getTierMeta(s.tier).gradient">
+              {{ s.passengerName?.charAt(0) }}
+            </div>
+            <div class="lr-drop-info">
+              <span class="lr-drop-name">{{ s.passengerName }}</span>
+              <span class="lr-drop-sub">{{ s.memberNumber }} - {{ s.passengerEmail }}</span>
+              <span class="lr-drop-passport" *ngIf="s.passportNumber"><i class="fas fa-passport"></i> {{ s.passportNumber }}</span>
+            </div>
+            <div class="lr-drop-right">
+              <span class="lr-drop-pts">{{ s.availablePoints | number }} pts</span>
+              <span class="lr-drop-tier" [style.color]="getTierMeta(s.tier).color">
+                <i class="fas" [ngClass]="getTierMeta(s.tier).icon"></i>{{ getTierMeta(s.tier).label }}
+              </span>
+            </div>
+          </div>
+          <div class="lr-drop-footer"><i class="fas fa-keyboard"></i> Arrow keys and Enter supported</div>
+        </div>
+      </div>
+      <div class="lr-error" *ngIf="searchError"><i class="fas fa-exclamation-circle"></i> {{ searchError }}</div>
+      <p class="lr-hint"><i class="fas fa-info-circle"></i> Start with one letter to see floating suggestions</p>
+    </div>
+
+    <!-- Selected Account Preview -->
+    <div class="lr-selected-card" *ngIf="selectedAccount">
+      <div class="lr-sc-top">
+        <div class="lr-sc-avatar" [style.background]="getTierMeta(selectedAccount.tier).gradient">
+          {{ selectedAccount.passengerName?.charAt(0) }}
+        </div>
+        <div class="lr-sc-info">
+          <h4>{{ selectedAccount.passengerName }}</h4>
+          <span class="lr-sc-num">{{ selectedAccount.memberNumber }}</span>
+          <span class="lr-sc-email">{{ selectedAccount.passengerEmail }}</span>
+        </div>
+        <div class="lr-sc-tier-badge" [style.background]="getTierMeta(selectedAccount.tier).bg"
+             [style.color]="getTierMeta(selectedAccount.tier).color"
+             [style.border]="'1px solid ' + getTierMeta(selectedAccount.tier).border">
+          <i class="fas" [ngClass]="getTierMeta(selectedAccount.tier).icon"></i>
+          {{ getTierMeta(selectedAccount.tier).label }}
+        </div>
+      </div>
+      <div class="lr-sc-points-row">
+        <div class="lr-sc-pt-box lr-pt-available">
+          <i class="fas fa-coins"></i>
+          <span class="lr-pt-val">{{ formatNum(selectedAccount.availablePoints) }}</span>
+          <span class="lr-pt-lbl">Available Points</span>
+        </div>
+        <div class="lr-sc-pt-box lr-pt-earned">
+          <i class="fas fa-chart-line"></i>
+          <span class="lr-pt-val">{{ formatNum(selectedAccount.totalPointsEarned) }}</span>
+          <span class="lr-pt-lbl">Total Earned</span>
+        </div>
+        <div class="lr-sc-pt-box lr-pt-redeemed">
+          <i class="fas fa-exchange-alt"></i>
+          <span class="lr-pt-val">{{ formatNum(selectedAccount.totalPointsRedeemed) }}</span>
+          <span class="lr-pt-lbl">Total Redeemed</span>
+        </div>
+        <div class="lr-sc-pt-box lr-pt-value">
+          <i class="fas fa-money-bill-wave"></i>
+          <span class="lr-pt-val">USD {{ (selectedAccount.availablePoints / 100).toFixed(2) }}</span>
+          <span class="lr-pt-lbl">Redeem Value</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lr-card-footer">
+      <button class="lr-btn-next" [disabled]="!selectedAccount" (click)="proceedToStep2()">
+        Continue to Points Entry <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       STEP 2 — ENTER POINTS
+       ══════════════════════════════════════════════════════════ -->
+  <div class="lr-card" *ngIf="step === 2">
+    <div class="lr-card-header"><i class="fas fa-calculator"></i><h3>Enter Points to Redeem</h3></div>
+
+    <form [formGroup]="redeemForm">
+      <!-- Member mini card -->
+      <div class="lr-mini-member" *ngIf="selectedAccount">
+        <div class="lr-mm-avatar" [style.background]="getTierMeta(selectedAccount.tier).gradient">{{ selectedAccount.passengerName?.charAt(0) }}</div>
+        <div class="lr-mm-info">
+          <strong>{{ selectedAccount.passengerName }}</strong>
+          <span>{{ selectedAccount.memberNumber }}</span>
+        </div>
+        <div class="lr-mm-pts"><span class="lr-mm-avail">{{ formatNum(selectedAccount.availablePoints) }}</span><small>available pts</small></div>
+        <button type="button" class="lr-mm-change" (click)="goBack(1)"><i class="fas fa-exchange-alt"></i> Change</button>
+      </div>
+
+      <!-- Points input -->
+      <div class="lr-section">
+        <label class="lr-label">Points to Redeem <span class="lr-label-hint">(multiples of 100 only)</span></label>
+        <div class="lr-points-input-row">
+          <button type="button" class="lr-pts-adj-btn" (click)="adjustPoints(-100)" [disabled]="(redeemForm.get('pointsToRedeem')?.value || 0) <= 100">
+            <i class="fas fa-minus"></i>
+          </button>
+          <div class="lr-pts-input-wrap">
+            <i class="fas fa-star lr-pts-icon"></i>
+            <input type="number" class="lr-pts-input" formControlName="pointsToRedeem" min="100" step="100"
+                   (change)="loadPreview(redeemForm.get('pointsToRedeem')?.value)" />
+          </div>
+          <button type="button" class="lr-pts-adj-btn" (click)="adjustPoints(100)"
+                  [disabled]="(redeemForm.get('pointsToRedeem')?.value || 0) >= (selectedAccount?.availablePoints || 0)">
+            <i class="fas fa-plus"></i>
+          </button>
+          <button type="button" class="lr-pts-max-btn" (click)="setMaxPoints()">MAX</button>
+        </div>
+        <div class="lr-error" *ngIf="previewError"><i class="fas fa-exclamation-circle"></i> {{ previewError }}</div>
+      </div>
+
+      <!-- Quick select chips -->
+      <div class="lr-section lr-pt-chips">
+        <label class="lr-label">Quick Select</label>
+        <div class="lr-chip-row">
+          <button type="button" class="lr-chip" *ngFor="let pts of [100, 500, 1000, 2000, 5000]"
+                  [class.lr-chip-active]="redeemForm.get('pointsToRedeem')?.value === pts"
+                  [disabled]="pts > (selectedAccount?.availablePoints || 0)"
+                  (click)="redeemForm.get('pointsToRedeem')?.setValue(pts); loadPreview(pts)">
+            {{ pts | number }} pts
+          </button>
+        </div>
+      </div>
+
+      <!-- Booking Reference (optional) -->
+      <div class="lr-section">
+        <label class="lr-label">Booking Reference <span class="lr-label-opt">(optional)</span></label>
+        <div class="lr-input-wrap">
+          <i class="fas fa-ticket-alt"></i>
+          <input type="text" class="lr-text-input" formControlName="bookingReference" placeholder="e.g. SKY-20250001" />
+        </div>
+      </div>
+
+      <!-- Preview Panel -->
+      <div class="lr-preview-panel" *ngIf="preview && !previewLoading">
+        <h4 class="lr-preview-title"><i class="fas fa-receipt"></i> Redemption Summary</h4>
+        <div class="lr-preview-grid">
+          <div class="lr-pv-item lr-pv-highlight">
+            <i class="fas fa-star"></i>
+            <span class="lr-pv-val">{{ formatNum(preview.pointsToRedeem) }}</span>
+            <span class="lr-pv-lbl">Points to Redeem</span>
+          </div>
+          <div class="lr-pv-item lr-pv-value">
+            <i class="fas fa-money-bill-wave"></i>
+            <span class="lr-pv-val lr-pv-bdt">USD {{ preview.discountValueBDT.toFixed(2) }}</span>
+            <span class="lr-pv-lbl">Discount Value</span>
+          </div>
+          <div class="lr-pv-item lr-pv-remain">
+            <i class="fas fa-piggy-bank"></i>
+            <span class="lr-pv-val">{{ formatNum(preview.remainingPoints) }}</span>
+            <span class="lr-pv-lbl">Remaining Points</span>
+          </div>
+        </div>
+        <!-- Points balance bar -->
+        <div class="lr-balance-visual">
+          <div class="lr-bv-label">
+            <span>Redeeming: <strong>{{ formatNum(preview.pointsToRedeem) }} pts</strong></span>
+            <span>Keeping: <strong>{{ formatNum(preview.remainingPoints) }} pts</strong></span>
+          </div>
+          <div class="lr-bv-bar">
+            <div class="lr-bv-used" [style.width.%]="100 - getAvailableAfterPct()"></div>
+            <div class="lr-bv-keep" [style.width.%]="getAvailableAfterPct()"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lr-preview-loading" *ngIf="previewLoading">
+        <i class="fas fa-spinner fa-spin"></i> Calculating...
+      </div>
+    </form>
+
+    <div class="lr-card-footer">
+      <button class="lr-btn-back" (click)="goBack(1)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="lr-btn-next" [disabled]="redeemForm.get('pointsToRedeem')?.invalid || !preview || !!previewError" (click)="proceedToStep3()">
+        Review & Confirm <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       STEP 3 — CONFIRM
+       ══════════════════════════════════════════════════════════ -->
+  <div class="lr-card" *ngIf="step === 3">
+    <div class="lr-card-header"><i class="fas fa-check-double"></i><h3>Confirm Redemption</h3></div>
+
+    <div class="lr-confirm-layout">
+      <!-- Summary -->
+      <div class="lr-confirm-box" *ngIf="selectedAccount && preview">
+        <h4><i class="fas fa-user-circle"></i> Member Details</h4>
+        <div class="lr-cfm-rows">
+          <div class="lr-cfm-r"><span>Member</span><strong>{{ selectedAccount.passengerName }}</strong></div>
+          <div class="lr-cfm-r"><span>Member No.</span><strong>{{ selectedAccount.memberNumber }}</strong></div>
+          <div class="lr-cfm-r"><span>Tier</span>
+            <strong [style.color]="getTierMeta(selectedAccount.tier).color">
+              {{ getTierMeta(selectedAccount.tier).label }}
+            </strong>
+          </div>
+          <div class="lr-cfm-r"><span>Email</span><strong>{{ selectedAccount.passengerEmail }}</strong></div>
+        </div>
+
+        <h4 class="lr-cfm-h4"><i class="fas fa-coins"></i> Redemption Details</h4>
+        <div class="lr-cfm-rows">
+          <div class="lr-cfm-r"><span>Points to Redeem</span><strong class="lr-cfm-pts">{{ formatNum(preview.pointsToRedeem) }} pts</strong></div>
+          <div class="lr-cfm-r"><span>Discount Value</span><strong class="lr-cfm-bdt">USD {{ preview.discountValueBDT.toFixed(2) }}</strong></div>
+          <div class="lr-cfm-r"><span>Remaining Points</span><strong>{{ formatNum(preview.remainingPoints) }} pts</strong></div>
+          <div class="lr-cfm-r" *ngIf="redeemForm.get('bookingReference')?.value">
+            <span>Booking Ref</span><strong>{{ redeemForm.get('bookingReference')?.value }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warning + Checkbox -->
+    <div class="lr-warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>Redemption is <strong>immediate and irreversible</strong>. Points cannot be restored after confirmation.</p>
+    </div>
+
+    <div class="lr-confirm-check">
+      <label class="lr-check-label">
+        <input type="checkbox" [formControl]="$any(redeemForm.get('confirmUnderstand'))" />
+        <span class="lr-check-box"><i class="fas fa-check" *ngIf="redeemForm.get('confirmUnderstand')?.value"></i></span>
+        I confirm this redemption request and understand it cannot be undone.
+      </label>
+    </div>
+
+    <div class="lr-error" *ngIf="submitError"><i class="fas fa-times-circle"></i> {{ submitError }}</div>
+
+    <div class="lr-card-footer">
+      <button class="lr-btn-back" (click)="goBack(2)" [disabled]="submitting"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="lr-btn-confirm" (click)="confirmRedeem()"
+              [disabled]="!redeemForm.get('confirmUnderstand')?.value || submitting">
+        <i class="fas" [class.fa-gift]="!submitting" [class.fa-spinner]="submitting" [class.fa-spin]="submitting"></i>
+        {{ submitting ? 'Processing...' : 'Confirm Redemption' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       STEP 4 — SUCCESS
+       ══════════════════════════════════════════════════════════ -->
+  <div class="lr-success-card" *ngIf="step === 4 && successTx">
+    <div class="lr-success-icon"><i class="fas fa-check-circle"></i></div>
+    <h2 class="lr-success-title">Redemption Successful!</h2>
+    <p class="lr-success-sub">Points have been redeemed and discount applied.</p>
+
+    <div class="lr-success-details">
+      <div class="lr-sd-row"><span>Reference</span><strong class="lr-sd-ref">{{ successTx.redemptionReference }}</strong></div>
+      <div class="lr-sd-row"><span>Member</span><strong>{{ successTx.passengerName }}</strong></div>
+      <div class="lr-sd-row"><span>Points Redeemed</span><strong class="lr-sd-pts">{{ formatNum(Math.abs(successTx.pointsAmount)) }} pts</strong></div>
+      <div class="lr-sd-row"><span>Discount Value</span><strong class="lr-sd-bdt">USD {{ successTx.redemptionValue?.toFixed(2) }}</strong></div>
+      <div class="lr-sd-row"><span>Balance After</span><strong>{{ formatNum(successTx.balanceAfter) }} pts</strong></div>
+      <div class="lr-sd-row"><span>Processed At</span><strong>{{ formatDT(successTx.createdAt) }}</strong></div>
+    </div>
+
+    <div class="lr-success-actions">
+      <button class="lr-btn-new-redemption" (click)="startOver()"><i class="fas fa-redo"></i> New Redemption</button>
+      <a routerLink="/loyalty" class="lr-btn-back-list"><i class="fas fa-list"></i> Back to Members</a>
+    </div>
+  </div>
+
+</div>

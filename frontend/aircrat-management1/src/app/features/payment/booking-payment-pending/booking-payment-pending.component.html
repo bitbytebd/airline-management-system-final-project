@@ -1,0 +1,82 @@
+<section class="bpp-page">
+  <div class="bpp-header">
+    <div>
+      <span class="bpp-eyebrow">Booking Payment Pending</span>
+      <h1>Approved Bookings Ready for Payment</h1>
+      <p>Only bookings approved for payment and still pending collection are shown here.</p>
+    </div>
+    <div class="bpp-actions">
+      <button type="button" class="bpp-btn light" routerLink="/payment">
+        <i class="fas fa-arrow-left"></i>
+        Payment Ledger
+      </button>
+      <button type="button" class="bpp-btn primary" (click)="loadPendingPayments()" [disabled]="loading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="bpp-summary">
+    <div>
+      <span>Pending Collection</span>
+      <strong>{{ bookings.length }}</strong>
+    </div>
+    <div>
+      <span>Total Payable</span>
+      <strong>{{ formatAmount(totalPayable) }}</strong>
+    </div>
+  </div>
+
+  <div class="bpp-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="bpp-card">
+    <div class="bpp-loading" *ngIf="loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      Loading payment pending queue...
+    </div>
+
+    <div class="bpp-empty" *ngIf="!loading && bookings.length === 0">
+      <i class="fas fa-check-circle"></i>
+      <h2>No pending booking payments</h2>
+      <p>Approved bookings will appear here before payment is received.</p>
+    </div>
+
+    <div class="bpp-table-wrap" *ngIf="!loading && bookings.length > 0">
+      <table class="bpp-table">
+        <thead>
+          <tr>
+            <th>Booking Ref</th>
+            <th>Passenger</th>
+            <th>Flight</th>
+            <th>Route</th>
+            <th>Departure Date</th>
+            <th>Total Payable</th>
+            <th>Payment Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let booking of bookings; trackBy: trackByBookingId">
+            <td><strong class="bpp-ref">{{ booking.bookingReference || booking.id }}</strong></td>
+            <td>
+              <strong>{{ booking.passengerName }}</strong>
+              <span>{{ booking.email || booking.phone || 'No contact' }}</span>
+            </td>
+            <td><strong>{{ booking.flightNumber }}</strong></td>
+            <td>{{ booking.origin }} to {{ booking.destination }}</td>
+            <td>{{ booking.departureDate | date:'dd MMM, yyyy' }}</td>
+            <td><strong>{{ formatAmount(booking.totalPrice) }}</strong></td>
+            <td><span class="bpp-status">{{ booking.paymentStatus }}</span></td>
+            <td class="bpp-action-cell">
+              <button type="button" class="bpp-receive" (click)="receivePayment(booking)">
+                <i class="fas fa-credit-card"></i>
+                Pay
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

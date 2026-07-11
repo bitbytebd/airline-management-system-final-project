@@ -1,0 +1,84 @@
+<div class="voucher-page">
+  <div class="voucher-actions no-print">
+    <button type="button" routerLink="/expense/payment-queue" class="secondary-btn">
+      <i class="fas fa-arrow-left"></i> Expense Payment Queue
+    </button>
+    <button type="button" class="print-btn" (click)="printVoucher()" [disabled]="!payment">
+      <i class="fas fa-print"></i> Print Voucher
+    </button>
+  </div>
+
+  <div class="voucher-message" *ngIf="loading">Loading expense payment voucher...</div>
+  <div class="voucher-message error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+  <section class="voucher-paper" id="expense-payment-voucher-print" *ngIf="!loading && payment">
+    <header class="voucher-top">
+      <div class="brand">
+        <h2>Skyward Airlines</h2>
+        <span>Finance & Accounting Department</span>
+      </div>
+      <div class="title">
+        <span>Voucher Title</span>
+        <h1>EXPENSE PAYMENT VOUCHER</h1>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="field">
+        <span>Payment Reference</span>
+        <strong>{{ value(payment.paymentReference) }}</strong>
+      </div>
+      <div class="field">
+        <span>Transaction Reference</span>
+        <strong>{{ value(payment.transactionReference) }}</strong>
+      </div>
+      <div class="field">
+        <span>Expense Reference</span>
+        <strong>{{ expenseReference() }}</strong>
+      </div>
+      <div class="field">
+        <span>Expense Category</span>
+        <strong>{{ value(expense?.category) }}</strong>
+      </div>
+      <div class="field">
+        <span>Vendor / Payee</span>
+        <strong>{{ value(expense?.vendorName) }}</strong>
+      </div>
+      <div class="field">
+        <span>Expense Date</span>
+        <strong>{{ value(expense?.expenseDate) }}</strong>
+      </div>
+      <div class="field">
+        <span>Payment Method</span>
+        <strong>{{ value(payment.paymentMethod) }}</strong>
+      </div>
+      <div class="field">
+        <span>Payment Status</span>
+        <strong>{{ status() }}</strong>
+      </div>
+      <div class="field">
+        <span>Paid Date / Time</span>
+        <strong>{{ paidAt() }}</strong>
+      </div>
+      <div class="field">
+        <span>Prepared By</span>
+        <strong>{{ preparedBy() }}</strong>
+      </div>
+    </div>
+
+    <div class="amount-box">
+      <span>Paid Amount</span>
+      <strong>{{ amount(paidAmount()) }}</strong>
+    </div>
+
+    <div class="notes">
+      <span>Notes</span>
+      <p>{{ value(payment.notes) }}</p>
+    </div>
+
+    <div class="signatures">
+      <div class="signature">Prepared By</div>
+      <div class="signature">Approved By</div>
+    </div>
+  </section>
+</div>

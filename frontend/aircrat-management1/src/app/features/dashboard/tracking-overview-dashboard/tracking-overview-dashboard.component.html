@@ -1,0 +1,135 @@
+<section class="tracking-overview-dashboard">
+  <div class="dashboard-shell">
+    <header class="section-header">
+      <div>
+        <span>Skyward Live Network</span>
+        <h2>Tracking Overview Dashboard</h2>
+        <p>Compact flight movement and route monitoring</p>
+      </div>
+      <button type="button" (click)="loadDashboard()" [disabled]="loading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+        Refresh
+      </button>
+    </header>
+
+    <div class="loading-state" *ngIf="loading">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <strong>Loading compact tracking summary...</strong>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <div class="soft-alert" *ngIf="errorMessage">
+        <i class="fas fa-info-circle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <section class="kpi-grid">
+        <article class="kpi-card" *ngFor="let item of kpis" [ngClass]="item.tone">
+          <div class="kpi-icon"><i [class]="item.icon"></i></div>
+          <div>
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+            <small>{{ item.hint }}</small>
+          </div>
+        </article>
+      </section>
+
+      <section class="health-grid">
+        <article class="health-card" *ngFor="let item of healthCards" [ngClass]="item.tone">
+          <i [class]="item.icon"></i>
+          <div>
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+            <small>{{ item.hint }}</small>
+          </div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel table-panel">
+          <div class="panel-head">
+            <div>
+              <span>Live Route Summary</span>
+              <h3>Latest Tracking Flights</h3>
+            </div>
+            <small>Top {{ summaryRows.length || 0 }} records</small>
+          </div>
+
+          <div class="table-scroll" *ngIf="summaryRows.length; else emptyTracking">
+            <table>
+              <thead>
+                <tr>
+                  <th>Flight</th>
+                  <th>Route</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                  <th>ETA</th>
+                  <th>Mode</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of summaryRows">
+                  <td><strong>{{ row.flightNumber || 'N/A' }}</strong></td>
+                  <td><span class="ellipsis">{{ routeOf(row) }}</span></td>
+                  <td><span class="status-pill" [ngClass]="statusClass(statusOf(row))">{{ statusOf(row) }}</span></td>
+                  <td>
+                    <div class="progress-cell">
+                      <div class="progress-track"><span [style.width.%]="row.progressPercent || 0"></span></div>
+                      <b>{{ formatPercent(row.progressPercent) }}</b>
+                    </div>
+                  </td>
+                  <td>{{ formatEta(row.estimatedLandingMinutes) }}</td>
+                  <td><span class="mode-pill" [ngClass]="modeClass(modeOf(row))">{{ modeOf(row) }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel progress-panel">
+          <div class="panel-head">
+            <div>
+              <span>Compact Route Progress</span>
+              <h3>Active Flight Movement</h3>
+            </div>
+            <a routerLink="/tracking">View Full Live Tracking</a>
+          </div>
+
+          <div class="progress-list" *ngIf="progressRows.length; else emptyProgress">
+            <div class="route-card" *ngFor="let row of progressRows">
+              <div class="route-card-top">
+                <div>
+                  <strong>{{ row.flightNumber || 'N/A' }}</strong>
+                  <span>{{ routeOf(row) }}</span>
+                </div>
+                <span class="status-pill" [ngClass]="statusClass(statusOf(row))">{{ statusOf(row) }}</span>
+              </div>
+              <div class="route-progress">
+                <div class="progress-track"><span [style.width.%]="row.progressPercent || 0"></span></div>
+                <b>{{ formatPercent(row.progressPercent) }}</b>
+              </div>
+              <div class="route-meta">
+                <span>ETA {{ formatEta(row.estimatedLandingMinutes) }}</span>
+                <span class="mode-pill" [ngClass]="modeClass(modeOf(row))">{{ modeOf(row) }}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </ng-container>
+  </div>
+</section>
+
+<ng-template #emptyTracking>
+  <div class="empty-state">
+    <i class="fas fa-satellite-dish"></i>
+    <strong>No tracking records available.</strong>
+  </div>
+</ng-template>
+
+<ng-template #emptyProgress>
+  <div class="empty-state small">
+    <i class="fas fa-route"></i>
+    <strong>No active route progress to show.</strong>
+  </div>
+</ng-template>

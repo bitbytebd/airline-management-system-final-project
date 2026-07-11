@@ -1,0 +1,243 @@
+.bpp-page *,
+.bpp-page *::before,
+.bpp-page *::after {
+  box-sizing: border-box;
+}
+
+.bpp-page {
+  background: linear-gradient(180deg, #e7f8ff 0%, #f8fbff 100%);
+  color: #0f172a;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.bpp-header {
+  align-items: center;
+  background: linear-gradient(135deg, #075985, #0ea5e9);
+  color: #fff;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  padding: 26px;
+}
+
+.bpp-eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.bpp-header h1 {
+  font-size: 30px;
+  margin: 8px 0;
+}
+
+.bpp-header p {
+  margin: 0;
+  opacity: 0.88;
+}
+
+.bpp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.bpp-btn,
+.bpp-receive {
+  align-items: center;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 900;
+  gap: 8px;
+  justify-content: center;
+  padding: 11px 15px;
+}
+
+.bpp-btn.light {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+
+.bpp-btn.primary {
+  background: #fff;
+  color: #075985;
+}
+
+.bpp-summary {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 18px 0;
+}
+
+.bpp-summary div {
+  background: #fff;
+  border-left: 5px solid #0ea5e9;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  padding: 18px;
+}
+
+.bpp-summary span {
+  color: #64748b;
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.bpp-summary strong {
+  display: block;
+  font-size: 28px;
+  margin-top: 6px;
+}
+
+.bpp-card {
+  background: #fff;
+  border: 1px solid #bae6fd;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.bpp-table-wrap {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.bpp-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.bpp-table th {
+  background: #075985;
+  color: #fff;
+  font-size: 11px;
+  padding: 12px 8px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.bpp-table td {
+  border-top: 1px solid #e2e8f0;
+  color: #1e293b;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  padding: 12px 8px;
+  vertical-align: middle;
+}
+
+.bpp-table th:nth-child(1),
+.bpp-table td:nth-child(1) { width: 12%; }
+.bpp-table th:nth-child(2),
+.bpp-table td:nth-child(2) { width: 16%; }
+.bpp-table th:nth-child(3),
+.bpp-table td:nth-child(3) { width: 9%; }
+.bpp-table th:nth-child(4),
+.bpp-table td:nth-child(4) { width: 16%; }
+.bpp-table th:nth-child(5),
+.bpp-table td:nth-child(5) { width: 13%; }
+.bpp-table th:nth-child(6),
+.bpp-table td:nth-child(6) { width: 13%; }
+.bpp-table th:nth-child(7),
+.bpp-table td:nth-child(7) { width: 11%; }
+.bpp-table th:nth-child(8),
+.bpp-table td:nth-child(8) { width: 10%; }
+
+.bpp-table td span {
+  color: #64748b;
+  display: block;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.bpp-ref {
+  color: #2563eb;
+  font-family: Consolas, monospace;
+}
+
+.bpp-status {
+  background: #fef3c7;
+  color: #92400e !important;
+  display: inline-flex !important;
+  font-size: 11px !important;
+  font-weight: 900;
+  margin: 0 !important;
+  padding: 6px 10px;
+}
+
+.bpp-action-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bpp-receive {
+  background: #0ea5e9;
+  color: #fff;
+  font-size: 12px;
+  min-width: 0;
+  padding: 8px 10px;
+  width: 64px;
+}
+
+.bpp-loading,
+.bpp-empty {
+  color: #075985;
+  padding: 46px 20px;
+  text-align: center;
+}
+
+.bpp-empty i {
+  color: #22c55e;
+  font-size: 38px;
+}
+
+.bpp-empty h2 {
+  color: #0f172a;
+  margin: 12px 0 6px;
+}
+
+.bpp-empty p {
+  color: #64748b;
+  margin: 0;
+}
+
+.bpp-error {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 800;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+}
+
+@media (max-width: 820px) {
+  .bpp-page {
+    padding: 14px;
+  }
+
+  .bpp-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bpp-actions,
+  .bpp-btn {
+    width: 100%;
+  }
+
+  .bpp-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .bpp-table-wrap {
+    overflow-x: auto;
+  }
+
+  .bpp-table {
+    min-width: 980px;
+  }
+}

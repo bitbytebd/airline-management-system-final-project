@@ -1,0 +1,180 @@
+<div class="overview-container">
+  <div class="report-filter-card">
+    <div>
+      <label>Start Date</label>
+      <input type="date" [(ngModel)]="startDate">
+    </div>
+    <div>
+      <label>End Date</label>
+      <input type="date" [(ngModel)]="endDate">
+    </div>
+    <div>
+      <label>Payment Method</label>
+      <select [(ngModel)]="paymentMethod">
+        <option *ngFor="let method of paymentMethods" [value]="method">{{ method }}</option>
+      </select>
+    </div>
+    <div>
+      <label>Period</label>
+      <select [(ngModel)]="period">
+        <option *ngFor="let item of periods" [value]="item">{{ item }}</option>
+      </select>
+    </div>
+    <button type="button" class="btn-apply" (click)="loadData()">Apply</button>
+    <button type="button" class="btn-clear" (click)="clearFilters()">Clear</button>
+  </div>
+
+  <div class="report-alert" *ngIf="errorMsg">{{ errorMsg }}</div>
+  <div class="report-alert loading" *ngIf="loading">Loading real payment report...</div>
+  
+  <!-- Top Summary Cards -->
+  <div class="summary-row">
+    <div class="stat-card sales">
+      <i class="fas fa-arrow-up"></i>
+      <div class="stat-info">
+        <span>Total Revenue</span>
+        <h3>${{ sales | number:'1.2-2' }}</h3>
+        <small>{{ bookingPaymentCount }} booking payments</small>
+      </div>
+    </div>
+
+    <div class="stat-card expenses">
+      <i class="fas fa-arrow-down"></i>
+      <div class="stat-info">
+        <span>Total Expenses</span>
+        <h3>${{ expenses | number:'1.2-2' }}</h3>
+        <small>{{ expensePaymentCount }} expense payments</small>
+      </div>
+    </div>
+
+    <div class="stat-card profit">
+      <i class="fas fa-balance-scale"></i>
+      <div class="stat-info">
+        <span>{{ profit >= 0 ? 'Net Profit' : 'Net Loss' }}</span>
+        <h3>${{ profit | number:'1.2-2' }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="chart-card">
+    <div class="card-header"><h3>Financial Comparison</h3></div>
+    <div class="chart-wrapper">
+      <canvas baseChart 
+        [data]="barData" 
+        [type]="barType" 
+        [options]="chartOptions">
+      </canvas>
+    </div>
+  </div>
+
+  <div class="monthly-card" *ngIf="monthlySummary.length">
+    <div class="card-header"><h3>Monthly Revenue vs Expense</h3></div>
+    <div class="monthly-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Revenue</th>
+            <th>Expense</th>
+            <th>Profit / Loss</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of monthlySummary">
+            <td>{{ periodLabel(row) }}</td>
+            <td>${{ amountValue(row.revenue) | number:'1.2-2' }}</td>
+            <td>${{ amountValue(row.expense) | number:'1.2-2' }}</td>
+            <td [class.loss-text]="amountValue(row.profit) < 0">${{ amountValue(row.profit) | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+
+  <!-- Financial Report Wrapper (Dark Blue Border Section) -->
+  <div class="financial-report-wrapper">
+  
+    <!-- Title -->
+    <div class="section-header">
+      Financial Report
+    </div>
+
+    <div class="report-grid">
+      
+      <!-- DEBIT SECTION -->
+      <div class="report-card debit-section">
+        <span class="section-label">Debit (Successful Expense Payments)</span>
+        
+        <div class="data-row">
+          <span>Debit Amount</span>
+          <strong>${{ amountValue(expenses) | number:'1.2-2' }}</strong>
+        </div>
+        <div class="data-row">
+          <span>Payment Count</span>
+          <span class="text-muted">{{ expensePaymentCount }} successful expense payments</span>
+        </div>
+        <div class="data-row">
+          <span>Debit Details</span>
+          <span class="text-muted">{{ expenseDetails }}</span>
+        </div>
+        <div class="total-row">
+          <span>Total Debit</span>
+          <strong>${{ amountValue(expenses) | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+
+      <!-- CREDIT SECTION -->
+      <div class="report-card credit-section">
+        <span class="section-label">Credit (Successful Booking Payments)</span>
+        
+        <div class="data-row">
+          <span class="sales-overview-label">Credit Amount</span>
+          <strong>${{ amountValue(sales) | number:'1.2-2' }}</strong>
+        </div>
+        <div class="data-row">
+          <span>Payment Count</span>
+          <span class="text-muted">{{ bookingPaymentCount }} successful booking payments</span>
+        </div>
+        <div class="data-row">
+          <span>Credit Details</span>
+          <span class="text-muted">{{ salesDetails }}</span>
+        </div>
+        <div class="total-row">
+          <span>Total Credit</span>
+          <strong>${{ amountValue(sales) | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Balance Overview Section -->
+    <div class="balance-overview">
+      <div class="balance-content">
+        <span class="balance-label" [class.loss-text]="profit < 0">
+          {{ profit >= 0 ? 'Net Profit' : 'Net Loss' }}
+        </span>
+        <div class="balance-value" [class.loss-text]="profit < 0">
+          ${{ amountValue(profit < 0 ? (profit * -1) : profit) | number:'1.2-2' }}
+        </div>
+      </div>
+
+      <div class="status-indicator">
+        <div *ngIf="profit >= 0" class="status-badge profit-badge">
+          <i class="fas fa-arrow-up"></i> Profit
+        </div>
+        <div *ngIf="profit < 0" class="status-badge loss-badge">
+          <i class="fas fa-arrow-down"></i> Loss
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn-cancel" (click)="onCancel()">Cancel</button>
+      <button class="btn-save" (click)="onSave()">Save</button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,118 @@
+<div class="expense-queue-wrapper">
+  <section class="queue-header">
+    <div>
+      <span class="queue-eyebrow"><i class="fas fa-money-check-alt"></i> Expense Payment Queue</span>
+      <h1>Expense Payment Queue</h1>
+      <p>Review approved operating expenses and complete payment without touching booking payment processing.</p>
+    </div>
+    <button routerLink="/expense" class="queue-secondary"><i class="fas fa-arrow-left"></i> Expense List</button>
+  </section>
+
+  <div class="queue-summary">
+    <div>
+      <span>Pending Items</span>
+      <strong>{{ expenses.length }}</strong>
+    </div>
+    <div>
+      <span>Total Payable</span>
+      <strong>${{ queueTotal() | number:'1.2-2' }}</strong>
+    </div>
+  </div>
+
+  <div class="queue-alert error" *ngIf="errorMsg">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMsg }}
+  </div>
+  <div class="queue-alert success" *ngIf="successMsg">
+    <i class="fas fa-check-circle"></i> {{ successMsg }}
+  </div>
+
+  <div class="queue-card">
+    <div class="queue-loading" *ngIf="loading">Loading pending expense payments...</div>
+
+    <div class="table-responsive" *ngIf="!loading">
+      <table class="queue-table">
+        <thead>
+          <tr>
+            <th>Expense Reference</th>
+            <th>Expense Type/Category</th>
+            <th>Vendor/Payee</th>
+            <th>Expense Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let expense of expenses">
+            <td><strong>{{ expenseReference(expense) }}</strong></td>
+            <td>{{ expense.category || 'N/A' }}</td>
+            <td>{{ expense.vendorName || 'N/A' }}</td>
+            <td>{{ expense.expenseDate | date:'MMM dd, yyyy' }}</td>
+            <td class="amount">${{ expense.amount | number:'1.2-2' }}</td>
+            <td><span class="status-pill">{{ expense.status }}</span></td>
+            <td>
+              <button type="button" class="pay-btn" [routerLink]="['/expense/payment', expense.id]">
+                <i class="fas fa-credit-card"></i> Pay Now
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="!expenses.length">
+            <td colspan="7" class="empty-state">
+              <i class="fas fa-check-circle"></i>
+              <h4>No pending expense payments</h4>
+              <p>Approved or pending-payment expenses will appear here.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="selectedExpense">
+    <form class="payment-modal" [formGroup]="form" (ngSubmit)="payNow()">
+      <div class="modal-head">
+        <div>
+          <span>Pay Expense</span>
+          <h2>{{ expenseReference(selectedExpense) }}</h2>
+        </div>
+        <button type="button" class="modal-close" (click)="closePayment()"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="modal-summary">
+        <div><span>Vendor</span><strong>{{ selectedExpense.vendorName || 'N/A' }}</strong></div>
+        <div><span>Category</span><strong>{{ selectedExpense.category || 'N/A' }}</strong></div>
+        <div><span>Payable</span><strong>${{ selectedExpense.amount | number:'1.2-2' }}</strong></div>
+      </div>
+
+      <label>
+        Payment Method
+        <select formControlName="paymentMethod">
+          <option *ngFor="let method of methods" [value]="method">{{ method }}</option>
+        </select>
+      </label>
+
+      <label>
+        Paid Amount
+        <input type="number" formControlName="paidAmount" step="0.01">
+      </label>
+
+      <label>
+        Transaction Reference
+        <input type="text" formControlName="transactionReference" placeholder="Bank / card / wallet transaction id">
+      </label>
+
+      <label>
+        Notes
+        <textarea formControlName="notes" rows="3"></textarea>
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" (click)="closePayment()">Cancel</button>
+        <button type="submit" class="submit-btn" [disabled]="form.invalid || submitting">
+          <i class="fas fa-lock"></i> {{ submitting ? 'Paying...' : 'Confirm Payment' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

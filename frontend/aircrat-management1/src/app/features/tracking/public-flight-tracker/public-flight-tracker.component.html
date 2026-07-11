@@ -1,0 +1,151 @@
+<main class="public-tracker-page">
+  <section class="public-hero">
+    <div class="hero-copy">
+      <span>Skyward Public Flight Tracker</span>
+      <h1>Track your aircraft location in real time</h1>
+      <p>Search by flight number or booking reference to see current aircraft position, airport route, status, gate, delay, and landing countdown.</p>
+
+      <form class="tracker-search" (ngSubmit)="searchFlight()">
+        <div class="search-field">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            name="publicFlightSearch"
+            [(ngModel)]="searchText"
+            (input)="refreshSuggestions()"
+            (focus)="refreshSuggestions()"
+            placeholder="Enter flight number or PNR">
+          <div class="suggestions" *ngIf="showSuggestions && suggestions.length">
+            <button type="button" *ngFor="let item of suggestions" (click)="selectSuggestion(item)">
+              <strong>{{ item.flightNumber }}</strong>
+              <span>{{ item.origin || 'Origin' }} to {{ item.destination || 'Destination' }}</span>
+              <small>{{ item.flightStatus || item.status || 'SCHEDULED' }} · ETA {{ formatDate(item.estimatedArrival) }}</small>
+            </button>
+          </div>
+        </div>
+        <button type="submit" [disabled]="loading">
+          <i class="fas fa-location-arrow"></i>
+          {{ loading ? 'Tracking...' : 'Track Flight' }}
+        </button>
+      </form>
+      <p class="search-message" *ngIf="message">{{ message }}</p>
+    </div>
+
+    <article class="hero-status-card">
+      <small>Selected Flight</small>
+      <strong>{{ selectedFlight?.flightNumber || 'Not selected' }}</strong>
+      <span [ngClass]="statusClass(selectedFlight?.flightStatus || selectedFlight?.status)">
+        {{ selectedFlight?.flightStatus || selectedFlight?.status || 'Search required' }}
+      </span>
+    </article>
+  </section>
+
+  <section class="map-stage">
+    <div #publicMapCanvas class="public-map-canvas" [class.map-disabled]="!googleMapsReady"></div>
+
+    <div class="map-fallback" *ngIf="mapMessage">
+      <i class="fas fa-map-marked-alt"></i>
+      <strong>{{ mapMessage }}</strong>
+      <span>Google Maps key is read from browser runtime only. No key is stored in source code.</span>
+    </div>
+
+    <article class="flight-glass-panel">
+      <div class="panel-head">
+        <div>
+          <span>Passenger View</span>
+          <h2>{{ selectedFlight?.flightNumber || 'Flight Location' }}</h2>
+          <p>{{ selectedFlight?.origin || 'Departure' }} <i class="fas fa-arrow-right"></i> {{ selectedFlight?.destination || 'Arrival' }}</p>
+        </div>
+        <span class="tracking-mode" [ngClass]="trackingModeClass(selectedFlight)">
+          {{ trackingModeLabel(selectedFlight) }}
+        </span>
+      </div>
+
+      <div class="route-progress">
+        <div>
+          <span>Route Progress</span>
+          <strong>{{ formatProgress(selectedFlight?.progressPercent) }}</strong>
+        </div>
+        <div class="progress-bar"><span [style.width.%]="selectedFlight?.progressPercent || 0"></span></div>
+      </div>
+
+      <div class="eta-box">
+        <span>Landing Countdown</span>
+        <strong>{{ formatDuration(selectedFlight?.estimatedLandingMinutes) }}</strong>
+        <small>ETA {{ formatDate(selectedFlight?.estimatedArrival) }}</small>
+      </div>
+
+      <div class="public-coordinates">
+        <span>Current Position</span>
+        <strong>{{ formatCoordinate(selectedFlight?.currentLatitude) }}, {{ formatCoordinate(selectedFlight?.currentLongitude) }}</strong>
+        <small>Remaining {{ formatDistance(selectedFlight?.remainingDistanceKm ?? selectedFlight?.distanceRemainingKm) }}</small>
+      </div>
+    </article>
+  </section>
+
+  <section class="status-grid">
+    <article>
+      <i class="fas fa-plane-departure"></i>
+      <span>Status</span>
+      <strong>{{ selectedFlight?.flightStatus || selectedFlight?.status || 'N/A' }}</strong>
+    </article>
+    <article>
+      <i class="fas fa-mountain"></i>
+      <span>Altitude</span>
+      <strong>{{ formatAltitude(selectedFlight?.altitudeFt) }}</strong>
+    </article>
+    <article>
+      <i class="fas fa-tachometer-alt"></i>
+      <span>Speed</span>
+      <strong>{{ formatSpeed(selectedFlight?.speedKmh) }}</strong>
+    </article>
+    <article>
+      <i class="fas fa-compass"></i>
+      <span>Heading</span>
+      <strong>{{ selectedFlight?.headingDegree || 0 }} deg</strong>
+    </article>
+    <article>
+      <i class="fas fa-location-crosshairs"></i>
+      <span>Latitude</span>
+      <strong>{{ formatCoordinate(selectedFlight?.currentLatitude) }}</strong>
+    </article>
+    <article>
+      <i class="fas fa-location-dot"></i>
+      <span>Longitude</span>
+      <strong>{{ formatCoordinate(selectedFlight?.currentLongitude) }}</strong>
+    </article>
+    <article>
+      <i class="fas fa-route"></i>
+      <span>Remaining</span>
+      <strong>{{ formatDistance(selectedFlight?.remainingDistanceKm ?? selectedFlight?.distanceRemainingKm) }}</strong>
+    </article>
+    <article>
+      <i class="fas fa-clock"></i>
+      <span>ETA</span>
+      <strong>{{ formatDate(selectedFlight?.estimatedArrival) }}</strong>
+    </article>
+    <article>
+      <i class="fas fa-exclamation-circle"></i>
+      <span>Delay</span>
+      <strong>{{ selectedFlight?.delayMinutes || 0 }} min</strong>
+    </article>
+    <article>
+      <i class="fas fa-door-open"></i>
+      <span>Gate</span>
+      <strong>{{ selectedFlight?.departureGate || selectedFlight?.arrivalGate || 'TBA' }}</strong>
+    </article>
+    <article>
+      <i class="fas fa-building"></i>
+      <span>Terminal</span>
+      <strong>{{ selectedFlight?.terminal || 'TBA' }}</strong>
+    </article>
+  </section>
+
+  <section class="read-only-note">
+    <i class="fas fa-shield-alt"></i>
+    <div>
+      <strong>Read-only passenger tracking</strong>
+      <span>This page only displays public flight movement details. Admin update controls are not available here.</span>
+    </div>
+  </section>
+</main>

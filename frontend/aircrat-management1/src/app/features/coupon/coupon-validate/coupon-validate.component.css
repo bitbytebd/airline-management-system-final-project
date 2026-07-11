@@ -1,0 +1,26 @@
+* { box-sizing: border-box; }
+.validate-page { min-height: 100vh; padding: 24px; background: linear-gradient(135deg,#e7f7ff,#f8fbff 55%,#ecfeff); font-family: "Inter","Segoe UI",sans-serif; color: #0f172a; }
+.validate-shell { display: grid; grid-template-columns: 1fr 420px; gap: 18px; align-items: start; }
+.validate-copy, .validate-card, .result-card { border-radius: 8px; box-shadow: 0 16px 38px rgba(15,23,42,.09); }
+.validate-copy { min-height: 360px; padding: 32px; color: #fff; background: linear-gradient(135deg,#083344,#0e7490 60%,#0f766e); }
+.validate-copy span { color: #a7f3d0; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.validate-copy h1 { margin: 10px 0; font-size: 36px; letter-spacing: 0; }
+.validate-copy p { max-width: 620px; color: rgba(255,255,255,.78); line-height: 1.6; }
+.validate-copy button, .validate-btn { border: 0; border-radius: 8px; cursor: pointer; font-weight: 900; }
+.validate-copy button { margin-top: 18px; padding: 12px 15px; color: #083344; background: #fff; }
+.validate-card { display: grid; gap: 14px; padding: 22px; background: #fff; border: 1px solid #dbeafe; }
+label { display: grid; gap: 7px; color: #334155; font-size: 13px; font-weight: 800; }
+input, select { height: 44px; width: 100%; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; outline: none; }
+input:focus, select:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14,165,233,.14); }
+.validate-btn { min-height: 48px; color: #fff; background: linear-gradient(135deg,#0f766e,#0284c7); }
+.result-card { grid-column: 1 / -1; padding: 24px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+.result-card.invalid { background: #fff1f2; border-color: #fecdd3; color: #9f1239; }
+.result-card i { font-size: 34px; }
+.result-card h2 { margin: 10px 0 4px; }
+.result-card p { margin: 0 0 18px; }
+.amount-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.amount-grid div { padding: 16px; border-radius: 8px; background: rgba(255,255,255,.75); }
+.amount-grid span { display: block; font-size: 12px; font-weight: 800; }
+.amount-grid strong { font-size: 26px; }
+@media (max-width: 900px) { .validate-shell { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .validate-page { padding: 14px; } .amount-grid { grid-template-columns: 1fr; } }

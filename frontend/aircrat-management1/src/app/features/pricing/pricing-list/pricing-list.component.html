@@ -1,0 +1,41 @@
+<div class="pricing-page">
+  <section class="pricing-hero">
+    <div>
+      <p>Revenue pricing control</p>
+      <h1>Flight Class Fare Matrix</h1>
+      <span>Uses your existing flight route pricing fields from the connected backend and database.</span>
+    </div>
+    <a routerLink="/pricing/simulator">Open Simulator</a>
+  </section>
+
+  <section class="pricing-toolbar">
+    <input [(ngModel)]="query" (input)="filter()" placeholder="Search route, destination, or flight number">
+    <button type="button" (click)="load()">Refresh Prices</button>
+  </section>
+
+  <section class="pricing-grid">
+    <article class="route-list">
+      <button type="button" *ngFor="let rule of filtered" [class.active]="selected?.id === rule.id" (click)="select(rule)">
+        <strong>{{ rule.flightNumber }}</strong>
+        <span>{{ rule.origin }} to {{ rule.destination }}</span>
+        <small>{{ rule.departureDate }} | {{ rule.status }}</small>
+      </button>
+    </article>
+
+    <article class="fare-panel" *ngIf="selected">
+      <div class="fare-head">
+        <div>
+          <p>Selected route</p>
+          <h2>{{ selected.origin }} to {{ selected.destination }}</h2>
+          <span>{{ selected.flightNumber }} | {{ selected.distance | number:'1.0-0' }} km | {{ selected.totalSeats }} seats</span>
+        </div>
+      </div>
+      <div class="fare-cards">
+        <div><span>Economy</span><strong>{{ format(selected.economyPrice) }}</strong></div>
+        <div><span>Premium</span><strong>{{ format(selected.premiumPrice) }}</strong></div>
+        <div><span>Business</span><strong>{{ format(selected.businessPrice) }}</strong></div>
+        <div><span>First Class</span><strong>{{ format(selected.firstClassPrice) }}</strong></div>
+      </div>
+    </article>
+  </section>
+</div>

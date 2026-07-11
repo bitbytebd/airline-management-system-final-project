@@ -1,0 +1,36 @@
+<div class="sim-page">
+  <section class="sim-hero">
+    <div>
+      <p>Dynamic fare simulator</p>
+      <h1>Route Pricing Forecast</h1>
+      <span>Adjust demand, load factor, and tax to see class-wise suggested fares and projected revenue.</span>
+    </div>
+    <a routerLink="/pricing" class="sim-back"><i class="fas fa-arrow-left"></i> Back to Pricing List</a>
+  </section>
+
+  <section class="sim-controls">
+    <label>Route
+      <select [(ngModel)]="selectedId" (change)="simulate()">
+        <option *ngFor="let rule of rules" [value]="rule.id">{{ rule.flightNumber }} | {{ rule.origin }} to {{ rule.destination }}</option>
+      </select>
+    </label>
+    <label>Load Factor %
+      <input type="number" [(ngModel)]="loadFactor" (input)="simulate()" min="1" max="100">
+    </label>
+    <label>Demand Multiplier
+      <input type="number" [(ngModel)]="demand" (input)="simulate()" min="0.5" max="3" step="0.01">
+    </label>
+    <label>Tax %
+      <input type="number" [(ngModel)]="taxRate" (input)="simulate()" min="0" max="30">
+    </label>
+  </section>
+
+  <section class="sim-results">
+    <article *ngFor="let row of simulations">
+      <span>{{ row.classType }}</span>
+      <strong>{{ format(row.suggestedFare) }}</strong>
+      <p>Base {{ format(row.baseFare) }} + tax {{ format(row.tax) }}</p>
+      <small>Projected revenue: {{ format(row.projectedRevenue) }}</small>
+    </article>
+  </section>
+</div>

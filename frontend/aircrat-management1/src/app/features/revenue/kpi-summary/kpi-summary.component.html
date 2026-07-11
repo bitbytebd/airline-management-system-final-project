@@ -1,0 +1,15 @@
+<div class="kpi-page">
+  <section class="kpi-hero">
+    <p>Executive revenue cockpit</p>
+    <h1>KPI Summary</h1>
+    <span>Live KPIs from completed payments and paid expenses.</span>
+  </section>
+  <section class="kpi-grid">
+    <article><span>Total Revenue</span><strong>{{ money(revenue) }}</strong></article>
+    <article><span>Total Expenses</span><strong>{{ money(expenses) }}</strong></article>
+    <article><span>Net P&L</span><strong [class.negative]="pnl < 0">{{ money(pnl) }}</strong></article>
+    <article><span>Margin</span><strong>{{ margin }}%</strong></article>
+    <article><span>Completed Payments</span><strong>{{ completedPayments }}</strong></article>
+    <article><span>Paid Expense Entries</span><strong>{{ paidExpenses }}</strong></article>
+  </section>
+</div>

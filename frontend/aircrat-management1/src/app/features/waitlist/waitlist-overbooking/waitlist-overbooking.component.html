@@ -1,0 +1,58 @@
+<section class="ob-page">
+  <div class="ob-hero">
+    <div>
+      <span>Demand control center</span>
+      <h1>Overbooking Monitor</h1>
+      <p>Track flights where waitlisted demand is higher than available recovery options.</p>
+    </div>
+    <button routerLink="/waitlist"><i class="fas fa-arrow-left"></i> Queue</button>
+  </div>
+
+  <div class="guide-strip">
+    <div *ngFor="let item of guidance"><i class="fas fa-lightbulb"></i>{{ item }}</div>
+  </div>
+
+  <div class="ob-grid">
+    <article class="flight-pressure" *ngFor="let row of rows" (click)="select(row)" [class.active]="selectedFlight === row.flightNumber">
+      <div class="top">
+        <strong>{{ row.flightNumber }}</strong>
+        <span>{{ pressure(row) }}% pressure</span>
+      </div>
+      <h2>{{ row.origin }} to {{ row.destination }}</h2>
+      <div class="numbers">
+        <div><span>Passengers</span><b>{{ row.waitlisted }}</b></div>
+        <div><span>Seats Requested</span><b>{{ row.requestedSeats }}</b></div>
+        <div><span>Avg Priority</span><b>{{ row.avgPriority }}</b></div>
+      </div>
+      <div class="bar"><span [style.width.%]="pressure(row)"></span></div>
+    </article>
+  </div>
+
+  <div class="table-panel">
+    <div class="panel-head">
+      <h2>{{ selectedFlight ? selectedFlight + ' Queue' : 'Top Active Queue' }}</h2>
+      <button (click)="selectedFlight = ''" *ngIf="selectedFlight">Clear Filter</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Passenger</th>
+          <th>Flight</th>
+          <th>Class</th>
+          <th>Status</th>
+          <th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of visibleEntries()">
+          <td><strong>{{ item.passengerName }}</strong><span>{{ item.passengerEmail }}</span></td>
+          <td>{{ item.flightNumber }}<span>{{ item.origin }} to {{ item.destination }}</span></td>
+          <td>{{ item.classType }}</td>
+          <td><span class="status">{{ item.status }}</span></td>
+          <td><b>{{ item.priorityScore }}</b></td>
+        </tr>
+        <tr *ngIf="visibleEntries().length === 0"><td colspan="5" class="empty">No active pressure data yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>

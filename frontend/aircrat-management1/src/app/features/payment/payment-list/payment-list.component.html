@@ -1,0 +1,209 @@
+<div class="pl-page">
+  <section class="pl-hero">
+    <div class="pl-hero-copy">
+      <span class="pl-eyebrow"><i class="fas fa-shield-alt"></i> Secure Airline Payment Operations</span>
+      <h1>Payment Command Center</h1>
+      <p>Monitor booking collections, gateway status, refunds, failed attempts and high-value transactions from one professional finance workspace.</p>
+      <div class="pl-hero-actions">
+        <a routerLink="/payment/process" class="pl-btn-primary"><i class="fas fa-plus-circle"></i> Process Payment</a>
+        <button type="button" class="pl-btn-refresh" (click)="loadAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
+      </div>
+    </div>
+    <div class="pl-hero-card">
+      <div class="pl-hero-icon"><i class="fas fa-credit-card"></i></div>
+      <span>Completed Revenue</span>
+      <strong>{{ formatAmount(stats.totalRevenue) }}</strong>
+      <small>{{ stats.completedCount }} approved payments from {{ stats.totalCount }} total records</small>
+    </div>
+  </section>
+
+  <div class="pl-alert" *ngIf="alertMsg"
+       [class.pl-alert-success]="alertType==='success'"
+       [class.pl-alert-warn]="alertType==='warn'"
+       [class.pl-alert-error]="alertType==='error'">
+    <i class="fas" [class.fa-check-circle]="alertType==='success'"
+                   [class.fa-exclamation-triangle]="alertType==='warn'"
+                   [class.fa-times-circle]="alertType==='error'"></i>
+    {{ alertMsg }}
+  </div>
+
+  <section class="pl-kpi-grid">
+    <div class="pl-kpi pl-kpi-green">
+      <div class="pl-kpi-icon"><i class="fas fa-dollar-sign"></i></div>
+      <div><strong>{{ formatAmount(stats.totalRevenue) }}</strong><span>Total Revenue</span></div>
+    </div>
+    <div class="pl-kpi pl-kpi-blue">
+      <div class="pl-kpi-icon"><i class="fas fa-calendar-alt"></i></div>
+      <div><strong>{{ formatAmount(stats.monthlyRevenue) }}</strong><span>This Month</span></div>
+    </div>
+    <div class="pl-kpi pl-kpi-amber">
+      <div class="pl-kpi-icon"><i class="fas fa-clock"></i></div>
+      <div><strong>{{ stats.pendingCount }}</strong><span>Pending Review</span></div>
+    </div>
+    <div class="pl-kpi pl-kpi-purple">
+      <div class="pl-kpi-icon"><i class="fas fa-undo-alt"></i></div>
+      <div><strong>{{ stats.refundedCount }}</strong><span>Refunded</span></div>
+    </div>
+  </section>
+
+  <section class="pl-filter-card">
+    <div class="pl-search">
+      <i class="fas fa-search"></i>
+      <input type="text"
+             [(ngModel)]="search"
+             (input)="applyFilter()"
+             (focus)="applyFilter()"
+             (blur)="hideSuggestions()"
+             placeholder="Search payment ref, booking ref, passenger, flight or transaction id">
+      <button type="button" *ngIf="search" (click)="search=''; applyFilter()"><i class="fas fa-times"></i></button>
+      <div class="pl-search-suggestions" *ngIf="showSearchSuggestions">
+        <button type="button" *ngFor="let p of searchSuggestions" (mousedown)="selectSuggestion(p)">
+          <span class="suggest-ref">{{ p.paymentReference }}</span>
+          <span class="suggest-main">{{ p.passengerName }} | {{ p.bookingReference }}</span>
+          <span class="suggest-meta">{{ p.flightNumber }} | {{ formatMoney(p.totalAmount, p.currency) }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="pl-chip-row">
+      <button type="button" class="pl-status-chip-filter"
+              [class.pl-filter-active]="statusFilter === ''"
+              (click)="statusFilter=''; applyFilter()">
+        <i class="fas fa-layer-group"></i> All <span>{{ allPayments.length }}</span>
+      </button>
+      <button type="button" class="pl-status-chip-filter"
+              *ngFor="let s of allStatuses"
+              [class.pl-filter-active]="statusFilter === s"
+              [style.--chip-color]="getStatusMeta(s).color"
+              (click)="statusFilter = statusFilter === s ? '' : s; applyFilter()">
+        <i class="fas" [ngClass]="getStatusMeta(s).icon"></i>
+        {{ getStatusMeta(s).label }}
+        <span>{{ countStatus(s) }}</span>
+      </button>
+    </div>
+
+    <div class="pl-method-row">
+      <button type="button" class="pl-method-pill"
+              [class.pl-method-active]="methodFilter === ''"
+              (click)="methodFilter=''; applyFilter()">
+        All Methods
+      </button>
+      <button type="button" class="pl-method-pill"
+              *ngFor="let m of allMethods"
+              [class.pl-method-active]="methodFilter === m"
+              [style.--method-color]="getMethodMeta(m).color"
+              (click)="methodFilter = methodFilter === m ? '' : m; applyFilter()">
+        <i class="fas" [ngClass]="getMethodMeta(m).icon"></i>
+        {{ getMethodMeta(m).label }}
+      </button>
+    </div>
+  </section>
+
+  <div class="pl-loading" *ngIf="loading">
+    <div class="pl-loading-icon"><i class="fas fa-circle-notch fa-spin"></i></div>
+    <p>Loading secure payment ledger...</p>
+  </div>
+
+  <section class="pl-ledger" *ngIf="!loading">
+    <div class="pl-ledger-head">
+      <div>
+        <h2>Payment Ledger</h2>
+        <p>{{ filtered.length }} records visible - completed value {{ formatAmount(getTotalFiltered()) }}</p>
+      </div>
+      <a routerLink="/payment/process" class="pl-mini-action"><i class="fas fa-lock"></i> New Secure Charge</a>
+    </div>
+
+    <div class="pl-empty" *ngIf="filtered.length === 0">
+      <div class="pl-empty-icon"><i class="fas fa-receipt"></i></div>
+      <h3>No payment records found</h3>
+      <p>Try a different search, status or method filter.</p>
+    </div>
+
+    <div class="pl-table-scroll" *ngIf="filtered.length > 0">
+      <table class="pl-table">
+        <thead>
+          <tr>
+            <th (click)="sortBy('paymentReference')">Reference <i class="fas" [ngClass]="getSortIcon('paymentReference')"></i></th>
+            <th>Passenger</th>
+            <th>Flight</th>
+            <th>Method</th>
+            <th (click)="sortBy('totalAmount')">Amount <i class="fas" [ngClass]="getSortIcon('totalAmount')"></i></th>
+            <th>Status</th>
+            <th (click)="sortBy('createdAt')">Created <i class="fas" [ngClass]="getSortIcon('createdAt')"></i></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filtered">
+            <td>
+              <div class="pl-ref-cell">
+                <strong>{{ p.paymentReference }}</strong>
+                <span>{{ p.bookingReference }}</span>
+                <small *ngIf="p.transactionReference">{{ p.transactionReference }}</small>
+              </div>
+            </td>
+            <td>
+              <div class="pl-passenger">
+                <div class="pl-pax-avatar">{{ p.passengerName?.charAt(0) }}</div>
+                <div>
+                  <strong>{{ p.passengerName }}</strong>
+                  <span>{{ p.passengerEmail }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="pl-flight">
+                <strong>{{ p.flightNumber }}</strong>
+                <span>{{ p.flightRoute }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="pl-method-cell">
+                <div class="pl-method-icon" [style.background]="getMethodMeta(p.paymentMethod).gradient">
+                  <i class="fas" [ngClass]="getMethodMeta(p.paymentMethod).icon"></i>
+                </div>
+                <span>{{ getMethodMeta(p.paymentMethod).label }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="pl-amount-cell">
+                <strong>{{ formatMoney(p.totalAmount, p.currency) }}</strong>
+                <span>Base {{ formatMoney(p.baseFare, p.currency) }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="pl-status-badge"
+                    [style.background]="getStatusMeta(p.status).bg"
+                    [style.color]="getStatusMeta(p.status).color"
+                    [style.border]="'1px solid ' + getStatusMeta(p.status).border">
+                <i class="fas" [ngClass]="getStatusMeta(p.status).icon" [class.fa-spin]="p.status === 'PROCESSING'"></i>
+                {{ getStatusMeta(p.status).label }}
+              </span>
+            </td>
+            <td>
+              <div class="pl-date">
+                <strong>{{ formatDT(p.createdAt) }}</strong>
+                <span *ngIf="p.completedAt">Done {{ formatDT(p.completedAt) }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="pl-actions">
+                <button type="button" class="pl-act pl-view" (click)="viewDetail(p)" title="View details"><i class="fas fa-eye"></i></button>
+                <button type="button" class="pl-act pl-cancel"
+                        [disabled]="p.status === 'COMPLETED' || p.status === 'REFUNDED' || actionLoadingId === p.id"
+                        (click)="cancel(p)" title="Cancel">
+                  <i class="fas" [class.fa-ban]="actionLoadingId !== p.id" [class.fa-spinner]="actionLoadingId === p.id" [class.fa-spin]="actionLoadingId === p.id"></i>
+                </button>
+                <button type="button" class="pl-act pl-refund"
+                        [disabled]="p.status !== 'COMPLETED' || actionLoadingId === p.id"
+                        (click)="markRefunded(p)" title="Mark refunded">
+                  <i class="fas fa-undo-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

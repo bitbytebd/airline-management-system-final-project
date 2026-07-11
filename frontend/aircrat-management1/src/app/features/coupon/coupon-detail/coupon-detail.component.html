@@ -1,0 +1,51 @@
+<section class="coupon-form-page">
+  <div class="form-hero">
+    <div>
+      <span>Fare offer setup</span>
+      <h1>{{ id ? 'Edit Coupon' : 'Create Coupon' }}</h1>
+      <p>Define commercial rules that protect airline margin while keeping offers simple for passengers.</p>
+    </div>
+    <button routerLink="/coupon"><i class="fas fa-arrow-left"></i> Back</button>
+  </div>
+
+  <div class="alert" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="form-grid">
+    <div class="form-panel">
+      <h2>Campaign Details</h2>
+      <div class="fields">
+        <label>Coupon Code<input formControlName="code" placeholder="SKYGLOBAL25"></label>
+        <label>Campaign Title<input formControlName="title" placeholder="Global Spring Fare"></label>
+        <label class="wide">Description<textarea formControlName="description" rows="3"></textarea></label>
+        <label>Discount Type<select formControlName="discountType"><option value="PERCENTAGE">Percentage</option><option value="FIXED_AMOUNT">Fixed Amount</option></select></label>
+        <label>Discount Value<input type="number" formControlName="discountValue"></label>
+        <label>Minimum Booking<input type="number" formControlName="minimumBookingAmount"></label>
+        <label>Maximum Discount<input type="number" formControlName="maximumDiscountAmount"></label>
+        <label>Currency<select formControlName="currency"><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="BDT">BDT</option></select></label>
+        <label>Route<select formControlName="applicableRoute"><option *ngFor="let route of routes" [value]="route">{{ route }}</option></select></label>
+        <label>Cabin<select formControlName="applicableCabin"><option *ngFor="let cabin of cabins" [value]="cabin">{{ cabin }}</option></select></label>
+        <label>Valid From<input type="date" formControlName="validFrom"></label>
+        <label>Valid Until<input type="date" formControlName="validUntil"></label>
+        <label>Usage Limit<input type="number" formControlName="usageLimit"></label>
+        <label>Used Count<input type="number" formControlName="usedCount"></label>
+        <label>Status<select formControlName="status"><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option><option value="EXPIRED">Expired</option></select></label>
+      </div>
+    </div>
+
+    <aside class="preview-panel">
+      <span>Passenger View</span>
+      <h2>{{ form.get('code')?.value || 'COUPON' }}</h2>
+      <strong>{{ formatPreview() }}</strong>
+      <p>{{ form.get('title')?.value || 'Campaign title' }}</p>
+      <div>
+        <small>Route</small>
+        <b>{{ form.get('applicableRoute')?.value }}</b>
+      </div>
+      <div>
+        <small>Cabin</small>
+        <b>{{ form.get('applicableCabin')?.value }}</b>
+      </div>
+      <button type="submit" [disabled]="saving"><i class="fas fa-save"></i> {{ saving ? 'Saving...' : 'Save Coupon' }}</button>
+    </aside>
+  </form>
+</section>

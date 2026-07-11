@@ -1,0 +1,66 @@
+<section class="coupon-page">
+  <div class="coupon-hero">
+    <div>
+      <span class="eyebrow">Airline commercial controls</span>
+      <h1>Coupon Campaigns</h1>
+      <p>Manage route, cabin, amount, and validity rules for international ticket promotions.</p>
+    </div>
+    <div class="hero-actions">
+      <button routerLink="/coupon/validate" class="btn ghost"><i class="fas fa-check-circle"></i> Validate</button>
+      <button routerLink="/coupon/new" class="btn primary"><i class="fas fa-plus"></i> New Coupon</button>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card active"><i class="fas fa-tags"></i><span>Total Coupons</span><strong>{{ stats.totalCoupons }}</strong></div>
+    <div class="metric-card green"><i class="fas fa-bolt"></i><span>Active</span><strong>{{ stats.activeCoupons }}</strong></div>
+    <div class="metric-card blue"><i class="fas fa-ticket-alt"></i><span>Redemptions</span><strong>{{ stats.totalRedemptions }}</strong></div>
+    <div class="metric-card amber"><i class="fas fa-clock"></i><span>Expiring Soon</span><strong>{{ stats.expiringSoon }}</strong></div>
+  </div>
+
+  <div class="filter-card">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input [(ngModel)]="q" (input)="load()" placeholder="Search code, campaign title, or route">
+    </div>
+    <select [(ngModel)]="status" (change)="load()">
+      <option value="">All Status</option>
+      <option value="ACTIVE">Active</option>
+      <option value="INACTIVE">Inactive</option>
+      <option value="EXPIRED">Expired</option>
+    </select>
+  </div>
+
+  <div class="coupon-grid" *ngIf="!loading">
+    <article class="coupon-card" *ngFor="let coupon of coupons">
+      <div class="coupon-top">
+        <span class="code">{{ coupon.code }}</span>
+        <span class="status" [class.off]="coupon.status !== 'ACTIVE'">{{ coupon.status }}</span>
+      </div>
+      <h2>{{ coupon.title }}</h2>
+      <p>{{ coupon.description }}</p>
+      <div class="discount">{{ formatDiscount(coupon) }}</div>
+      <div class="coupon-rules">
+        <span><i class="fas fa-route"></i> {{ coupon.applicableRoute || 'ALL' }}</span>
+        <span><i class="fas fa-chair"></i> {{ coupon.applicableCabin || 'ALL' }}</span>
+        <span><i class="fas fa-wallet"></i> Min {{ formatMoney(coupon.minimumBookingAmount, coupon.currency) }}</span>
+      </div>
+      <div class="usage">
+        <div><span>Usage</span><strong>{{ coupon.usedCount }}/{{ coupon.usageLimit || 'Unlimited' }}</strong></div>
+        <div class="bar"><span [style.width.%]="usagePercent(coupon)"></span></div>
+      </div>
+      <div class="coupon-foot">
+        <span>Valid until {{ coupon.validUntil | date:'mediumDate' }}</span>
+        <div>
+          <button (click)="edit(coupon)" title="Edit"><i class="fas fa-edit"></i></button>
+          <button (click)="remove(coupon)" title="Delete"><i class="fas fa-trash-alt"></i></button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="empty" *ngIf="!loading && coupons.length === 0">
+    <i class="fas fa-tags"></i>
+    <h3>No coupon campaigns found</h3>
+  </div>
+</section>

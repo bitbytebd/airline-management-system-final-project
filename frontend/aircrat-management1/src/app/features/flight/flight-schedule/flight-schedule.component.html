@@ -1,0 +1,81 @@
+<section class="schedule-page">
+  <div class="schedule-hero">
+    <div>
+      <a routerLink="/flight" class="back-link"><i class="fas fa-arrow-left"></i> Flight list</a>
+      <div class="eyebrow"><i class="fas fa-calendar-days"></i> Network Schedule</div>
+      <h1>Flight Schedule Control</h1>
+      <p>Review departures by date, monitor schedule health, and jump directly to each flight record for operational updates.</p>
+      <div class="hero-actions">
+        <a routerLink="/flight/new" class="primary-btn"><i class="fas fa-plus"></i> Add Schedule</a>
+        <button type="button" class="ghost-btn" (click)="loadFlights()"><i class="fas fa-rotate"></i> Refresh</button>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <span>Schedule Health</span>
+      <strong>{{ scheduledCount }}</strong>
+      <small>scheduled departures</small>
+      <div><i class="fas fa-clock"></i> {{ delayedCount }} delayed flight(s)</div>
+      <div><i class="fas fa-plane-arrival"></i> {{ flights.length }} total records</div>
+    </div>
+  </div>
+
+  <div class="schedule-toolbar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" [(ngModel)]="searchText" placeholder="Search flight no, origin, destination, date or status">
+    </div>
+    <select [(ngModel)]="selectedStatus">
+      <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+    </select>
+  </div>
+
+  <div class="timeline" *ngIf="scheduleGroups.length > 0; else emptyState">
+    <article class="date-group" *ngFor="let group of scheduleGroups">
+      <div class="date-pin">
+        <i class="fas fa-calendar-check"></i>
+        <div>
+          <span>Departure Date</span>
+          <strong>{{ group.date | date:'fullDate' }}</strong>
+        </div>
+      </div>
+
+      <div class="schedule-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Flight</th>
+              <th>Route</th>
+              <th>Departure</th>
+              <th>Arrival</th>
+              <th>Fare</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let flight of group.flights">
+              <td><strong>{{ flight.flightNumber }}</strong></td>
+              <td>{{ flight.origin }} <i class="fas fa-arrow-right"></i> {{ flight.destination }}</td>
+              <td>{{ formatTime(flight.departureTime) }}</td>
+              <td>{{ flight.arrivalDate | date:'dd MMM' }} | {{ formatTime(flight.arrivalTime) }}</td>
+              <td>${{ flight.basePrice }}</td>
+              <td><span class="status-pill" [ngClass]="statusClass(flight.status)">{{ flight.status }}</span></td>
+              <td>
+                <button type="button" (click)="edit(flight.id)" class="mini-btn edit"><i class="fas fa-edit"></i></button>
+                <button type="button" (click)="delete(flight.id)" class="mini-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <i class="fas fa-calendar-xmark"></i>
+      <h3>No schedule found</h3>
+      <p>Add flights or adjust your search filter.</p>
+    </div>
+  </ng-template>
+</section>

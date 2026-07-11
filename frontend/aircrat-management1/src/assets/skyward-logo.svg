@@ -1,0 +1,8 @@
+<svg width="260" height="80" viewBox="0 0 260 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="260" height="80" rx="18" fill="#FFFFFF"/>
+  <path d="M34 44C57 18 88 17 113 34C89 31 70 39 56 55C49 55 41 51 34 44Z" fill="#7A1135"/>
+  <path d="M58 55C86 38 116 38 141 52C113 53 90 61 69 71C65 67 61 61 58 55Z" fill="#C89B3C"/>
+  <path d="M34 44C57 42 79 48 100 63C75 59 52 60 29 68C30 60 31 51 34 44Z" fill="#64C7E8"/>
+  <text x="151" y="36" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="700" fill="#4B0C25">Skyward</text>
+  <text x="153" y="55" font-family="Arial, sans-serif" font-size="11" letter-spacing="3" fill="#4C6475">AIRLINES</text>
+</svg>

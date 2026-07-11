@@ -1,0 +1,924 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.tracking-map-page {
+  min-height: 100vh;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  padding: clamp(12px, 1.6vw, 20px);
+  background: linear-gradient(180deg, #dff7ff 0%, #f8fdff 54%, #ffffff 100%);
+  color: #082f49;
+}
+
+.tracking-toolbar {
+  display: grid;
+  grid-template-columns: minmax(190px, .85fr) minmax(260px, 1.15fr) minmax(150px, .45fr) minmax(145px, .45fr) auto;
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid #c8edf8;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 16px 34px rgba(14, 116, 144, .1);
+}
+
+.brand-block {
+  min-width: 0;
+  padding: 8px 10px;
+}
+
+.brand-block span,
+.toolbar-control,
+.refresh-btn,
+.selected-flight-card span,
+.flight-card-grid span,
+.drawer-head span {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.brand-block span {
+  color: #0284c7;
+}
+
+.brand-block h1 {
+  margin: 4px 0 0;
+  color: #082f49;
+  font-size: clamp(20px, 2.2vw, 30px);
+  line-height: 1.05;
+}
+
+.toolbar-control {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid #bae6fd;
+  border-radius: 16px;
+  color: #164e63;
+  background: #f8fdff;
+  outline: 0;
+}
+
+.search-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+}
+
+.search-control input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #0f172a;
+  font: inherit;
+}
+
+.search-control button,
+.refresh-btn {
+  border: 0;
+  cursor: pointer;
+  font-weight: 900;
+  border-radius: 14px;
+}
+
+.search-control button {
+  width: 32px;
+  height: 32px;
+  color: #0284c7;
+  background: #e0f7ff;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 16px;
+  color: #fff;
+  background: linear-gradient(135deg, #0369a1, #06b6d4);
+  box-shadow: 0 14px 28px rgba(14, 165, 233, .2);
+}
+
+.refresh-btn:disabled {
+  cursor: progress;
+  opacity: .72;
+}
+
+.refresh-btn .spin {
+  animation: trackingSpin .8s linear infinite;
+}
+
+@keyframes trackingSpin {
+  to { transform: rotate(360deg); }
+}
+
+.search-result-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border: 1px solid #bae6fd;
+  border-radius: 16px;
+  color: #075985;
+  background: rgba(240, 249, 255, .94);
+  box-shadow: 0 10px 22px rgba(14, 116, 144, .08);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.search-result-strip span,
+.search-result-strip em {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.search-result-strip em {
+  color: #334155;
+  font-style: normal;
+}
+
+.search-result-strip button {
+  border: 1px solid #7dd3fc;
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #075985;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.map-command-screen {
+  display: grid;
+  grid-template-columns: minmax(280px, 28%) minmax(0, 72%);
+  gap: 0;
+  min-height: 75vh;
+  height: min(82vh, 840px);
+  overflow: hidden;
+  border: 1px solid rgba(14, 165, 233, .28);
+  border-radius: 28px;
+  background: #e0f2fe;
+  box-shadow: 0 30px 70px rgba(8, 47, 73, .18);
+}
+
+.map-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+.leaflet-world-map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 650px;
+}
+
+:host ::ng-deep .leaflet-container {
+  font-family: inherit;
+  overflow: hidden;
+  background: #eef7fb;
+  outline: 0;
+  width: 100%;
+  height: 100%;
+}
+
+:host ::ng-deep .leaflet-pane,
+:host ::ng-deep .leaflet-tile,
+:host ::ng-deep .leaflet-marker-icon,
+:host ::ng-deep .leaflet-marker-shadow,
+:host ::ng-deep .leaflet-tile-container,
+:host ::ng-deep .leaflet-pane > svg,
+:host ::ng-deep .leaflet-pane > canvas,
+:host ::ng-deep .leaflet-zoom-box,
+:host ::ng-deep .leaflet-image-layer,
+:host ::ng-deep .leaflet-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+:host ::ng-deep .leaflet-tile,
+:host ::ng-deep .leaflet-marker-icon,
+:host ::ng-deep .leaflet-marker-shadow {
+  user-select: none;
+}
+
+:host ::ng-deep .leaflet-tile {
+  width: 256px;
+  height: 256px;
+  display: block !important;
+  border: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+:host ::ng-deep .leaflet-pane {
+  z-index: 400;
+}
+
+:host ::ng-deep .leaflet-map-pane {
+  z-index: 100;
+}
+
+:host ::ng-deep .leaflet-tile-pane {
+  z-index: 200 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: saturate(1.05) contrast(1.04) brightness(1.02);
+}
+
+:host ::ng-deep .leaflet-tile-container,
+:host ::ng-deep .leaflet-tile {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+:host ::ng-deep img.leaflet-tile {
+  display: block !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-width: 256px;
+  min-height: 256px;
+  opacity: 1 !important;
+  visibility: visible !important;
+  object-fit: initial !important;
+  background: transparent !important;
+}
+
+:host ::ng-deep .leaflet-overlay-pane {
+  z-index: 400;
+}
+
+:host ::ng-deep .leaflet-marker-pane {
+  z-index: 600;
+}
+
+:host ::ng-deep .leaflet-popup-pane {
+  z-index: 700;
+}
+
+:host ::ng-deep .leaflet-tooltip-pane {
+  z-index: 720;
+}
+
+:host ::ng-deep .leaflet-control {
+  position: relative;
+  z-index: 800;
+  pointer-events: auto;
+}
+
+:host ::ng-deep path.selected-full-route-line {
+  stroke: #334155 !important;
+  stroke-width: 5px !important;
+  stroke-opacity: .5 !important;
+  filter: drop-shadow(0 0 4px rgba(51, 65, 85, .35));
+}
+
+:host ::ng-deep path.selected-travelled-route-line {
+  stroke: #0284c7 !important;
+  stroke-width: 8px !important;
+  stroke-opacity: 1 !important;
+  filter: drop-shadow(0 0 8px rgba(2, 132, 199, .72)) drop-shadow(0 0 14px rgba(14, 165, 233, .34));
+}
+
+:host ::ng-deep path.selected-remaining-route-line {
+  stroke: #7c3aed !important;
+  stroke-width: 6px !important;
+  stroke-opacity: .85 !important;
+  filter: drop-shadow(0 0 7px rgba(124, 58, 237, .46));
+}
+
+:host ::ng-deep path.muted-route-line,
+:host ::ng-deep path.muted-travelled-route-line,
+:host ::ng-deep path.muted-remaining-route-line {
+  pointer-events: auto;
+}
+
+:host ::ng-deep .skyward-route-tooltip {
+  border: 1px solid rgba(125, 211, 252, .68);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #082f49;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 10px 22px rgba(8, 47, 73, .18);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .01em;
+}
+
+:host ::ng-deep .skyward-route-tooltip::before {
+  display: none;
+}
+
+:host ::ng-deep .skyward-route-tooltip.origin {
+  border-color: rgba(14, 165, 233, .75);
+}
+
+:host ::ng-deep .skyward-route-tooltip.destination {
+  border-color: rgba(124, 58, 237, .55);
+}
+
+:host ::ng-deep .leaflet-top,
+:host ::ng-deep .leaflet-bottom {
+  position: absolute;
+  z-index: 800;
+  pointer-events: none;
+}
+
+:host ::ng-deep .leaflet-top {
+  top: 0;
+}
+
+:host ::ng-deep .leaflet-right {
+  right: 0;
+}
+
+:host ::ng-deep .leaflet-bottom {
+  bottom: 0;
+}
+
+:host ::ng-deep .leaflet-left {
+  left: 0;
+}
+
+:host ::ng-deep .leaflet-control-zoom,
+:host ::ng-deep .leaflet-control-attribution {
+  margin: 12px;
+  background: rgba(255, 255, 255, .92);
+  border-radius: 12px;
+  box-shadow: 0 10px 22px rgba(8, 47, 73, .14);
+}
+
+:host ::ng-deep .leaflet-control-zoom a {
+  display: block;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  color: #075985;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+:host ::ng-deep .leaflet-control-attribution {
+  padding: 4px 8px;
+  color: #475569;
+  font-size: 11px;
+}
+
+:host ::ng-deep .leaflet-popup {
+  position: absolute;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+:host ::ng-deep .leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 38px rgba(8, 47, 73, .22);
+}
+
+:host ::ng-deep .leaflet-popup-content {
+  margin: 12px;
+}
+
+:host ::ng-deep .leaflet-popup-tip {
+  width: 14px;
+  height: 14px;
+  margin: -7px auto 0;
+  background: #fff;
+  transform: rotate(45deg);
+}
+
+.flight-drawer-toggle {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 650;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid rgba(125, 211, 252, .55);
+  border-radius: 999px;
+  color: #082f49;
+  background: rgba(224, 247, 255, .96);
+  box-shadow: 0 16px 34px rgba(2, 6, 23, .16);
+  backdrop-filter: blur(12px);
+}
+
+.flight-drawer-toggle strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: #fff;
+  background: #0284c7;
+}
+
+.active-flight-drawer {
+  position: absolute;
+  top: 72px;
+  right: 18px;
+  z-index: 640;
+  display: grid;
+  gap: 8px;
+  width: min(300px, 24%);
+  max-height: calc(100% - 100px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  color: #e0f7ff;
+  border: 1px solid rgba(186, 230, 253, .3);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(2, 6, 23, .84), rgba(8, 47, 73, .66));
+  box-shadow: 0 22px 48px rgba(2, 6, 23, .28);
+  backdrop-filter: blur(18px);
+  scrollbar-width: thin;
+}
+
+.active-flight-drawer.collapsed {
+  width: 54px;
+  max-height: 54px;
+  min-height: 54px;
+  overflow: hidden;
+  border-radius: 999px;
+  padding: 8px;
+}
+
+.active-flight-drawer.collapsed .drawer-head {
+  padding: 0;
+  border: 0;
+  justify-content: center;
+}
+
+.active-flight-drawer.collapsed .drawer-head span,
+.active-flight-drawer.collapsed button {
+  display: none;
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(186, 230, 253, .2);
+}
+
+.drawer-head strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: #082f49;
+  background: #bae6fd;
+}
+
+.active-flight-drawer button {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(186, 230, 253, .18);
+  border-radius: 15px;
+  color: #e0f7ff;
+  text-align: left;
+  background: rgba(255, 255, 255, .08);
+}
+
+.active-flight-drawer button.selected,
+.active-flight-drawer button:hover {
+  border-color: rgba(34, 211, 238, .88);
+  background: rgba(14, 165, 233, .26);
+  box-shadow: inset 4px 0 0 #22d3ee, 0 10px 22px rgba(14, 165, 233, .18);
+}
+
+.active-flight-drawer b,
+.active-flight-drawer small,
+.active-flight-drawer em {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.active-flight-drawer small {
+  margin-top: 3px;
+  color: rgba(224, 247, 255, .74);
+  font-size: 11px;
+}
+
+.active-flight-drawer em {
+  margin-top: 4px;
+  color: #fecaca;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.active-flight-drawer i,
+.card-head strong {
+  justify-self: start;
+  padding: 6px 8px;
+  border-radius: 999px;
+  color: #082f49;
+  background: #bae6fd;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.active-flight-drawer i.live-gps,
+.card-head strong.live-gps {
+  color: #022c22;
+  background: #86efac;
+}
+
+.active-flight-drawer i.simulated-route,
+.card-head strong.simulated-route {
+  color: #431407;
+  background: #fdba74;
+}
+
+.active-flight-drawer i.manual,
+.card-head strong.manual {
+  color: #082f49;
+  background: #bae6fd;
+}
+
+.selected-flight-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  overflow: auto;
+  padding: 18px;
+  border: 0;
+  border-right: 1px solid rgba(186, 230, 253, .3);
+  border-radius: 0;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(2, 6, 23, .82), rgba(8, 47, 73, .68));
+  box-shadow: none;
+  backdrop-filter: blur(18px);
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.card-head h2 {
+  margin: 4px 0;
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.04;
+}
+
+.card-head p {
+  margin: 0;
+  color: rgba(224, 247, 255, .82);
+  font-weight: 800;
+}
+
+.progress-line {
+  height: 10px;
+  margin: 12px 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(224, 247, 255, .22);
+}
+
+.progress-line span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22c55e, #06b6d4, #7c3aed);
+}
+
+.flight-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.flight-card-grid div {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgba(186, 230, 253, .18);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .1);
+}
+
+.flight-card-grid span {
+  display: block;
+  color: rgba(224, 247, 255, .74);
+}
+
+.flight-card-grid b {
+  display: block;
+  margin-top: 3px;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+
+.selected-flight-card > small {
+  display: block;
+  margin-top: 10px;
+  color: rgba(224, 247, 255, .72);
+  font-weight: 800;
+}
+
+.map-empty {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 620;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  width: min(360px, calc(100% - 32px));
+  padding: 24px;
+  border: 1px solid #bae6fd;
+  border-radius: 22px;
+  color: #075985;
+  text-align: center;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 22px 44px rgba(8, 47, 73, .16);
+  transform: translate(-50%, -50%);
+}
+
+.map-empty i {
+  color: #0ea5e9;
+  font-size: 34px;
+}
+
+.map-attribution {
+  margin-top: 10px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+:host ::ng-deep .skyward-aircraft-icon div {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2px solid rgba(255, 255, 255, .96);
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 25%, #e0f7ff 0%, #38bdf8 32%, #075985 100%);
+  box-shadow: 0 0 0 8px rgba(14, 165, 233, .16), 0 16px 30px rgba(8, 47, 73, .26);
+  transform-origin: center;
+}
+
+:host ::ng-deep .skyward-aircraft-icon div.selected {
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(circle at 35% 25%, #ffffff 0%, #22d3ee 30%, #4f46e5 100%);
+  box-shadow: 0 0 0 10px rgba(34, 211, 238, .2), 0 20px 38px rgba(8, 47, 73, .34);
+}
+
+:host ::ng-deep .skyward-aircraft-icon svg {
+  width: 76%;
+  height: 76%;
+  overflow: visible;
+}
+
+:host ::ng-deep .skyward-aircraft-icon .aircraft-shadow {
+  fill: rgba(2, 6, 23, .28);
+  transform: translate(2px, 3px);
+}
+
+:host ::ng-deep .skyward-aircraft-icon .aircraft-body {
+  fill: #ffffff;
+  stroke: rgba(8, 47, 73, .26);
+  stroke-width: 1.2;
+}
+
+:host ::ng-deep .skyward-aircraft-icon .aircraft-highlight {
+  fill: #bae6fd;
+  opacity: .95;
+}
+
+:host ::ng-deep .skyward-airport-icon span {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: #0284c7;
+  box-shadow: 0 0 0 6px rgba(14, 165, 233, .18), 0 10px 20px rgba(8, 47, 73, .2);
+}
+
+:host ::ng-deep .skyward-airport-icon span.destination {
+  background: #7c3aed;
+  box-shadow: 0 0 0 6px rgba(124, 58, 237, .16), 0 10px 20px rgba(8, 47, 73, .2);
+}
+
+:host ::ng-deep .skyward-airport-icon span.selected {
+  width: 20px;
+  height: 20px;
+  background: #f59e0b;
+}
+
+:host ::ng-deep .tracking-popup {
+  display: grid;
+  gap: 4px;
+  min-width: 220px;
+  color: #082f49;
+}
+
+:host ::ng-deep .tracking-popup strong {
+  font-size: 15px;
+}
+
+:host ::ng-deep .tracking-popup span,
+:host ::ng-deep .tracking-popup small {
+  display: block;
+}
+
+:host ::ng-deep .tracking-popup em {
+  justify-self: start;
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: #075985;
+  background: #e0f2fe;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+:host ::ng-deep .english-map-label {
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+:host ::ng-deep .english-map-label span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 120px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #334155;
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(148, 163, 184, .25);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, .08);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .tracking-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .map-command-screen { grid-template-columns: minmax(260px, 30%) minmax(0, 70%); }
+
+  .active-flight-drawer {
+    width: min(270px, 26%);
+  }
+}
+
+@media (max-width: 900px) {
+  .tracking-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .map-command-screen {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(620px, 1fr);
+    height: auto;
+    min-height: 75vh;
+    padding-bottom: 250px;
+  }
+
+  .map-stage {
+    min-height: 620px;
+  }
+
+  .leaflet-world-map {
+    min-height: 620px;
+  }
+
+  .flight-drawer-toggle {
+    top: auto;
+    right: 14px;
+    bottom: 190px;
+  }
+
+  .active-flight-drawer,
+  .active-flight-drawer.collapsed {
+    left: 14px;
+    right: 14px;
+    top: auto;
+    bottom: 12px;
+    width: auto;
+    max-height: 160px;
+    min-height: 0;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 18px;
+  }
+
+  .active-flight-drawer.collapsed {
+    left: auto;
+    width: 54px;
+    min-height: 54px;
+    max-height: 54px;
+    overflow: hidden;
+    border-radius: 999px;
+  }
+
+  .active-flight-drawer button {
+    min-width: 220px;
+  }
+
+  .drawer-head {
+    min-width: 120px;
+    padding: 0 10px 0 0;
+    border-right: 1px solid rgba(186, 230, 253, .2);
+    border-bottom: 0;
+  }
+
+  .selected-flight-card {
+    width: 100%;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid rgba(186, 230, 253, .3);
+  }
+}
+
+@media (max-width: 560px) {
+  .tracking-map-page {
+    padding: 10px;
+  }
+
+  .map-command-screen {
+    border-radius: 20px;
+    padding-bottom: 315px;
+    grid-template-rows: auto minmax(560px, 1fr);
+  }
+
+  .map-stage,
+  .leaflet-world-map {
+    min-height: 560px;
+  }
+
+  .selected-flight-card {
+    padding: 12px;
+  }
+
+  .card-head {
+    flex-direction: column;
+  }
+
+  .flight-card-grid {
+    grid-template-columns: 1fr;
+    max-height: 190px;
+    overflow: auto;
+  }
+
+  .flight-drawer-toggle {
+    bottom: 244px;
+    max-width: calc(100% - 28px);
+  }
+}

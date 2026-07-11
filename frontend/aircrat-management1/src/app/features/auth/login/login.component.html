@@ -1,0 +1,22 @@
+<div class="login-page">
+  <form class="login-card" (ngSubmit)="onSubmit()">
+    <h2>Skyward Login</h2>
+    <p>Sign in to continue to the workspace.</p>
+
+    <label>
+      Username or Email
+      <input type="text" name="username" [(ngModel)]="username" autocomplete="username" placeholder="Enter username or email" required>
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" [(ngModel)]="password" autocomplete="current-password" required>
+    </label>
+
+    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <button type="submit" [disabled]="loading">
+      {{ loading ? 'Signing in...' : 'Login' }}
+    </button>
+  </form>
+</div>

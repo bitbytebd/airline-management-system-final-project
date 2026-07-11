@@ -1,0 +1,76 @@
+<!-- ১. Professional Banner Header -->
+<div class="header-banner">
+  <div class="banner-content">
+    <div class="icon-circle">
+      <i class="fas fa-layer-group"></i>
+    </div>
+    <div class="text-area">
+      <h2>Expense Configuration</h2>
+      <p>Standardize your financial tracking with predefined categories. Click any category to view detailed transactions.</p>
+    </div>
+  </div>
+  <button routerLink="/expense" class="btn-back-list"><i class="fas fa-arrow-left"></i> Back to Expense List</button>
+  <div class="banner-stats">
+    <div class="stat-item">
+      <h3>{{ categories.length }}</h3>
+      <span>Active Categories</span>
+    </div>
+    <div class="stat-item highlight">
+      <h3>{{ totalBudget | currency:'USD' }}</h3>
+      <span>Total Budget</span>
+    </div>
+  </div>
+</div>
+
+<!-- ২. Page Title & Action -->
+<div class="page-title-bar">
+  <div>
+    <h3>Category Overview</h3>
+    <p>Browse and manage expense buckets</p>
+  </div>
+  <button class="btn-add-outline">
+    <i class="fas fa-cog"></i> Manage Settings
+  </button>
+</div>
+
+<!-- ৩. Category Grid -->
+<div class="category-grid">
+  
+  <!-- Card Loop -->
+  <div class="cat-card" *ngFor="let cat of categories" (click)="viewExpenses(cat.queryParam)">
+    
+    <!-- Top Icon Section -->
+    <div class="card-head" [style.background]="cat.color">
+      <div class="icon-box">
+        <i [class]="cat.icon"></i>
+      </div>
+      <!-- Quick Stat -->
+      <span class="count-badge">{{ cat.count }} txns</span>
+    </div>
+
+    <!-- Content Section -->
+    <div class="card-body">
+      <h4 class="cat-name">{{ cat.name }}</h4>
+      <p class="cat-desc">{{ cat.desc }}</p>
+      
+      <!-- Budget Progress Bar (New Feature) -->
+      <div class="budget-section">
+        <div class="budget-meta">
+          <span>Spent: <strong>{{ cat.spent | currency:'USD' }}</strong></span>
+          <span>Budget: <strong>{{ cat.budget | currency:'USD' }}</strong></span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar" [style.width]="getProgress(cat) + '%'" [style.background]="cat.color"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="card-footer">
+      <span class="link-text">
+        View Details <i class="fas fa-arrow-right"></i>
+      </span>
+    </div>
+
+  </div>
+</div>

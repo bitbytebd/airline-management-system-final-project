@@ -1,0 +1,252 @@
+/* =========================================
+   1. COMPONENT WRAPPER (Sidebar Compatibility)
+   ========================================= */
+:host { display: block; }
+.flight-page { min-height: 100vh; padding: 28px; background: linear-gradient(180deg, #dff7ff, #fff); color: #10243f; }
+.flight-hero { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 22px; padding: 28px; margin-bottom: 20px; color: #fff; border-radius: 24px; background: linear-gradient(135deg, rgba(2,132,199,.95), rgba(14,165,233,.82)), url('https://images.unsplash.com/photo-1556388158-158ea5ccacbd?auto=format&fit=crop&w=1600&q=80') center/cover; background-blend-mode: multiply; box-shadow: 0 22px 48px rgba(2,132,199,.22); }
+.back-link { border: 0; background: transparent; color: rgba(255,255,255,.92); cursor: pointer; font-weight: 900; padding: 0; }
+.eyebrow { display: inline-flex; gap: 8px; margin-top: 18px; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.16); font-weight: 900; }
+.flight-hero h1 { margin: 16px 0 10px; font-size: 36px; line-height: 1.08; }
+.flight-hero p { margin: 0; max-width: 720px; color: rgba(255,255,255,.88); line-height: 1.6; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+.primary-btn, .ghost-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 10px 16px; border-radius: 12px; font-weight: 900; text-decoration: none; }
+.primary-btn { color: #075985; background: #fff; }
+.ghost-btn { color: #fff; border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.14); }
+.hero-panel { padding: 22px; border-radius: 20px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.24); }
+.hero-panel span, .hero-panel small { text-transform: uppercase; font-size: 12px; font-weight: 900; opacity: .82; }
+.hero-panel strong { display: block; margin: 8px 0 2px; font-size: 42px; }
+.hero-panel div { margin-top: 12px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,.14); font-weight: 800; }
+
+/* =========================================
+   2. DEEP BLUE HEADER SECTION
+   ========================================= */
+.list-header-section {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  border-radius: 12px;
+  padding: 20px 25px; /* Balanced padding */
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; /* Responsive for smaller widths */
+  gap: 15px;
+}
+
+.header-content .icon-box {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+}
+
+.header-content .text-box h2 {
+  margin: 0;
+  color: white;
+  font-size: 22px; /* Slightly reduced for better fit */
+  font-weight: 700;
+}
+
+.header-content .text-box p {
+  margin: 3px 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
+
+.btn-add-flight {
+  background-color: #22c55e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+}
+.btn-add-flight:hover { background-color: #16a34a; transform: translateY(-1px); }
+
+/* =========================================
+   3. CARD & TABLE CONTAINER
+   ========================================= */
+.card-container { 
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden; /* Keeps radius intact */
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on Mac/Safari */
+}
+
+/* =========================================
+   4. TABLE STYLING
+   ========================================= */
+.enterprise-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 0;
+}
+
+/* DARK BLUE TABLE HEADER */
+.enterprise-table thead th {
+  background-color: #0f172a; 
+  color: white;
+  padding: 12px 8px; /* Vertical padding adjusted */
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #1e293b;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.enterprise-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+.enterprise-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.enterprise-table td {
+  padding: 12px 8px; /* Comfortable padding */
+  vertical-align: middle;
+  color: #334155;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.enterprise-table th:nth-child(1), .enterprise-table td:nth-child(1) { width: 10%; }
+.enterprise-table th:nth-child(2), .enterprise-table td:nth-child(2) { width: 13%; }
+.enterprise-table th:nth-child(3), .enterprise-table td:nth-child(3) { width: 13%; }
+.enterprise-table th:nth-child(4), .enterprise-table td:nth-child(4) { width: 11%; }
+.enterprise-table th:nth-child(5), .enterprise-table td:nth-child(5) { width: 9%; }
+.enterprise-table th:nth-child(6), .enterprise-table td:nth-child(6) { width: 11%; }
+.enterprise-table th:nth-child(7), .enterprise-table td:nth-child(7) { width: 9%; }
+.enterprise-table th:nth-child(8), .enterprise-table td:nth-child(8) { width: 8%; }
+.enterprise-table th:nth-child(9), .enterprise-table td:nth-child(9) { width: 9%; }
+.enterprise-table th:nth-child(10), .enterprise-table td:nth-child(10) { width: 7%; }
+
+/* =========================================
+   5. CELL INTERNAL STYLING
+   ========================================= */
+
+.flight-code { font-weight: 700; color: #1e293b; font-size: 14px; }
+
+.location-box { display: flex; flex-direction: column; }
+.city-name { font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+.airport-code { 
+  font-size: 10px; 
+  color: #64748b; 
+  background: #f1f5f9; 
+  padding: 2px 6px; 
+  border-radius: 4px; 
+  width: fit-content; 
+}
+
+.date-text { color: #475569; font-size: 12px; white-space: nowrap; }
+
+.time-badge {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-family: monospace;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.price-tag { font-weight: 700; color: #059669; font-size: 14px; }
+
+/* =========================================
+   6. STATUS PILLS
+   ========================================= */
+.status-pill {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+.status-scheduled { background: #dcfce7; color: #16a34a; }
+.status-delayed { background: #fef3c7; color: #d97706; }
+.status-cancelled { background: #fee2e2; color: #dc2626; }
+.status-landed { background: #dbeafe; color: #2563eb; }
+
+/* =========================================
+   7. ACTION BUTTONS
+   ========================================= */
+.action-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  margin-left: 5px;
+  transition: all 0.2s;
+}
+
+.edit-btn {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+.edit-btn:hover { background: #e2e8f0; color: #0f172a; }
+
+.delete-btn {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+.delete-btn:hover { background: #fee2e2; }
+
+/* =========================================
+   8. EMPTY STATE
+   ========================================= */
+.empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+.empty-state i { font-size: 50px; margin-bottom: 15px; display: block; }
+.empty-state h4 { margin: 0 0 5px; color: #475569; }
+.empty-state p { margin: 0; font-size: 13px; }
+
+/* =========================================
+   9. RESPONSIVE FIXES
+   ========================================= */
+@media (max-width: 1200px) {
+  .flight-page { padding: 18px; }
+  .flight-hero { grid-template-columns: 1fr; }
+  .header-content { flex-direction: column; align-items: flex-start; }
+  .header-content .action-box { margin-top: 10px; width: 100%; }
+  .btn-add-flight { width: 100%; justify-content: center; }
+  .table-responsive { overflow-x: auto; }
+  .enterprise-table { min-width: 980px; }
+}
+@media (max-width: 620px) { .flight-hero h1 { font-size: 28px; } .hero-actions > * { width: 100%; } }

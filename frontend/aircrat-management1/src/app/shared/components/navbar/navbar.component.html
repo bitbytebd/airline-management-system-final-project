@@ -1,0 +1,30 @@
+<nav class="shell-navbar" aria-label="Workspace navigation">
+  <a routerLink="/home" class="nav-brand">
+    <i class="fas fa-plane-departure"></i>
+    <span>Skyward Airlines</span>
+  </a>
+
+  <div class="nav-links">
+    <a *ngFor="let link of primaryLinks"
+       [routerLink]="link.route"
+       routerLinkActive="active"
+       class="nav-link">
+      <i [class]="link.icon"></i>
+      <span>{{ link.label }}</span>
+    </a>
+  </div>
+
+  <div class="nav-settings" [class.open]="isMenuOpen">
+    <button type="button" class="settings-trigger" (click)="toggleSubmenu()">
+      <i class="fas fa-sliders"></i>
+      <span>Workspace</span>
+      <i class="fas fa-chevron-down"></i>
+    </button>
+    <div class="settings-menu" *ngIf="isMenuOpen">
+      <a *ngFor="let link of settingsLinks" [routerLink]="link.route" (click)="toggleSubmenu()">
+        <i [class]="link.icon"></i>
+        <span>{{ link.label }}</span>
+      </a>
+    </div>
+  </div>
+</nav>

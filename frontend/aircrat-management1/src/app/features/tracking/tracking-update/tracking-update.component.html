@@ -1,0 +1,221 @@
+<div class="tracking-page">
+  <section class="tracking-hero update-hero">
+    <div>
+      <span class="eyebrow">Admin Operations Control</span>
+      <h1>Manual GPS & Status Control</h1>
+      <p>Update live aircraft position, operational status, delay note, gate and terminal information for passenger-facing tracking.</p>
+      <div class="hero-actions">
+        <button type="button" (click)="submitUpdate()" [disabled]="!selectedFlight || saving">
+          <i class="fas fa-save"></i> Save Update
+        </button>
+        <button type="button" class="ghost" (click)="goList()">
+          <i class="fas fa-broadcast-tower"></i> Live Tracking
+        </button>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <span>Admin Update</span>
+      <strong>{{ selectedFlight?.flightNumber || 'Select' }}</strong>
+      <small>{{ selectedFlight?.origin || '--' }} to {{ selectedFlight?.destination || '--' }}</small>
+    </div>
+  </section>
+
+  <section class="toolbar-card">
+    <div class="search-wrap">
+      <i class="fas fa-search"></i>
+      <input [(ngModel)]="searchText" (input)="refreshSuggestions()" (focus)="refreshSuggestions()" placeholder="Search flight number, origin or destination">
+      <button type="button" *ngIf="searchText" (click)="clearSearch()"><i class="fas fa-times"></i></button>
+      <div class="suggestions" *ngIf="showSuggestions && suggestions.length">
+        <button type="button" *ngFor="let item of suggestions" (click)="selectFlight(item)">
+          <strong>{{ item.flightNumber }}</strong>
+          <span>{{ item.origin }} to {{ item.destination }} | {{ item.departureDate }}</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main class="update-layout">
+    <section class="form-card">
+      <div class="section-title">
+        <div>
+          <span>Manual Tracking Input</span>
+          <h2>Status & GPS Update</h2>
+        </div>
+        <strong [ngClass]="statusClass(form.flightStatus)">{{ form.flightStatus }}</strong>
+      </div>
+
+      <div class="auto-calc-panel">
+        <div class="section-title compact">
+          <div>
+            <span>Route Auto Calculation</span>
+            <h2>Schedule-Based Position</h2>
+          </div>
+          <button type="button" (click)="autoCalculate()" [disabled]="calculating">
+            <i class="fas fa-calculator"></i> {{ calculating ? 'Calculating...' : 'Auto Calculate' }}
+          </button>
+        </div>
+        <div class="form-grid">
+          <label>Origin / Departure Location
+            <input [(ngModel)]="routeForm.origin" placeholder="Dhaka, DAC, Hazrat Shahjalal">
+          </label>
+          <label>Destination / Arrival Location
+            <input [(ngModel)]="routeForm.destination" placeholder="London, LHR, Heathrow">
+          </label>
+          <label>Departure Date
+            <input type="date" [(ngModel)]="routeForm.departureDate">
+          </label>
+          <label>Departure Time
+            <input type="time" [(ngModel)]="routeForm.departureTime">
+          </label>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label>Status
+          <select [(ngModel)]="form.flightStatus">
+            <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+          </select>
+        </label>
+        <label>Progress %
+          <input type="number" min="0" max="100" [(ngModel)]="form.progressPercent">
+        </label>
+        <label>Latitude
+          <input type="number" step="0.000001" [(ngModel)]="form.currentLatitude">
+        </label>
+        <label>Longitude
+          <input type="number" step="0.000001" [(ngModel)]="form.currentLongitude">
+        </label>
+        <label>Origin Latitude
+          <input type="number" step="0.000001" [(ngModel)]="form.originLatitude">
+        </label>
+        <label>Origin Longitude
+          <input type="number" step="0.000001" [(ngModel)]="form.originLongitude">
+        </label>
+        <label>Destination Latitude
+          <input type="number" step="0.000001" [(ngModel)]="form.destinationLatitude">
+        </label>
+        <label>Destination Longitude
+          <input type="number" step="0.000001" [(ngModel)]="form.destinationLongitude">
+        </label>
+        <label>Distance KM
+          <input type="number" min="0" step="0.1" [(ngModel)]="form.distanceKm">
+        </label>
+        <label>Remaining KM
+          <input type="number" min="0" step="0.1" [(ngModel)]="form.remainingDistanceKm">
+        </label>
+        <label>Altitude ft
+          <input type="number" min="0" [(ngModel)]="form.altitudeFt">
+        </label>
+        <label>Speed km/h
+          <input type="number" min="0" [(ngModel)]="form.speedKmh">
+        </label>
+        <label>Heading Degree
+          <input type="number" min="0" max="360" [(ngModel)]="form.headingDegree">
+        </label>
+        <label>Delay Minutes
+          <input type="number" min="0" [(ngModel)]="form.delayMinutes">
+        </label>
+        <label>Estimated Landing Minutes
+          <input type="number" min="0" [(ngModel)]="form.estimatedLandingMinutes">
+        </label>
+        <label>Estimated Arrival
+          <input type="datetime-local" [(ngModel)]="form.estimatedArrival">
+        </label>
+        <label>Tracking Mode
+          <input [(ngModel)]="form.trackingMode" placeholder="SIMULATED_ROUTE">
+        </label>
+        <label>Tracking Source
+          <input [(ngModel)]="form.trackingSource" placeholder="SIMULATED_ROUTE">
+        </label>
+        <label>Gate
+          <input [(ngModel)]="form.departureGate" placeholder="A12">
+        </label>
+        <label>Terminal
+          <input [(ngModel)]="form.terminal" placeholder="Terminal 1">
+        </label>
+      </div>
+
+      <label>Delay Reason / Operations Note
+        <textarea rows="4" [(ngModel)]="form.delayReason" placeholder="Weather, ATC restriction, aircraft rotation, gate hold..."></textarea>
+      </label>
+
+      <div class="form-actions">
+        <button type="button" (click)="submitUpdate()" [disabled]="!selectedFlight || saving">
+          <i class="fas fa-save"></i> Save Full Update
+        </button>
+        <button type="button" class="soft" (click)="quick('BOARDING')" [disabled]="!selectedFlight">Boarding</button>
+        <button type="button" class="soft" (click)="quick('EN_ROUTE')" [disabled]="!selectedFlight">En Route</button>
+        <button type="button" class="soft danger" (click)="quick('DELAYED')" [disabled]="!selectedFlight">Delayed</button>
+      </div>
+      <div class="notice" *ngIf="notice">{{ notice }}</div>
+    </section>
+
+    <aside class="preview-card" *ngIf="selectedFlight">
+      <div class="section-title">
+        <div>
+          <span>Latest Preview</span>
+          <h2>{{ selectedFlight.flightNumber }}</h2>
+        </div>
+        <button type="button" (click)="goStatus()"><i class="fas fa-eye"></i> Status</button>
+      </div>
+      <p>{{ selectedFlight.origin }} to {{ selectedFlight.destination }}</p>
+
+      <div class="mini-map">
+        <svg class="mini-route-layer" viewBox="0 0 100 100" preserveAspectRatio="none" *ngIf="hasPreviewRoute()">
+          <path class="mini-route-glow" [attr.d]="previewRoutePath()"></path>
+          <path class="mini-route-active" [attr.d]="previewTravelledPath()"></path>
+          <path class="mini-route-pending" [attr.d]="previewRemainingPath()"></path>
+        </svg>
+        <span class="airport-pin origin" *ngIf="hasPreviewRoute()" [style.left.%]="mapX(form.originLongitude)" [style.top.%]="mapY(form.originLatitude)">
+          <b>{{ selectedFlight.origin }}</b>
+        </span>
+        <span class="airport-pin destination" *ngIf="hasPreviewRoute()" [style.left.%]="mapX(form.destinationLongitude)" [style.top.%]="mapY(form.destinationLatitude)">
+          <b>{{ selectedFlight.destination }}</b>
+        </span>
+        <div class="plane-dot" [style.left.%]="previewX()" [style.top.%]="previewY()">
+          <i class="fas fa-plane" [style.transform]="'rotate(' + (form.headingDegree || 0) + 'deg)'"></i>
+        </div>
+        <span class="tracking-mode-badge" [ngClass]="modeClass(form.trackingMode)">{{ form.trackingMode || 'MANUAL' }}</span>
+        <div class="map-caption">
+          <strong>{{ form.currentLatitude || 0 }}, {{ form.currentLongitude || 0 }}</strong>
+          <span>{{ form.altitudeFt || 0 }} ft | {{ form.speedKmh || 0 }} km/h | {{ form.headingDegree || 0 }} deg</span>
+        </div>
+      </div>
+
+      <div class="preview-route">
+        <span>{{ selectedFlight.departureDate }} {{ selectedFlight.departureTime }}</span>
+        <strong>{{ form.flightStatus }}</strong>
+        <span>{{ selectedFlight.arrivalDate }} {{ selectedFlight.arrivalTime }}</span>
+      </div>
+      <div class="progress big"><span [style.width.%]="form.progressPercent || 0"></span></div>
+    </aside>
+  </main>
+
+  <section class="history-panel">
+    <div class="section-title">
+      <div>
+        <span>Audit Trail</span>
+        <h2>Update History Timeline</h2>
+      </div>
+      <strong>{{ history.length }} logs</strong>
+    </div>
+    <div class="timeline" *ngIf="history.length; else noHistory">
+      <article *ngFor="let item of history">
+        <span class="timeline-dot" [ngClass]="statusClass(item.flightStatus)"></span>
+        <div>
+          <strong>{{ item.flightStatus }}</strong>
+          <small>{{ formatDate(item.loggedAt) }}</small>
+          <p>{{ item.origin || selectedFlight?.origin }} to {{ item.destination || selectedFlight?.destination }}</p>
+          <em>{{ item.currentLatitude || '--' }}, {{ item.currentLongitude || '--' }} | {{ item.altitudeFt || 0 }} ft | {{ item.speedKmh || 0 }} km/h</em>
+          <span>{{ item.delayReason || 'No operations note.' }}</span>
+        </div>
+      </article>
+    </div>
+    <ng-template #noHistory>
+      <div class="empty-history">
+        <i class="fas fa-history"></i>
+        <span>No update history available for this flight yet.</span>
+      </div>
+    </ng-template>
+  </section>
+</div>

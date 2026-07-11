@@ -1,0 +1,21 @@
+:host { display: block; }
+.roles-page { min-height: 100vh; padding: 28px; background: linear-gradient(180deg, #dff7ff, #fff); color: #10243f; }
+.roles-hero { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 22px; padding: 28px; color: #fff; border-radius: 24px; background: linear-gradient(135deg, #0284c7, #38bdf8); box-shadow: 0 22px 48px rgba(2,132,199,.22); }
+.back-link { color: rgba(255,255,255,.92); text-decoration: none; font-weight: 900; }
+.eyebrow { display: inline-flex; gap: 8px; margin-top: 18px; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.16); font-weight: 900; }
+h1 { margin: 16px 0 10px; font-size: 36px; }
+.roles-hero p { margin: 0; max-width: 720px; color: rgba(255,255,255,.88); line-height: 1.6; }
+.hero-panel { padding: 22px; border-radius: 20px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.24); }
+.hero-panel strong { display: block; font-size: 46px; line-height: 1; }
+.hero-panel span, .hero-panel small { display: block; margin-top: 8px; font-size: 12px; font-weight: 900; text-transform: uppercase; opacity: .86; }
+.role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 20px; }
+.role-card { overflow: hidden; padding: 18px; background: #fff; border: 1px solid #dbeafe; border-radius: 22px; box-shadow: 0 18px 40px rgba(15,23,42,.08); }
+.role-head { display: flex; justify-content: space-between; gap: 12px; margin: -18px -18px 16px; padding: 20px; color: #fff; background: var(--role-color); }
+.role-head span { font-size: 11px; font-weight: 900; text-transform: uppercase; opacity: .85; }
+.role-head h2 { margin: 6px 0 0; font-size: 20px; }
+.role-head i { font-size: 30px; opacity: .9; }
+.role-card p { color: #64748b; line-height: 1.6; }
+ul { display: grid; gap: 10px; padding: 0; margin: 16px 0 0; list-style: none; }
+li { display: flex; gap: 8px; color: #31506f; font-size: 13px; font-weight: 800; }
+li i { color: #10b981; }
+@media (max-width: 800px) { .roles-page { padding: 18px; } .roles-hero { grid-template-columns: 1fr; } h1 { font-size: 28px; } }
