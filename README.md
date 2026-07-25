@@ -2,6 +2,10 @@
 
 A full-stack airline operations and reservation management system built with Angular, Spring Boot REST APIs, and MySQL. The project is prepared for portfolio review, local demonstration, and future GitHub publishing with secrets and generated artifacts excluded.
 
+## Video Demonstration
+
+- **YouTube Live Demo Video**: https://www.youtube.com/watch?v=pAPH5O2MO6U
+
 ## Key Features
 
 - Role-based administration
@@ -94,7 +98,6 @@ JWT_SECRET
 CORS_ALLOWED_ORIGIN
 SMTP_USERNAME
 SMTP_PASSWORD
-SMS_API_TOKEN
 TRACKING_API_KEY
 ```
 
